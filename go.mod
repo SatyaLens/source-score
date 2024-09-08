@@ -1,4 +1,4 @@
-module oapi-gin-petstore
+module source-score
 
 go 1.22.5
 
