@@ -63,5 +63,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
+
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 }

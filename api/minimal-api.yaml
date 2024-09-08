@@ -1,13 +1,13 @@
 openapi: "3.0.0"
 info:
-  version: 1.0.0
+  version: 0.0.1
   title: Minimal ping API server
 paths:
   /ping:
     get:
       responses:
         '200':
-          description: pet response
+          description: pong response
           content:
             application/json:
               schema:
@@ -18,8 +18,8 @@ components:
     Pong:
       type: object
       required:
-        - ping
+        - pong
       properties:
-        ping:
+        pong:
           type: string
           example: pong
