@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"oapi-gin-petstore/pkg/api"
-	"oapi-gin-petstore/pkg/handlers"
+	"source-score/pkg/api"
+	"source-score/pkg/handlers"
 )
 
 //go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=configs/config.yaml api/minimal-api.yaml
