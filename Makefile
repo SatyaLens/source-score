@@ -31,8 +31,6 @@ cnpg-cluster-setup: cnpg-controller-setup
 	kubectl apply -f acceptance/cnpg-cluster.yaml
 	@echo -e "\n\e[0;32mCreated CNPG cluster on the cluster :)\n\e[0m"
 	sleep 60
-	kubectl get cluster -n postgres-cluster
+	kubectl get pods -l cnpg.io/cluster=cnpg-cluster -n postgres-cluster
 
 pg-setup: minikube-setup cnpg-cluster-setup
-	
-acceptance-test: pg-setup
