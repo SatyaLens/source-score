@@ -21,8 +21,8 @@ metadata:
   name: post-init-sql-db-setup
   namespace: {{ .Values.cnpg_database.namespace }}
 data:
-  sql.commands: >
-    {{- .Values.cnpg_database.table_setup | indent 2 }}
+  sql.commands:
+    {{ (.Files.Get "files/db.sql") | indent 4 }}
 
 ---
 apiVersion: postgresql.cnpg.io/v1
