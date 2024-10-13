@@ -28,7 +28,7 @@ data:
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: cnpg-cluster
+  name: {{ .Values.cnpg_cluster.name }}
   namespace: {{ .Values.cnpg_database.namespace }}
 spec:
   instances: {{ .Values.cnpg_cluster.instanceCount }}
@@ -44,3 +44,28 @@ spec:
         configMapRefs:
         - name: post-init-sql-db-setup
           key: sql.commands
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: adminer
+  namespace: {{ .Values.cnpg_database.namespace }}
+spec:
+  containers:
+  - name: adminer
+    image: adminer:4.8.1
+    ports:
+    - containerPort: 8080
+    env:
+    - name: ADMINER_DEFAULT_SERVER
+      value: "{{ .Values.cnpg_cluster.name }}-r"
+    - name: ADMINER_DEFAULT_DB
+      value: {{ .Values.cnpg_database.name }}
+    - name: ADMINER_DEFAULT_USER
+      value: {{ .Values.cnpg_cluster.username }}
+    - name: ADMINER_DEFAULT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: app-user-auth
+          key: password

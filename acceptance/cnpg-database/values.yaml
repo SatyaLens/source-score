@@ -1,5 +1,6 @@
 cnpg_cluster:
   instanceCount: 2
+  name: cnpg-cluster
   storageSize: "1Gi"
   username: "app"
   password: ""

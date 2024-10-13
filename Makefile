@@ -19,7 +19,7 @@ minikube-cleanup:
 	fi
 
 minikube-setup: minikube-cleanup
-	minikube start --cpus 3 --memory 4096
+	minikube start --cpus 3 --memory 6144
 	@echo -e "\n\n"
 
 cnpg-controller-setup:
