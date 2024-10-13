@@ -1,11 +1,13 @@
-cnpg-cluster:
+cnpg_cluster:
   instanceCount: 2
   storageSize: "1Gi"
   username: "app"
+  password: ""
 
-cnpg-database:
+cnpg_database:
   name: sourcescore
-  table-setup: |
+  namespace: postgres-cluster
+  table_setup: |
     CREATE TABLE sources (
       id BIGSERIAL,
       name TEXT,

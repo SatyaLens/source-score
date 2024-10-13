@@ -1,34 +1,43 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.cnpg_database.namespace }}
+
+---
+apiVersion: v1
 data:
-  password: {{ required "PG_USER_PASSWORD is required" (env "PG_USER_PASSWORD") | b64enc | quote }}
-  username: {{ .Values.cnpg-cluster.username | b64enc | quote }}
+  password: {{ .Values.cnpg_cluster.password | b64enc | quote }}
+  username: {{ .Values.cnpg_cluster.username | b64enc | quote }}
 kind: Secret
 metadata:
   name: app-user-auth
+  namespace: {{ .Values.cnpg_database.namespace }}
 type: kubernetes.io/basic-auth
 
 ---
 apiVersion: v1
 kind: ConfigMap
-metadata:b64enc
+metadata:
   name: post-init-sql-db-setup
+  namespace: {{ .Values.cnpg_database.namespace }}
 data:
-  sql.commands: {{ .Values.cnpg-cluster.instanceCount | quote }}
+  sql.commands: >
+    {{- .Values.cnpg_database.table_setup | indent 2 }}
 
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cnpg-cluster
-  namespace: postgres-cluster
+  namespace: {{ .Values.cnpg_database.namespace }}
 spec:
-  instances: {{ .Values.cnpg-cluster.instanceCount }}
+  instances: {{ .Values.cnpg_cluster.instanceCount }}
   storage:
-    size: {{ .Values.cnpg-cluster.storageSize | quote }}
+    size: {{ .Values.cnpg_cluster.storageSize }}
   bootstrap:
     initdb:
-      database: {{ .Values.cnpg-database.name | quote }}
-      owner: {{ .Values.cnpg-cluster.username | quote }}
+      database: {{ .Values.cnpg_database.name }}
+      owner: {{ .Values.cnpg_cluster.username }}
       secret:
         name: app-user-auth
       postInitApplicationSQLRefs:
