@@ -19,7 +19,7 @@ minikube-cleanup:
 	fi
 
 minikube-setup: minikube-cleanup
-	minikube start --cpus 3 --memory 6144
+	minikube start --cpus 4 --memory 6144
 	@echo -e "\n\n"
 
 cnpg-controller-setup:
@@ -33,5 +33,5 @@ cnpg-controller-setup:
 pg-setup: minikube-setup cnpg-controller-setup
 	helm install --set cnpg_cluster.password=$(PG_USER_PASSWORD) cnpg-database acceptance/cnpg-database
 	@echo -e "\n\e[0;32mCreated CNPG cluster :)\n\e[0m"
-	sleep 90
+	sleep 120
 	kubectl get pods -l cnpg.io/cluster=cnpg-cluster -n postgres-cluster

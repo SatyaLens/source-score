@@ -22,7 +22,9 @@ metadata:
   namespace: {{ .Values.cnpg_database.namespace }}
 data:
   sql.commands:
-    {{ (.Files.Get "files/db.sql") | indent 4 }}
+    {{ (.Files.Get "files/tables.sql") | indent 4 }}
+    {{ (.Files.Get "files/permissions.sql") | indent 4 }}
+    {{ (.Files.Get "files/sample-data.sql") | indent 4 }}
 
 ---
 apiVersion: postgresql.cnpg.io/v1
@@ -57,15 +59,3 @@ spec:
     image: adminer:4.8.1
     ports:
     - containerPort: 8080
-    env:
-    - name: ADMINER_DEFAULT_SERVER
-      value: "{{ .Values.cnpg_cluster.name }}-r"
-    - name: ADMINER_DEFAULT_DB
-      value: {{ .Values.cnpg_database.name }}
-    - name: ADMINER_DEFAULT_USER
-      value: {{ .Values.cnpg_cluster.username }}
-    - name: ADMINER_DEFAULT_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: app-user-auth
-          key: password

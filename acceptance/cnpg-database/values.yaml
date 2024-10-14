@@ -1,9 +1,9 @@
 cnpg_cluster:
   instanceCount: 2
   name: cnpg-cluster
-  storageSize: "1Gi"
-  username: "app"
   password: ""
+  storageSize: "1Gi"
+  username: sourcescore
 
 cnpg_database:
   name: sourcescore
