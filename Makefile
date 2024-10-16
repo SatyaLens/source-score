@@ -6,11 +6,12 @@ POSTGRES_VERSION ?= "17"
 export PG_USER_PASSWORD
 export POSTGRES_VERSION
 
-build:
+codegen:
 	go mod tidy && \
-	go generate ./... && \
-	go build && \
-	go mod tidy
+	go generate ./...
+
+build: codegen
+	go build
 
 minikube-cleanup:
 	@if minikube status > /dev/null 2>&1; then \

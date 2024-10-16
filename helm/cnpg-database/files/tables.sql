@@ -6,6 +6,7 @@ CREATE TABLE
             score >= 0
             AND score <= 100
         ),
+        source_uri_digest TEXT,
         summary TEXT,
         tags TEXT,
         uri TEXT PRIMARY KEY

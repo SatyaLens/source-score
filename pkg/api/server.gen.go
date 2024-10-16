@@ -13,18 +13,18 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// creates a user
-	// (POST /api/v1/users)
-	CreateUser(c *gin.Context)
-	// delete a user
-	// (DELETE /api/v1/users/{userId})
-	DeleteUser(c *gin.Context, userId int64)
-	// get user
-	// (GET /api/v1/users/{userId})
-	GetUser(c *gin.Context, userId int64)
 
-	// (PUT /api/v1/users/{userId})
-	PutApiV1UsersUserId(c *gin.Context, userId int64)
+	// (POST /api/v1/sources)
+	Createsource(c *gin.Context)
+
+	// (DELETE /api/v1/sources/{sourceUriDigest})
+	DeleteSource(c *gin.Context, sourceUriDigest string)
+
+	// (GET /api/v1/sources/{sourceUriDigest})
+	GetSource(c *gin.Context, sourceUriDigest string)
+
+	// (PUT /api/v1/sources/{sourceUriDigest})
+	PutApiV1SourcesSourceUriDigest(c *gin.Context, sourceUriDigest string)
 
 	// (GET /ping)
 	GetPing(c *gin.Context)
@@ -39,8 +39,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// CreateUser operation middleware
-func (siw *ServerInterfaceWrapper) CreateUser(c *gin.Context) {
+// Createsource operation middleware
+func (siw *ServerInterfaceWrapper) Createsource(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -49,20 +49,20 @@ func (siw *ServerInterfaceWrapper) CreateUser(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.CreateUser(c)
+	siw.Handler.Createsource(c)
 }
 
-// DeleteUser operation middleware
-func (siw *ServerInterfaceWrapper) DeleteUser(c *gin.Context) {
+// DeleteSource operation middleware
+func (siw *ServerInterfaceWrapper) DeleteSource(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "userId" -------------
-	var userId int64
+	// ------------- Path parameter "sourceUriDigest" -------------
+	var sourceUriDigest string
 
-	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "sourceUriDigest", c.Param("sourceUriDigest"), &sourceUriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sourceUriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -73,20 +73,20 @@ func (siw *ServerInterfaceWrapper) DeleteUser(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteUser(c, userId)
+	siw.Handler.DeleteSource(c, sourceUriDigest)
 }
 
-// GetUser operation middleware
-func (siw *ServerInterfaceWrapper) GetUser(c *gin.Context) {
+// GetSource operation middleware
+func (siw *ServerInterfaceWrapper) GetSource(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "userId" -------------
-	var userId int64
+	// ------------- Path parameter "sourceUriDigest" -------------
+	var sourceUriDigest string
 
-	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "sourceUriDigest", c.Param("sourceUriDigest"), &sourceUriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sourceUriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -97,20 +97,20 @@ func (siw *ServerInterfaceWrapper) GetUser(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetUser(c, userId)
+	siw.Handler.GetSource(c, sourceUriDigest)
 }
 
-// PutApiV1UsersUserId operation middleware
-func (siw *ServerInterfaceWrapper) PutApiV1UsersUserId(c *gin.Context) {
+// PutApiV1SourcesSourceUriDigest operation middleware
+func (siw *ServerInterfaceWrapper) PutApiV1SourcesSourceUriDigest(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "userId" -------------
-	var userId int64
+	// ------------- Path parameter "sourceUriDigest" -------------
+	var sourceUriDigest string
 
-	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "sourceUriDigest", c.Param("sourceUriDigest"), &sourceUriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sourceUriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (siw *ServerInterfaceWrapper) PutApiV1UsersUserId(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PutApiV1UsersUserId(c, userId)
+	siw.Handler.PutApiV1SourcesSourceUriDigest(c, sourceUriDigest)
 }
 
 // GetPing operation middleware
@@ -164,9 +164,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.POST(options.BaseURL+"/api/v1/users", wrapper.CreateUser)
-	router.DELETE(options.BaseURL+"/api/v1/users/:userId", wrapper.DeleteUser)
-	router.GET(options.BaseURL+"/api/v1/users/:userId", wrapper.GetUser)
-	router.PUT(options.BaseURL+"/api/v1/users/:userId", wrapper.PutApiV1UsersUserId)
+	router.POST(options.BaseURL+"/api/v1/sources", wrapper.Createsource)
+	router.DELETE(options.BaseURL+"/api/v1/sources/:sourceUriDigest", wrapper.DeleteSource)
+	router.GET(options.BaseURL+"/api/v1/sources/:sourceUriDigest", wrapper.GetSource)
+	router.PUT(options.BaseURL+"/api/v1/sources/:sourceUriDigest", wrapper.PutApiV1SourcesSourceUriDigest)
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 }
