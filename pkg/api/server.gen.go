@@ -17,14 +17,14 @@ type ServerInterface interface {
 	// (POST /api/v1/sources)
 	Createsource(c *gin.Context)
 
-	// (DELETE /api/v1/sources/{sourceUriDigest})
-	DeleteSource(c *gin.Context, sourceUriDigest string)
+	// (DELETE /api/v1/sources/{uriDigest})
+	DeleteSource(c *gin.Context, uriDigest string)
 
-	// (GET /api/v1/sources/{sourceUriDigest})
-	GetSource(c *gin.Context, sourceUriDigest string)
+	// (GET /api/v1/sources/{uriDigest})
+	GetSource(c *gin.Context, uriDigest string)
 
-	// (PUT /api/v1/sources/{sourceUriDigest})
-	PutApiV1SourcesSourceUriDigest(c *gin.Context, sourceUriDigest string)
+	// (PUT /api/v1/sources/{uriDigest})
+	PutApiV1SourcesUriDigest(c *gin.Context, uriDigest string)
 
 	// (GET /ping)
 	GetPing(c *gin.Context)
@@ -57,12 +57,12 @@ func (siw *ServerInterfaceWrapper) DeleteSource(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "sourceUriDigest" -------------
-	var sourceUriDigest string
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
 
-	err = runtime.BindStyledParameterWithOptions("simple", "sourceUriDigest", c.Param("sourceUriDigest"), &sourceUriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sourceUriDigest: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -73,7 +73,7 @@ func (siw *ServerInterfaceWrapper) DeleteSource(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteSource(c, sourceUriDigest)
+	siw.Handler.DeleteSource(c, uriDigest)
 }
 
 // GetSource operation middleware
@@ -81,12 +81,12 @@ func (siw *ServerInterfaceWrapper) GetSource(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "sourceUriDigest" -------------
-	var sourceUriDigest string
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
 
-	err = runtime.BindStyledParameterWithOptions("simple", "sourceUriDigest", c.Param("sourceUriDigest"), &sourceUriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sourceUriDigest: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -97,20 +97,20 @@ func (siw *ServerInterfaceWrapper) GetSource(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetSource(c, sourceUriDigest)
+	siw.Handler.GetSource(c, uriDigest)
 }
 
-// PutApiV1SourcesSourceUriDigest operation middleware
-func (siw *ServerInterfaceWrapper) PutApiV1SourcesSourceUriDigest(c *gin.Context) {
+// PutApiV1SourcesUriDigest operation middleware
+func (siw *ServerInterfaceWrapper) PutApiV1SourcesUriDigest(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "sourceUriDigest" -------------
-	var sourceUriDigest string
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
 
-	err = runtime.BindStyledParameterWithOptions("simple", "sourceUriDigest", c.Param("sourceUriDigest"), &sourceUriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sourceUriDigest: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (siw *ServerInterfaceWrapper) PutApiV1SourcesSourceUriDigest(c *gin.Context
 		}
 	}
 
-	siw.Handler.PutApiV1SourcesSourceUriDigest(c, sourceUriDigest)
+	siw.Handler.PutApiV1SourcesUriDigest(c, uriDigest)
 }
 
 // GetPing operation middleware
@@ -165,8 +165,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.POST(options.BaseURL+"/api/v1/sources", wrapper.Createsource)
-	router.DELETE(options.BaseURL+"/api/v1/sources/:sourceUriDigest", wrapper.DeleteSource)
-	router.GET(options.BaseURL+"/api/v1/sources/:sourceUriDigest", wrapper.GetSource)
-	router.PUT(options.BaseURL+"/api/v1/sources/:sourceUriDigest", wrapper.PutApiV1SourcesSourceUriDigest)
+	router.DELETE(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.DeleteSource)
+	router.GET(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.GetSource)
+	router.PUT(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.PutApiV1SourcesUriDigest)
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 }
