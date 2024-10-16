@@ -31,7 +31,7 @@ cnpg-controller-setup:
 	@echo -e "\n\n"
 
 pg-setup: cnpg-controller-setup
-	helm install --set cnpg_cluster.password=$(PG_USER_PASSWORD) cnpg-database acceptance/cnpg-database
+	helm install --set cnpg_cluster.password=$(PG_USER_PASSWORD) cnpg-database helm/cnpg-database
 	@echo -e "\n\e[0;32mCreated CNPG cluster :)\n\e[0m"
 	sleep 120
 	kubectl get pods -l cnpg.io/cluster=cnpg-cluster -n postgres-cluster
