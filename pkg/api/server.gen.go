@@ -11,6 +11,35 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// CreateSource defines model for CreateSource.
+type CreateSource struct {
+	Name    string `json:"name"`
+	Summary string `json:"summary"`
+	Tags    string `json:"tags"`
+	Uri     string `json:"uri"`
+}
+
+// Pong defines model for Pong.
+type Pong struct {
+	Pong string `json:"pong"`
+}
+
+// Source defines model for Source.
+type Source struct {
+	Name      string  `json:"name"`
+	Score     int     `json:"score"`
+	Summary   string  `json:"summary"`
+	Tags      string  `json:"tags"`
+	Uri       string  `json:"uri"`
+	UriDigest *string `json:"uriDigest,omitempty"`
+}
+
+// CreatesourceJSONRequestBody defines body for Createsource for application/json ContentType.
+type CreatesourceJSONRequestBody = CreateSource
+
+// PutApiV1SourcesUriDigestJSONRequestBody defines body for PutApiV1SourcesUriDigest for application/json ContentType.
+type PutApiV1SourcesUriDigestJSONRequestBody = CreateSource
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
