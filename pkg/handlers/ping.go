@@ -6,16 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type pong struct {
+type PongHandler struct {
 	message string
 }
 
-func NewPong() *pong {
-	return &pong{
-		message: "pong",
+func NewPongHandler() *PongHandler {
+	return &PongHandler{
+		message: "Pong",
 	}
 }
 
-func (pg pong) GetPing(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{"data": pg.message})
+func (ph PongHandler) GetPing(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{"data": ph.message})
 }

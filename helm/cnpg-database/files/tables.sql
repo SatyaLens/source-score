@@ -2,7 +2,7 @@ CREATE TABLE
     sources (
         id BIGSERIAL,
         name TEXT,
-        score SMALLINT CHECK (
+        score SMALLINT DEFAULT 0 CHECK (
             score >= 0
             AND score <= 100
         ),

@@ -37,8 +37,8 @@ type Source struct {
 // CreatesourceJSONRequestBody defines body for Createsource for application/json ContentType.
 type CreatesourceJSONRequestBody = CreateSource
 
-// PutApiV1SourcesUriDigestJSONRequestBody defines body for PutApiV1SourcesUriDigest for application/json ContentType.
-type PutApiV1SourcesUriDigestJSONRequestBody = CreateSource
+// UpdateSourceJSONRequestBody defines body for UpdateSource for application/json ContentType.
+type UpdateSourceJSONRequestBody = CreateSource
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -53,7 +53,7 @@ type ServerInterface interface {
 	GetSource(c *gin.Context, uriDigest string)
 
 	// (PUT /api/v1/sources/{uriDigest})
-	PutApiV1SourcesUriDigest(c *gin.Context, uriDigest string)
+	UpdateSource(c *gin.Context, uriDigest string)
 
 	// (GET /ping)
 	GetPing(c *gin.Context)
@@ -129,8 +129,8 @@ func (siw *ServerInterfaceWrapper) GetSource(c *gin.Context) {
 	siw.Handler.GetSource(c, uriDigest)
 }
 
-// PutApiV1SourcesUriDigest operation middleware
-func (siw *ServerInterfaceWrapper) PutApiV1SourcesUriDigest(c *gin.Context) {
+// UpdateSource operation middleware
+func (siw *ServerInterfaceWrapper) UpdateSource(c *gin.Context) {
 
 	var err error
 
@@ -150,7 +150,7 @@ func (siw *ServerInterfaceWrapper) PutApiV1SourcesUriDigest(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PutApiV1SourcesUriDigest(c, uriDigest)
+	siw.Handler.UpdateSource(c, uriDigest)
 }
 
 // GetPing operation middleware
@@ -196,6 +196,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/api/v1/sources", wrapper.Createsource)
 	router.DELETE(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.DeleteSource)
 	router.GET(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.GetSource)
-	router.PUT(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.PutApiV1SourcesUriDigest)
+	router.PUT(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.UpdateSource)
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 }

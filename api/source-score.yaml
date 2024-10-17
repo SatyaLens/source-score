@@ -54,6 +54,7 @@ paths:
     put:
       tags:
         - source
+      operationId: updateSource
       parameters:
         - in: path
           name: uriDigest
@@ -76,13 +77,13 @@ paths:
     delete:
       tags:
         - source
+      operationId: deleteSource
       parameters:
         - in: path
           name: uriDigest
           required: true
           schema:
             type: string
-      operationId: deleteSource
       responses:
         204:
           description: source deleted
