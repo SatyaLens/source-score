@@ -34,8 +34,8 @@ type Source struct {
 	UriDigest *string `json:"uriDigest,omitempty"`
 }
 
-// CreatesourceJSONRequestBody defines body for Createsource for application/json ContentType.
-type CreatesourceJSONRequestBody = CreateSource
+// CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.
+type CreateSourceJSONRequestBody = CreateSource
 
 // UpdateSourceJSONRequestBody defines body for UpdateSource for application/json ContentType.
 type UpdateSourceJSONRequestBody = CreateSource
@@ -44,7 +44,7 @@ type UpdateSourceJSONRequestBody = CreateSource
 type ServerInterface interface {
 
 	// (POST /api/v1/sources)
-	Createsource(c *gin.Context)
+	CreateSource(c *gin.Context)
 
 	// (DELETE /api/v1/sources/{uriDigest})
 	DeleteSource(c *gin.Context, uriDigest string)
@@ -68,8 +68,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// Createsource operation middleware
-func (siw *ServerInterfaceWrapper) Createsource(c *gin.Context) {
+// CreateSource operation middleware
+func (siw *ServerInterfaceWrapper) CreateSource(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -78,7 +78,7 @@ func (siw *ServerInterfaceWrapper) Createsource(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.Createsource(c)
+	siw.Handler.CreateSource(c)
 }
 
 // DeleteSource operation middleware
@@ -193,7 +193,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.POST(options.BaseURL+"/api/v1/sources", wrapper.Createsource)
+	router.POST(options.BaseURL+"/api/v1/sources", wrapper.CreateSource)
 	router.DELETE(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.DeleteSource)
 	router.GET(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.GetSource)
 	router.PUT(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.UpdateSource)
