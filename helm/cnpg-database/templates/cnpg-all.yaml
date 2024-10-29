@@ -24,7 +24,6 @@ data:
   sql.commands:
     {{ (.Files.Get "files/tables.sql") | indent 4 }}
     {{ (.Files.Get "files/permissions.sql") | indent 4 }}
-    {{ (.Files.Get "files/sample-data.sql") | indent 4 }}
 
 ---
 apiVersion: postgresql.cnpg.io/v1

@@ -1,5 +1,6 @@
 package: api
 output: pkg/api/server.gen.go
 generate:
-  strict-server: false
   gin-server: true
+  models: true
+  strict-server: false

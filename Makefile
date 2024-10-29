@@ -6,11 +6,12 @@ POSTGRES_VERSION ?= "17"
 export PG_USER_PASSWORD
 export POSTGRES_VERSION
 
-build:
+codegen:
 	go mod tidy && \
-	go generate ./... && \
-	go build && \
-	go mod tidy
+	go generate ./...
+
+build: codegen
+	go build
 
 minikube-cleanup:
 	@if minikube status > /dev/null 2>&1; then \
@@ -31,9 +32,15 @@ cnpg-controller-setup:
 	@echo -e "\n\n"
 
 pg-setup: cnpg-controller-setup
-	helm install --set cnpg_cluster.password=$(PG_USER_PASSWORD) cnpg-database acceptance/cnpg-database
+	helm upgrade --install cnpg-database --set cnpg_cluster.password=$(PG_USER_PASSWORD) helm/cnpg-database
 	@echo -e "\n\e[0;32mCreated CNPG cluster :)\n\e[0m"
-	sleep 120
+	sleep 240
 	kubectl get pods -l cnpg.io/cluster=cnpg-cluster -n postgres-cluster
 
 local-pg-setup: minikube-setup pg-setup
+
+cloud-k8s-setup:
+	chmod 400 configs/civo-kubeconfig
+	cp -f configs/civo-kubeconfig ~/.kube/config
+
+cloud-pg-setup: cloud-k8s-setup pg-setup

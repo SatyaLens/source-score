@@ -1,21 +1,15 @@
 package handlers
 
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
-
-type pong struct {
+type PingHandler struct {
 	message string
 }
 
-func NewPong() *pong {
-	return &pong{
-		message: "pong",
+func NewPingHandler() *PingHandler {
+	return &PingHandler{
+		message: "Pong",
 	}
 }
 
-func (pg pong) GetPing(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{"data": pg.message})
+func (ph PingHandler) GetPing() string {
+	return ph.message
 }

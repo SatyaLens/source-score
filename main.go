@@ -1,25 +1,22 @@
 package main
 
 import (
-	"fmt"
-	
-	"github.com/gin-gonic/gin"
-
+	"log"
 	"source-score/pkg/api"
-	"source-score/pkg/handlers"
+
+	"github.com/gin-gonic/gin"
 )
 
-//go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=configs/config.yaml api/user-app.yaml
+//go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=configs/config.yaml api/source-score.yaml
 func main() {
 	server := gin.Default()
-	api.RegisterHandlers(server, handlers.NewPong())
+	err := server.Run()
 
-	// err := server.Run()
-	// if err != nil {
-	// 	log.Fatalf("failed to start the server: %s\n", err)
-	// } else {
-	// 	log.Println("Server is up and running!")
-	// }
+	if err != nil {
+		log.Fatalf("failed to start the server: %s\n", err)
+	} else {
+		log.Println("Server is up and running!")
+	}
 
-	fmt.Println("unimplemented")
+	api.RegisterHandlers(server, api.NewRouter())
 }
