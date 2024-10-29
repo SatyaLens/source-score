@@ -1,10 +1,8 @@
 CNPG_VERSION ?= "1.24.0"
 PG_USER_PASSWORD ?= "test_123"
-POSTGRES_VERSION ?= "17"
 
 # common env setup
 export PG_USER_PASSWORD
-export POSTGRES_VERSION
 
 codegen:
 	go mod tidy && \
