@@ -32,9 +32,15 @@ cnpg-controller-setup:
 	@echo -e "\n\n"
 
 pg-setup: cnpg-controller-setup
-	helm install --set cnpg_cluster.password=$(PG_USER_PASSWORD) cnpg-database helm/cnpg-database
+	helm upgrade --install cnpg-database --set cnpg_cluster.password=$(PG_USER_PASSWORD) helm/cnpg-database
 	@echo -e "\n\e[0;32mCreated CNPG cluster :)\n\e[0m"
-	sleep 120
+	sleep 240
 	kubectl get pods -l cnpg.io/cluster=cnpg-cluster -n postgres-cluster
 
 local-pg-setup: minikube-setup pg-setup
+
+cloud-k8s-setup:
+	chmod 400 configs/civo-kubeconfig
+	cp -f configs/civo-kubeconfig ~/.kube/config
+
+cloud-pg-setup: cloud-k8s-setup pg-setup

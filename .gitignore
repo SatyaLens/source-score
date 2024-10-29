@@ -1,2 +1,5 @@
 # generated files
 source-score
+
+# secrets
+configs/civo-kubeconfig
