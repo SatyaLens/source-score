@@ -5,7 +5,8 @@ PG_USER_PASSWORD ?= "test_123"
 export PG_USER_PASSWORD
 
 codegen:
-	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=configs/config.yaml api/source-score.yaml && \
+	go mod tidy
+	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=configs/config.yaml api/source-score.yaml
 	go mod tidy
 
 build: codegen

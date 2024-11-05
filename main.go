@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//go:generate 
 func main() {
 	server := gin.Default()
 	err := server.Run()
