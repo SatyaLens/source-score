@@ -4,6 +4,8 @@ PG_USER_PASSWORD ?= "test_123"
 # common env setup
 export PG_USER_PASSWORD
 
+## TODO:: add linters
+
 codegen:
 	go mod tidy
 	mkdir -p pkg/api
@@ -12,6 +14,10 @@ codegen:
 
 build: codegen
 	go build
+
+start: build
+	chmod +x ./source-score
+	./source-score
 
 minikube-cleanup:
 	@if minikube status > /dev/null 2>&1; then \
