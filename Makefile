@@ -4,12 +4,20 @@ PG_USER_PASSWORD ?= "test_123"
 # common env setup
 export PG_USER_PASSWORD
 
+## TODO:: add linters
+
 codegen:
-	go mod tidy && \
-	go generate ./...
+	go mod tidy
+	mkdir -p pkg/api
+	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=configs/config.yaml api/source-score.yaml
+	go mod tidy
 
 build: codegen
 	go build
+
+start: build
+	chmod +x ./source-score
+	./source-score
 
 minikube-cleanup:
 	@if minikube status > /dev/null 2>&1; then \
