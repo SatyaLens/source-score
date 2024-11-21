@@ -1,5 +1,6 @@
 # generated files
 source-score
+**coverage/
 
 # secrets
 configs/civo-kubeconfig
