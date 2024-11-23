@@ -2,5 +2,8 @@
 source-score
 **coverage/
 
+# ide
+.vscode/
+
 # secrets
 configs/civo-kubeconfig
