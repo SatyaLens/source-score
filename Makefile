@@ -19,9 +19,10 @@ build: codegen
 
 start: build
 	chmod +x ./source-score
-	./source-score
+	./source-score &
 
-acceptance-test: start 
+acceptance-test: start
+	go run github.com/onsi/ginkgo/v2/ginkgo run ./...
 
 minikube-cleanup:
 	@if minikube status > /dev/null 2>&1; then \
