@@ -2,9 +2,10 @@ package main
 
 import (
 	"log"
-	"source-score/pkg/api"
 
 	"github.com/gin-gonic/gin"
+
+	"source-score/pkg/api"
 )
 
 func main() {

@@ -1,8 +1,10 @@
 CNPG_VERSION ?= "1.24.0"
 PG_USER_PASSWORD ?= "test_123"
+SERVER_PORT ?= 8070
 
 # common env setup
 export PG_USER_PASSWORD
+export PORT=$(SERVER_PORT)
 
 ## TODO:: add linters
 
@@ -18,6 +20,8 @@ build: codegen
 start: build
 	chmod +x ./source-score
 	./source-score
+
+acceptance-test: start 
 
 minikube-cleanup:
 	@if minikube status > /dev/null 2>&1; then \
