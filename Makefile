@@ -6,15 +6,16 @@ SERVER_PORT ?= 8070
 export PG_USER_PASSWORD
 export PORT=$(SERVER_PORT)
 
-## TODO:: add linters
-
 codegen:
 	go mod tidy
 	mkdir -p pkg/api
 	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=configs/config.yaml api/source-score.yaml
 	go mod tidy
 
-build: codegen
+lint: codegen
+	go run github.com/golangci/golangci-lint/cmd/golangci-lint run
+
+build: codegen lint
 	go build
 
 start: build
