@@ -15,6 +15,80 @@ paths:
               schema:
                 $ref: '#/components/schemas/Pong'
 
+  /api/v1/sources:
+    post:
+      tags:
+        - source
+      operationId: createSource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSource'
+      responses:
+        201:
+          description: source created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Source'
+
+  /api/v1/sources/{uriDigest}:
+    get:
+      tags:
+        - source
+      operationId: getSource
+      parameters:
+        - in: path
+          name: uriDigest
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: source retrned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Source'
+
+    put:
+      tags:
+        - source
+      operationId: updateSource
+      parameters:
+        - in: path
+          name: uriDigest
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSource'
+      responses:
+        200:
+          description: source updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Source'
+
+    delete:
+      tags:
+        - source
+      operationId: deleteSource
+      parameters:
+        - in: path
+          name: uriDigest
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: source deleted
+
 components:
   schemas:
     Pong:
@@ -25,3 +99,43 @@ components:
         pong:
           type: string
           example: pong
+
+    CreateSource:
+      type: object
+      required:
+        - name
+        - summary
+        - tags
+        - uri
+      properties:
+        name:
+          type: string
+        summary:
+          type: string
+        tags:
+          type: string
+        uri:
+          type: string
+
+    Source:
+      type: object
+      required:
+        - name
+        - score
+        - summary
+        - tags
+        - uri
+      properties:
+        name:
+          type: string
+        score:
+          type: integer
+          format: double
+        uriDigest:
+          type: string
+        summary:
+          type: string
+        tags:
+          type: string
+        uri:
+          type: string
