@@ -31,7 +31,7 @@ type Source struct {
 	Summary   string  `json:"summary"`
 	Tags      string  `json:"tags"`
 	Uri       string  `json:"uri"`
-	UriDigest *string `json:"uriDigest,omitempty"`
+	UriDigest *string `gorm:"primaryKey" json:"uriDigest,omitempty"`
 }
 
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.

@@ -133,6 +133,8 @@ components:
           format: double
         uriDigest:
           type: string
+          x-oapi-codegen-extra-tags:
+            gorm: primary_key
         summary:
           type: string
         tags:
