@@ -9,16 +9,23 @@ import (
 )
 
 type router struct {
-	pingHandler   *handlers.PingHandler
+	pingHandler *handlers.PingHandler
 }
 
 func NewRouter() *router {
 	return &router{
-		pingHandler:   handlers.NewPingHandler(),
+		pingHandler: handlers.NewPingHandler(),
 	}
 }
 
 func (r *router) CreateSource(ctx *gin.Context) {
+	body := CreateSource{}
+	// using BindJson method to serialize body with struct
+	if err := ctx.BindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		_ = ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
 	log.Println("unimplemented")
 }
 

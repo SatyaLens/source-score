@@ -16,7 +16,7 @@ type CreateSource struct {
 	Name    string `json:"name"`
 	Summary string `json:"summary"`
 	Tags    string `json:"tags"`
-	Uri     string `json:"uri"`
+	Uri     string `binding:"required" json:"uri"`
 }
 
 // Pong defines model for Pong.
@@ -31,7 +31,7 @@ type Source struct {
 	Summary   string  `json:"summary"`
 	Tags      string  `json:"tags"`
 	Uri       string  `json:"uri"`
-	UriDigest *string `gorm:"primaryKey" json:"uriDigest,omitempty"`
+	UriDigest *string `gorm:"primary_key" json:"uriDigest,omitempty"`
 }
 
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.

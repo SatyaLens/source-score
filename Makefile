@@ -18,12 +18,17 @@ lint: codegen
 build: codegen lint
 	go build
 
-start: build
+acceptance-test: build
 	chmod +x ./source-score
-	./source-score &
+	( \
+		./source-score & BG_PID=$$!; \
+		trap "echo 'terminating the app'; kill $$BG_PID" EXIT; \
+		echo "app running with PID $$BG_PID"; \
+		go run github.com/onsi/ginkgo/v2/ginkgo run ./...; \
+	)
 
-acceptance-test: start
-	go run github.com/onsi/ginkgo/v2/ginkgo run ./...
+start:
+	go run main.go
 
 minikube-cleanup:
 	@if minikube status > /dev/null 2>&1; then \
