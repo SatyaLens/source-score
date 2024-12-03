@@ -27,7 +27,7 @@ acceptance-test: build
 		go run github.com/onsi/ginkgo/v2/ginkgo run ./...; \
 	)
 
-start:
+start: codegen
 	go run main.go
 
 minikube-cleanup:
