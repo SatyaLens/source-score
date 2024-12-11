@@ -147,7 +147,7 @@ components:
           type: string
           x-oapi-codegen-extra-tags:
             binding: required
-            gorm: primary_key
+            gorm: primaryKey
         summary:
           type: string
           x-oapi-codegen-extra-tags:
