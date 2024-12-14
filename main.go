@@ -6,9 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"source-score/pkg/api"
+	"source-score/pkg/conf"
 )
 
 func main() {
+	conf.LoadConfig()
+
 	server := gin.Default()
 	api.RegisterHandlers(server, api.NewRouter())
 
