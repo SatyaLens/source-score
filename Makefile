@@ -1,8 +1,10 @@
 CNPG_VERSION ?= "1.24.0"
+PG_HOST ?= "http://127.0.0.1"
 PG_USER_PASSWORD ?= "test_123"
 SERVER_PORT ?= 8070
 
 # common env setup
+export PG_SERVER=$(PG_HOST):$(SERVER_PORT)
 export PG_USER_PASSWORD
 export PORT=$(SERVER_PORT)
 
