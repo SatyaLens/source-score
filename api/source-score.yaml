@@ -110,12 +110,20 @@ components:
       properties:
         name:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
         summary:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
         tags:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
         uri:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
 
     Source:
       type: object
@@ -128,14 +136,27 @@ components:
       properties:
         name:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
         score:
           type: integer
           format: double
+          x-oapi-codegen-extra-tags:
+            binding: required
         uriDigest:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+            gorm: primaryKey
         summary:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
         tags:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
         uri:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required

@@ -1,8 +1,10 @@
 CNPG_VERSION ?= "1.24.0"
+PG_HOST ?= "http://127.0.0.1"
 PG_USER_PASSWORD ?= "test_123"
 SERVER_PORT ?= 8070
 
 # common env setup
+export PG_SERVER=$(PG_HOST):$(SERVER_PORT)
 export PG_USER_PASSWORD
 export PORT=$(SERVER_PORT)
 
@@ -13,17 +15,25 @@ codegen:
 	go mod tidy
 
 lint: codegen
-	go run github.com/golangci/golangci-lint/cmd/golangci-lint run
+	go run github.com/golangci/golangci-lint/cmd/golangci-lint run ./...
 
-build: codegen lint
+build: codegen
 	go build
 
-start: build
-	chmod +x ./source-score
-	./source-score &
+unit-tests:
+	go run github.com/onsi/ginkgo/v2/ginkgo run --skip-package=acceptance ./...
 
-acceptance-test: start
-	go run github.com/onsi/ginkgo/v2/ginkgo run ./...
+acceptance-tests: build
+	chmod +x ./source-score
+	( \
+		./source-score & BG_PID=$$!; \
+		trap "echo 'terminating the app'; kill $$BG_PID" EXIT; \
+		echo "app running with PID $$BG_PID"; \
+		go run github.com/onsi/ginkgo/v2/ginkgo run acceptance/...; \
+	)
+
+start: codegen
+	go run main.go
 
 minikube-cleanup:
 	@if minikube status > /dev/null 2>&1; then \

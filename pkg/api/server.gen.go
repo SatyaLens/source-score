@@ -13,10 +13,10 @@ import (
 
 // CreateSource defines model for CreateSource.
 type CreateSource struct {
-	Name    string `json:"name"`
-	Summary string `json:"summary"`
-	Tags    string `json:"tags"`
-	Uri     string `json:"uri"`
+	Name    string `binding:"required" json:"name"`
+	Summary string `binding:"required" json:"summary"`
+	Tags    string `binding:"required" json:"tags"`
+	Uri     string `binding:"required" json:"uri"`
 }
 
 // Pong defines model for Pong.
@@ -26,12 +26,12 @@ type Pong struct {
 
 // Source defines model for Source.
 type Source struct {
-	Name      string  `json:"name"`
-	Score     int     `json:"score"`
-	Summary   string  `json:"summary"`
-	Tags      string  `json:"tags"`
-	Uri       string  `json:"uri"`
-	UriDigest *string `json:"uriDigest,omitempty"`
+	Name      string  `binding:"required" json:"name"`
+	Score     int     `binding:"required" json:"score"`
+	Summary   string  `binding:"required" json:"summary"`
+	Tags      string  `binding:"required" json:"tags"`
+	Uri       string  `binding:"required" json:"uri"`
+	UriDigest *string `binding:"required" gorm:"primaryKey" json:"uriDigest,omitempty"`
 }
 
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.

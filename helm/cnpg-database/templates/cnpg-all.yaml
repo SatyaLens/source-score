@@ -56,5 +56,9 @@ spec:
   containers:
   - name: adminer
     image: adminer:4.8.1
+    limits:
+      memory: "256Mi"
+    requests:
+      cpu: "50m"
     ports:
     - containerPort: 8080
