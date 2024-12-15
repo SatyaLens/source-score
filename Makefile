@@ -20,13 +20,16 @@ lint: codegen
 build: codegen lint
 	go build
 
-acceptance-test: build
+unit-tests:
+	go run github.com/onsi/ginkgo/v2/ginkgo run --skip-package=acceptance ./...
+
+acceptance-tests: build
 	chmod +x ./source-score
 	( \
 		./source-score & BG_PID=$$!; \
 		trap "echo 'terminating the app'; kill $$BG_PID" EXIT; \
 		echo "app running with PID $$BG_PID"; \
-		go run github.com/onsi/ginkgo/v2/ginkgo run ./...; \
+		go run github.com/onsi/ginkgo/v2/ginkgo run acceptance/...; \
 	)
 
 start: codegen

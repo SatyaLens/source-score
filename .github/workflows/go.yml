@@ -24,5 +24,8 @@ jobs:
     - name: Golangci-lint
       uses: golangci/golangci-lint-action@v6.1.1
 
-    - name: Test
-      run: make acceptance-test
+    - name: Unit Tests
+      run: make unit-tests
+
+    - name: Acceptance Tests
+      run: make acceptance-tests
