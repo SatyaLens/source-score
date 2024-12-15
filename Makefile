@@ -15,9 +15,9 @@ codegen:
 	go mod tidy
 
 lint: codegen
-	go run github.com/golangci/golangci-lint/cmd/golangci-lint run
+	go run github.com/golangci/golangci-lint/cmd/golangci-lint run ./...
 
-build: codegen lint
+build: codegen
 	go build
 
 unit-tests:

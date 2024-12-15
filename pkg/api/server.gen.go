@@ -31,7 +31,7 @@ type Source struct {
 	Summary   string  `binding:"required" json:"summary"`
 	Tags      string  `binding:"required" json:"tags"`
 	Uri       string  `binding:"required" json:"uri"`
-	UriDigest *string `binding:"required" gorm:"primary_key" json:"uriDigest,omitempty"`
+	UriDigest *string `binding:"required" gorm:"primaryKey" json:"uriDigest,omitempty"`
 }
 
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.
