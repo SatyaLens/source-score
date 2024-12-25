@@ -19,7 +19,7 @@ func NewRouter() *router {
 }
 
 func (r *router) CreateSource(ctx *gin.Context) {
-	body := CreateSource{}
+	body := SourceInput{}
 	// using BindJson method to serialize body with struct
 	if err := ctx.BindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
