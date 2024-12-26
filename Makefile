@@ -32,6 +32,8 @@ acceptance-tests: build
 		go run github.com/onsi/ginkgo/v2/ginkgo run acceptance/...; \
 	)
 
+tests: unit-tests acceptance-tests
+
 start: codegen
 	go run main.go
 
