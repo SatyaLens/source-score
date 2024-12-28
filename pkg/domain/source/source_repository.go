@@ -22,14 +22,9 @@ func NewSourceRepository(ctx context.Context, client *cnpg.Client) *SourceReposi
 
 func (sr *SourceRepository) DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error {
 	result := sr.client.Delete(ctx, source)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
 	log.Printf("%d rows affected\n", result.RowsAffected)
 
-	return nil
+	return result.Error
 }
 
 func (sr *SourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error) {
@@ -61,30 +56,27 @@ func (sr *SourceRepository) PutSource(ctx context.Context, sourceInput *api.Sour
 	}
 
 	result := sr.client.Create(ctx, source)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
 	log.Printf("%d rows affected\n", result.RowsAffected)
 
-	return nil
+	return result.Error
 }
 
-func (sr *SourceRepository) UpdateSourceByUriDigest(ctx context.Context, uriDigest string) error {
+// Updates source model fields except for `uri` and `uriDigest`
+func (sr *SourceRepository) UpdateSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
 	source := &api.Source{}
 	source.UriDigest = uriDigest
+
 	result := sr.client.FindFirst(ctx, source)
-
-	if result.Statement.RaiseErrorOnNotFound {
-		log.Printf("no matching record found with uri digest:%s\n", uriDigest)
-	} else {
-		result = sr.client.Update(ctx, source)
-	}
-
 	if result.Error != nil {
 		return result.Error
 	}
 
-	return nil
+	source.Name = sourceInput.Name
+	source.Summary = sourceInput.Summary
+	source.Tags = sourceInput.Tags
+
+	result = sr.client.Update(ctx, source)
+	log.Printf("%d rows affected\n", result.RowsAffected)
+
+	return result.Error
 }
