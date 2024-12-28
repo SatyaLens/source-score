@@ -21,7 +21,7 @@ build: codegen
 	go build
 
 unit-tests:
-	go run github.com/onsi/ginkgo/v2/ginkgo run --skip-package=acceptance ./...
+	go run github.com/onsi/ginkgo/v2/ginkgo run --skip-package=acceptance --cover --coverprofile=coverage.out ./...
 
 acceptance-tests: build
 	chmod +x ./source-score
@@ -29,8 +29,10 @@ acceptance-tests: build
 		./source-score & BG_PID=$$!; \
 		trap "echo 'terminating the app'; kill $$BG_PID" EXIT; \
 		echo "app running with PID $$BG_PID"; \
-		go run github.com/onsi/ginkgo/v2/ginkgo run acceptance/...; \
+		go run github.com/onsi/ginkgo/v2/ginkgo run --cover --coverprofile=coverage.out acceptance/...; \
 	)
+
+tests: unit-tests acceptance-tests
 
 start: codegen
 	go run main.go

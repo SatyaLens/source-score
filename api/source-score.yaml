@@ -24,7 +24,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateSource'
+              $ref: '#/components/schemas/SourceInput'
       responses:
         201:
           description: source created
@@ -66,7 +66,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateSource'
+              $ref: '#/components/schemas/SourceInput'
       responses:
         200:
           description: source updated
@@ -100,7 +100,7 @@ components:
           type: string
           example: pong
 
-    CreateSource:
+    SourceInput:
       type: object
       required:
         - name
@@ -133,6 +133,7 @@ components:
         - summary
         - tags
         - uri
+        - uriDigest
       properties:
         name:
           type: string
