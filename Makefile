@@ -1,3 +1,4 @@
+CLUSTER_NAME = "test-env"
 CNPG_VERSION ?= "1.24.0"
 PG_HOST ?= "http://127.0.0.1"
 PG_USER_PASSWORD ?= "test_123"
@@ -37,14 +38,13 @@ tests: unit-tests acceptance-tests
 start: codegen
 	go run main.go
 
-minikube-cleanup:
-	@if minikube status > /dev/null 2>&1; then \
-		minikube stop; \
-		minikube delete; \
+k3d-cleanup:
+	@if k3d cluster list | grep -q "^$(CLUSTER_NAME) "; then \
+		k3d cluster delete "$(CLUSTER_NAME)"; \
 	fi
 
-minikube-setup: minikube-cleanup
-	minikube start --cpus 4 --memory 6144
+k3d-setup: k3d-cleanup
+	k3d cluster create $(CLUSTER_NAME) --servers 1 --agents 1
 	@echo -e "\n\n"
 
 cnpg-controller-setup:
@@ -61,7 +61,7 @@ pg-setup: cnpg-controller-setup
 	sleep 240
 	kubectl get pods -l cnpg.io/cluster=cnpg-cluster -n postgres-cluster
 
-local-pg-setup: minikube-setup pg-setup
+local-pg-setup: k3d-setup pg-setup
 
 cloud-k8s-setup:
 	chmod 400 configs/civo-kubeconfig
