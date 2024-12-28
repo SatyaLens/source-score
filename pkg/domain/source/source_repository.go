@@ -32,15 +32,16 @@ func (sr *SourceRepository) DeleteSourceByUriDigest(ctx context.Context, source 
 	return nil
 }
 
-func (sr *SourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest string) error {
-	var source *api.Source
-	result := sr.client.FindByPrimaryKey(ctx, source, uriDigest)
+func (sr *SourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error) {
+	source := &api.Source{}
+	source.UriDigest = uriDigest
+	result := sr.client.FindFirst(ctx, source)
 
 	if result.Error != nil {
-		return result.Error
+		return nil, result.Error
 	}
 
-	return nil
+	return source, nil
 }
 
 func (sr *SourceRepository) PutSource(ctx context.Context, sourceInput *api.SourceInput) error {
@@ -56,7 +57,7 @@ func (sr *SourceRepository) PutSource(ctx context.Context, sourceInput *api.Sour
 		Summary:   sourceInput.Summary,
 		Tags:      sourceInput.Tags,
 		Uri:       sourceInput.Uri,
-		UriDigest: &uriDigest,
+		UriDigest: uriDigest,
 	}
 
 	result := sr.client.Create(ctx, source)
@@ -71,8 +72,9 @@ func (sr *SourceRepository) PutSource(ctx context.Context, sourceInput *api.Sour
 }
 
 func (sr *SourceRepository) UpdateSourceByUriDigest(ctx context.Context, uriDigest string) error {
-	var source *api.Source
-	result := sr.client.FindByPrimaryKey(ctx, source, uriDigest)
+	source := &api.Source{}
+	source.UriDigest = uriDigest
+	result := sr.client.FindFirst(ctx, source)
 
 	if result.Statement.RaiseErrorOnNotFound {
 		log.Printf("no matching record found with uri digest:%s\n", uriDigest)

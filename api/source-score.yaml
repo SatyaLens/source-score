@@ -133,6 +133,7 @@ components:
         - summary
         - tags
         - uri
+        - uriDigest
       properties:
         name:
           type: string

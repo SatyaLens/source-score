@@ -1,6 +1,7 @@
 # generated files
 source-score
 **coverage/
+coverage.out
 
 # ide
 .vscode/

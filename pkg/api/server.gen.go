@@ -18,12 +18,12 @@ type Pong struct {
 
 // Source defines model for Source.
 type Source struct {
-	Name      string  `binding:"required" json:"name"`
-	Score     int     `binding:"required" json:"score"`
-	Summary   string  `binding:"required" json:"summary"`
-	Tags      string  `binding:"required" json:"tags"`
-	Uri       string  `binding:"required" json:"uri"`
-	UriDigest *string `binding:"required" gorm:"primaryKey" json:"uriDigest,omitempty"`
+	Name      string `binding:"required" json:"name"`
+	Score     int    `binding:"required" json:"score"`
+	Summary   string `binding:"required" json:"summary"`
+	Tags      string `binding:"required" json:"tags"`
+	Uri       string `binding:"required" json:"uri"`
+	UriDigest string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
 }
 
 // SourceInput defines model for SourceInput.

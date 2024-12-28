@@ -39,8 +39,8 @@ func (client *Client) Delete(ctx context.Context, record interface{}) *gorm.DB {
 	return client.DB.Delete(record)
 }
 
-func (client *Client) FindByPrimaryKey(ctx context.Context, record interface{}, primaryKey interface{}) *gorm.DB {
-	return client.DB.First(record, primaryKey)
+func (client *Client) FindFirst(ctx context.Context, record interface{}) *gorm.DB {
+	return client.DB.First(record)
 }
 
 func (client *Client) Update(ctx context.Context, record interface{}) *gorm.DB {
