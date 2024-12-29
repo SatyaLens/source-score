@@ -1,4 +1,4 @@
-CLUSTER_NAME = "test-env"
+TEST_CLUSTER_NAME = "test-env"
 CNPG_VERSION ?= "1.24.0"
 PG_HOST ?= "http://127.0.0.1"
 PG_USER_PASSWORD ?= "test_123"
@@ -39,12 +39,12 @@ start: codegen
 	go run main.go
 
 k3d-cleanup:
-	@if k3d cluster list | grep -q "^$(CLUSTER_NAME) "; then \
-		k3d cluster delete "$(CLUSTER_NAME)"; \
+	@if k3d cluster list | grep -q "^$(TEST_CLUSTER_NAME) "; then \
+		k3d cluster delete "$(TEST_CLUSTER_NAME)"; \
 	fi
 
 k3d-setup: k3d-cleanup
-	k3d cluster create $(CLUSTER_NAME) --servers 1 --agents 1
+	k3d cluster create $(TEST_CLUSTER_NAME) --servers 1 --agents 1
 	@echo -e "\n\n"
 
 cnpg-controller-setup:
