@@ -4,21 +4,41 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"source-score/pkg/api"
 	"source-score/pkg/conf"
 )
 
-func main() {
+var (
+	Logger *zap.Logger
+	server *gin.Engine
+)
+
+func init() {
+	// initialize the config
 	conf.LoadConfig()
 
+	// initialize the logger
+	Logger, err := zap.NewProduction()
+	if err != nil {
+		log.Fatalf("failed to initialize the logger: %s\n", err)
+	}
+	defer Logger.Sync()
+
+	// initialize the server
 	server := gin.Default()
 	api.RegisterHandlers(server, api.NewRouter())
+}
 
+func main() {
 	err := server.Run()
 	if err != nil {
-		log.Fatalf("failed to start the server: %s\n", err)
+		Logger.Fatal(
+			"failed to start the server",
+			zap.String("err", err.Error()),
+		)
 	} else {
-		log.Println("Server is up and running!")
+		Logger.Info("Server is up and running!")
 	}
 }

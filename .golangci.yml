@@ -1,3 +1,8 @@
 issues:
   exclude:
     - (.*)_test\.go$
+
+linters-settings:
+  errcheck:
+    exclude-functions:
+    - (*Logger).Sync
