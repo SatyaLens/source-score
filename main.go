@@ -1,13 +1,15 @@
 package main
 
 import (
-	"log"
+	"log/slog"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
 	"source-score/pkg/api"
 	"source-score/pkg/conf"
+	"source-score/pkg/logger"
 )
 
 var (
@@ -20,11 +22,11 @@ func init() {
 	conf.LoadConfig()
 
 	// initialize the logger
-	Logger, err := zap.NewProduction()
-	if err != nil {
-		log.Fatalf("failed to initialize the logger: %s\n", err)
-	}
-	defer Logger.Sync()
+	slog.SetDefault(
+		slog.New(&logger.ContextHandler{
+			Handler: slog.NewJSONHandler(os.Stdout, nil),
+		}),
+	)
 
 	// initialize the server
 	server := gin.Default()
