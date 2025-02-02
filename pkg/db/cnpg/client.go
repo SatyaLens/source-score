@@ -3,7 +3,6 @@ package cnpg
 import (
 	"context"
 	"log"
-	"log/slog"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

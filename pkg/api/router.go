@@ -42,6 +42,7 @@ func (r *router) UpdateSource(ctx *gin.Context, uriDigest string) {
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
+	// TODO :: log using a context that has request header and verify request ID is printed
 	message := r.pingHandler.GetPing()
 
 	ctx.JSON(http.StatusOK, gin.H{"data": message})
