@@ -3,12 +3,12 @@ package logger
 import (
 	"context"
 	"log/slog"
+
+	"github.com/gin-gonic/gin"
 )
 
-type ctxKey string
-
 const (
-	slogFields ctxKey = "slog_fields"
+	slogFields = "slog_fields"
 )
 
 type ContextHandler struct {
@@ -26,19 +26,15 @@ func (h ContextHandler) Handle(ctx context.Context, r slog.Record) error {
 	return h.Handler.Handle(ctx, r)
 }
 
-// AppendCtx adds an slog attribute to the provided context so that it will be included 
+// AppendGinCtx adds an slog attribute to the provided context so that it will be included
 // in any Record created with such context
-func AppendCtx(parent context.Context, attr slog.Attr) context.Context {
-	if parent == nil {
-		parent = context.Background()
-	}
-
+func AppendGinCtx(parent *gin.Context, attr slog.Attr) {
 	if v, ok := parent.Value(slogFields).([]slog.Attr); ok {
 		v = append(v, attr)
-		return context.WithValue(parent, slogFields, v)
+		parent.Set(slogFields, v)
 	}
 
 	v := []slog.Attr{}
 	v = append(v, attr)
-	return context.WithValue(parent, slogFields, v)
+	parent.Set(slogFields, v)
 }

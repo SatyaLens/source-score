@@ -2,6 +2,7 @@ package api
 
 import (
 	"log"
+	"log/slog"
 	"net/http"
 	"source-score/pkg/handlers"
 
@@ -42,7 +43,12 @@ func (r *router) UpdateSource(ctx *gin.Context, uriDigest string) {
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
+	// requestId := ctx.GetHeader(helpers.RequestIdHeader)
+	// if requestId == "" {
+	// 	requestId = uuid.NewString()
+	// }
 	// TODO :: log using a context that has request header and verify request ID is printed
+	slog.InfoContext(ctx, "printing using slog")
 	message := r.pingHandler.GetPing()
 
 	ctx.JSON(http.StatusOK, gin.H{"data": message})

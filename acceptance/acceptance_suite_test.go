@@ -31,14 +31,14 @@ func TestSourceScore(t *testing.T) {
 		log.Fatalf("application not running on port: %s", serverPort)
 	}
 
-	baseUrl = "http://" + helpers.LOCALHOST + ":" + serverPort
+	baseUrl = "http://" + helpers.Localhost + ":" + serverPort
 
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "SourceScore Acceptance Test Suite")
 }
 
 func isLocalPortOpen(port string) bool {
-	address := net.JoinHostPort(helpers.LOCALHOST, port)
+	address := net.JoinHostPort(helpers.Localhost, port)
 	conn, err := net.DialTimeout("tcp", address, 2*time.Second)
 	if err != nil {
 		return false

@@ -1,19 +1,19 @@
 package main
 
 import (
+	"log"
 	"log/slog"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 
 	"source-score/pkg/api"
 	"source-score/pkg/conf"
+	"source-score/pkg/helpers"
 	"source-score/pkg/logger"
 )
 
 var (
-	Logger *zap.Logger
 	server *gin.Engine
 )
 
@@ -29,18 +29,27 @@ func init() {
 	)
 
 	// initialize the server
+	loggerOpts := api.GinServerOptions{
+		Middlewares: []api.MiddlewareFunc{
+			// function to add request headers to log fields
+			func(c *gin.Context) {
+				for _, fieldKey := range helpers.ApiReqLogFields {
+					fieldVal := c.Request.Header.Get(fieldKey)
+					logger.AppendGinCtx(c, slog.String(fieldKey, fieldVal))
+				}
+			},
+		},
+	}
+
 	server := gin.Default()
-	api.RegisterHandlers(server, api.NewRouter())
+	api.RegisterHandlersWithOptions(server, api.NewRouter(), loggerOpts)
 }
 
 func main() {
 	err := server.Run()
 	if err != nil {
-		Logger.Fatal(
-			"failed to start the server",
-			zap.String("err", err.Error()),
-		)
+		log.Fatalf("failed to start the server : %s\n", err.Error())
 	} else {
-		Logger.Info("Server is up and running!")
+		log.Println("Server is up and running!")
 	}
 }
