@@ -49,7 +49,7 @@ func (r *router) GetPing(ctx *gin.Context) {
 	// }
 	// TODO :: log using a context that has request header and verify request ID is printed
 	slog.InfoContext(ctx, "printing using slog")
-	message := r.pingHandler.GetPing()
+	message := r.pingHandler.GetPing(ctx)
 
 	ctx.JSON(http.StatusOK, gin.H{"data": message})
 }

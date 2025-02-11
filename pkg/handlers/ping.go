@@ -1,5 +1,10 @@
 package handlers
 
+import (
+	"context"
+	"log/slog"
+)
+
 type PingHandler struct {
 	message string
 }
@@ -10,6 +15,7 @@ func NewPingHandler() *PingHandler {
 	}
 }
 
-func (ph PingHandler) GetPing() string {
+func (ph PingHandler) GetPing(ctx context.Context) string {
+	slog.InfoContext(ctx, "returning ping response message")
 	return ph.message
 }
