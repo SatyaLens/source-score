@@ -1,7 +1,6 @@
 package api
 
 import (
-	"log"
 	"log/slog"
 	"net/http"
 	"source-score/pkg/handlers"
@@ -27,28 +26,22 @@ func (r *router) CreateSource(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	log.Println("unimplemented")
+	slog.InfoContext(ctx, "unimplemented")
 }
 
 func (r *router) DeleteSource(ctx *gin.Context, uriDigest string) {
-	log.Println("unimplemented")
+	slog.InfoContext(ctx, "unimplemented")
 }
 
 func (r *router) GetSource(ctx *gin.Context, uriDigest string) {
-	log.Println("unimplemented")
+	slog.InfoContext(ctx, "unimplemented")
 }
 
 func (r *router) UpdateSource(ctx *gin.Context, uriDigest string) {
-	log.Println("unimplemented")
+	slog.InfoContext(ctx, "unimplemented")
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
-	// requestId := ctx.GetHeader(helpers.RequestIdHeader)
-	// if requestId == "" {
-	// 	requestId = uuid.NewString()
-	// }
-	// TODO :: log using a context that has request header and verify request ID is printed
-	slog.InfoContext(ctx, "printing using slog")
 	message := r.pingHandler.GetPing(ctx)
 
 	ctx.JSON(http.StatusOK, gin.H{"data": message})

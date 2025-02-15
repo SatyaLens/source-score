@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"log/slog"
 )
 
 type PingHandler struct {
@@ -16,6 +15,5 @@ func NewPingHandler() *PingHandler {
 }
 
 func (ph PingHandler) GetPing(ctx context.Context) string {
-	slog.InfoContext(ctx, "returning ping response message")
 	return ph.message
 }
