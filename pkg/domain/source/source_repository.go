@@ -4,7 +4,8 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"log"
+	"fmt"
+	"log/slog"
 
 	"source-score/pkg/api"
 	"source-score/pkg/db/cnpg"
@@ -22,7 +23,10 @@ func NewSourceRepository(ctx context.Context, client *cnpg.Client) *SourceReposi
 
 func (sr *SourceRepository) DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error {
 	result := sr.client.Delete(ctx, source)
-	log.Printf("%d rows affected\n", result.RowsAffected)
+	slog.InfoContext(
+		ctx,
+		fmt.Sprintf("%d rows affected\n", result.RowsAffected),
+	)
 
 	return result.Error
 }
@@ -56,7 +60,10 @@ func (sr *SourceRepository) PutSource(ctx context.Context, sourceInput *api.Sour
 	}
 
 	result := sr.client.Create(ctx, source)
-	log.Printf("%d rows affected\n", result.RowsAffected)
+	slog.InfoContext(
+		ctx,
+		fmt.Sprintf("%d rows affected\n", result.RowsAffected),
+	)
 
 	return result.Error
 }
@@ -76,7 +83,10 @@ func (sr *SourceRepository) UpdateSourceByUriDigest(ctx context.Context, sourceI
 	source.Tags = sourceInput.Tags
 
 	result = sr.client.Update(ctx, source)
-	log.Printf("%d rows affected\n", result.RowsAffected)
+	slog.InfoContext(
+		ctx,
+		fmt.Sprintf("%d rows affected\n", result.RowsAffected),
+	)
 
 	return result.Error
 }

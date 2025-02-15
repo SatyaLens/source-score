@@ -1,5 +1,9 @@
 package handlers
 
+import (
+	"context"
+)
+
 type PingHandler struct {
 	message string
 }
@@ -10,6 +14,6 @@ func NewPingHandler() *PingHandler {
 	}
 }
 
-func (ph PingHandler) GetPing() string {
+func (ph PingHandler) GetPing(ctx context.Context) string {
 	return ph.message
 }

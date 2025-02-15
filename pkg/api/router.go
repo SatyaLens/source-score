@@ -1,7 +1,7 @@
 package api
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"source-score/pkg/handlers"
 
@@ -26,23 +26,23 @@ func (r *router) CreateSource(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	log.Println("unimplemented")
+	slog.InfoContext(ctx, "unimplemented")
 }
 
 func (r *router) DeleteSource(ctx *gin.Context, uriDigest string) {
-	log.Println("unimplemented")
+	slog.InfoContext(ctx, "unimplemented")
 }
 
 func (r *router) GetSource(ctx *gin.Context, uriDigest string) {
-	log.Println("unimplemented")
+	slog.InfoContext(ctx, "unimplemented")
 }
 
 func (r *router) UpdateSource(ctx *gin.Context, uriDigest string) {
-	log.Println("unimplemented")
+	slog.InfoContext(ctx, "unimplemented")
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
-	message := r.pingHandler.GetPing()
+	message := r.pingHandler.GetPing(ctx)
 
 	ctx.JSON(http.StatusOK, gin.H{"data": message})
 }

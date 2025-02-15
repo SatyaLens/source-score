@@ -1,5 +1,12 @@
 package helpers
 
 const (
-	LOCALHOST = "127.0.0.1"
+	Localhost       = "127.0.0.1"
+	RequestIdHeader = "X-Request-ID"
+)
+
+var (
+	ApiReqLogFields = []string {
+		RequestIdHeader,
+	}
 )
