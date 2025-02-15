@@ -13,11 +13,7 @@ import (
 	"source-score/pkg/logger"
 )
 
-var (
-	server *gin.Engine
-)
-
-func init() {
+func main() {
 	// initialize the config
 	conf.LoadConfig()
 
@@ -43,9 +39,7 @@ func init() {
 
 	server := gin.Default()
 	api.RegisterHandlersWithOptions(server, api.NewRouter(), loggerOpts)
-}
 
-func main() {
 	err := server.Run()
 	if err != nil {
 		log.Fatalf("failed to start the server : %s\n", err.Error())
