@@ -20,5 +20,5 @@ jobs:
     - name: Install k3d
       run: make install-k3d-cli
 
-    # - name: Acceptance Tests
-    #   run: make acceptance-tests
+    - name: Setup test CNPG
+      run: make local-pg-setup
