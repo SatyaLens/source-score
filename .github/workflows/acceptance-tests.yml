@@ -12,13 +12,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # - name: Install kubectl
-    #   uses: azure/setup-kubectl@v4
-    #   with:
-    #     version: 'v1.31.8'
-
     - name: Install k3d
       run: make install-k3d-cli
 
     - name: Setup test CNPG
       run: make local-pg-setup
+
+    - name: Run acceptance tests
+      run: make acceptance-tests
