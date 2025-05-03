@@ -1,13 +1,18 @@
-TEST_CLUSTER_NAME = "test-env"
-CNPG_VERSION ?= "1.24.0"
+CNPG_VERSION ?= "1.25.1"
+K3D_VERSION ?= "v5.8.3"
+K3S_IMAGE_VERSION ?= "rancher/k3s:v1.31.8-k3s1-amd64"
 PG_HOST ?= "http://127.0.0.1"
 PG_USER_PASSWORD ?= "test_123"
 SERVER_PORT ?= 8070
+TEST_CLUSTER_NAME = "test-env"
 
 # common env setup
 export PG_SERVER=$(PG_HOST):$(SERVER_PORT)
 export PG_USER_PASSWORD
 export PORT=$(SERVER_PORT)
+
+install-k3d-cli:
+	curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=$(K3D_VERSION) bash
 
 codegen:
 	go mod tidy
@@ -44,7 +49,7 @@ k3d-cleanup:
 	fi
 
 k3d-setup: k3d-cleanup
-	k3d cluster create $(TEST_CLUSTER_NAME) --servers 1 --agents 1
+	k3d cluster create $(TEST_CLUSTER_NAME) --servers 1 --agents 1 --image $(K3S_IMAGE_VERSION)
 	@echo -e "\n\n"
 
 cnpg-controller-setup:

@@ -1,0 +1,24 @@
+name: Acceptance Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  acceptance-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v4
+      with:
+        version: 'v1.31.8'
+
+    - name: Install k3d
+      run: make install-k3d-cli
+
+    # - name: Acceptance Tests
+    #   run: make acceptance-tests
