@@ -8,8 +8,10 @@ SERVER_PORT ?= 8070
 TEST_CLUSTER_NAME = "test-env"
 
 # common env setup
+export APP_USER_PASSWORD
 export PG_SERVER=$(PG_HOST):$(SERVER_PORT)
 export PORT=$(SERVER_PORT)
+export SUPER_USER_PASSWORD
 
 install-k3d-cli:
 	curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=$(K3D_VERSION) bash
