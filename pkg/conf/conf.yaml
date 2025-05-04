@@ -1,2 +1,4 @@
-PG_USER_PASSWORD: env-pwd
+APP_USER_PASSWORD: env-pwd
 PG_SERVER: env-server
+PORT: 8999
+SUPER_USER_PASSWORD: user-pwd
