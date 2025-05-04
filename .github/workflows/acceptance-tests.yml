@@ -19,7 +19,8 @@ jobs:
       env:
         APP_USER_PASSWORD: ${{ vars.APP_USER_PASSWORD }}
       run: |
-        echo "$APP_USER_PASSWORD"
+        set -x
+        echo "env var is :: $APP_USER_PASSWORD"
 
     - name: Setup test CNPG
       env:
