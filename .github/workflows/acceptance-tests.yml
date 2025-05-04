@@ -9,9 +9,6 @@ on:
 jobs:
   acceptance-tests:
     runs-on: ubuntu-latest
-    env:
-      APP_USER_PASSWORD: ${{ vars.APP_USER_PASSWORD }}
-      SUPER_USER_PASSWORD: ${{ secrets.SUPER_USER_PASSWORD }}
     steps:
     - uses: actions/checkout@v4
 
@@ -19,9 +16,15 @@ jobs:
       run: make install-k3d-cli
 
     - name: Check env
-      run: echo "$APP_USER_PASSWORD"
+      env:
+        APP_USER_PASSWORD: ${{ vars.APP_USER_PASSWORD }}
+      run: |
+        echo "$APP_USER_PASSWORD"
 
-    - name: Setup test CNPG 
+    - name: Setup test CNPG
+      env:
+        APP_USER_PASSWORD: ${{ vars.APP_USER_PASSWORD }}
+        SUPER_USER_PASSWORD: ${{ secrets.SUPER_USER_PASSWORD }}
       run: make local-pg-setup
 
     - name: Run acceptance tests
