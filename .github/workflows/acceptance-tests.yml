@@ -9,6 +9,7 @@ on:
 jobs:
   acceptance-tests:
     runs-on: ubuntu-latest
+    environment: test
     steps:
     - uses: actions/checkout@v4
 
@@ -19,7 +20,6 @@ jobs:
       env:
         APP_USER_PASSWORD: ${{ vars.APP_USER_PASSWORD }}
       run: |
-        set -x
         echo "env var is :: $APP_USER_PASSWORD"
 
     - name: Setup test CNPG
