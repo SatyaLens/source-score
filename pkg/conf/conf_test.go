@@ -22,7 +22,7 @@ var _ = Describe("Conf Tests", func() {
 			os.Unsetenv("DOTENV_PATH")
 			conf.LoadConfig()
 
-			Expect(conf.Cfg.PgUserPassword).To(BeEquivalentTo(SamplePwd))
+			Expect(conf.Cfg.AppUserPassword).To(BeEquivalentTo(SamplePwd))
 			Expect(conf.Cfg.PgServer).To(BeEquivalentTo(SampleServer))
 		})
 	})
@@ -32,7 +32,7 @@ var _ = Describe("Conf Tests", func() {
 			os.Setenv("DOTENV_PATH", "./conf.yaml")
 			conf.LoadConfig()
 
-			Expect(conf.Cfg.PgUserPassword).To(BeEquivalentTo("env-pwd"))
+			Expect(conf.Cfg.AppUserPassword).To(BeEquivalentTo("env-pwd"))
 			Expect(conf.Cfg.PgServer).To(BeEquivalentTo("env-server"))
 		})
 	})

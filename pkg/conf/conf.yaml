@@ -1,2 +1,2 @@
-PG_USER_PASSWORD: env-pwd
+APP_USER_PASSWORD: env-pwd
 PG_SERVER: env-server

@@ -8,8 +8,8 @@ import (
 )
 
 type conf struct {
-	PgUserPassword string `env:"PG_USER_PASSWORD" yaml:"PG_USER_PASSWORD" env-required:"true"`
-	PgServer       string `env:"PG_SERVER" yaml:"PG_SERVER" env-required:"true"`
+	AppUserPassword string `env:"APP_USER_PASSWORD" yaml:"APP_USER_PASSWORD" env-required:"true"`
+	PgServer        string `env:"PG_SERVER" yaml:"PG_SERVER" env-required:"true"`
 }
 
 var Cfg conf

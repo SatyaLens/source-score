@@ -17,7 +17,12 @@ jobs:
 
     - name: Setup test CNPG
       env:
-        APP_USER_PASSWORD: ${{ secrets.APP_USER_PASSWORD }}
+        APP_USER_PASSWORD: ${{ vars.APP_USER_PASSWORD }}
+      run: echo "$APP_USER_PASSWORD"
+
+    - name: Setup test CNPG
+      env:
+        APP_USER_PASSWORD: ${{ vars.APP_USER_PASSWORD }}
         SUPER_USER_PASSWORD: ${{ secrets.SUPER_USER_PASSWORD }}
       run: make local-pg-setup
 
