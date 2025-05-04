@@ -28,8 +28,8 @@ var _ = Describe("Conf Tests", func() {
 
 			Expect(conf.Cfg.AppUserPassword).To(BeEquivalentTo(SamplePwd))
 			Expect(conf.Cfg.PgServer).To(BeEquivalentTo(SampleServer))
-			Expect(conf.Cfg.Port).To(BeEquivalentTo("8999"))
-			Expect(conf.Cfg.SuperUserPassword).To(BeEquivalentTo("user-pwd"))
+			Expect(conf.Cfg.Port).To(BeEquivalentTo(SamplePort))
+			Expect(conf.Cfg.SuperUserPassword).To(BeEquivalentTo(SampleSUPwd))
 		})
 	})
 
