@@ -1,10 +1,12 @@
-cnpg_cluster:
+cnpgCluster:
   instanceCount: 2
   name: cnpg-cluster
-  password: ""
   storageSize: "1Gi"
-  username: sourcescore
+  superuserName: "postgres"
+  superuserPassword: ""
 
-cnpg_database:
+cnpgDatabase:
   name: sourcescore
   namespace: postgres-cluster
+  username: sourcescore
+  userPassword: ""

@@ -1,14 +1,14 @@
+APP_USER_PASSWORD ?= "sourcescore"
 CNPG_VERSION ?= "1.25.1"
 K3D_VERSION ?= "v5.8.3"
 K3S_IMAGE_VERSION ?= "rancher/k3s:v1.31.8-k3s1-amd64"
 PG_HOST ?= "http://127.0.0.1"
-PG_USER_PASSWORD ?= "test_123"
+SUPER_USER_PASSWORD ?= "test_123"
 SERVER_PORT ?= 8070
 TEST_CLUSTER_NAME = "test-env"
 
 # common env setup
 export PG_SERVER=$(PG_HOST):$(SERVER_PORT)
-export PG_USER_PASSWORD
 export PORT=$(SERVER_PORT)
 
 install-k3d-cli:
@@ -60,8 +60,12 @@ cnpg-controller-setup:
 	kubectl get deployment -n cnpg-system cnpg-controller-manager
 	@echo -e "\n\n"
 
+# TODO:: create super user and app user secrets in the cluster after reading them from GA secrets
 pg-setup: cnpg-controller-setup
-	helm upgrade --install cnpg-database --set cnpg_cluster.password=$(PG_USER_PASSWORD) helm/cnpg-database
+	helm upgrade --install cnpg-database \
+		--set cnpgCluster.superuserPassword=$(SUPER_USER_PASSWORD) \
+		--set cnpgDatabase.userPassword=$(APP_USER_PASSWORD) \
+		helm/cnpg-database
 	@echo -e "\n\e[0;32mCreated CNPG cluster :)\n\e[0m"
 	sleep 240
 	kubectl get pods -l cnpg.io/cluster=cnpg-cluster -n postgres-cluster

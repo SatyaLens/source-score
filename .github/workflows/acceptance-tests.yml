@@ -16,6 +16,9 @@ jobs:
       run: make install-k3d-cli
 
     - name: Setup test CNPG
+      env:
+        APP_USER_PASSWORD: ${{ secrets.APP_USER_PASSWORD }}
+        SUPER_USER_PASSWORD: ${{ secrets.SUPER_USER_PASSWORD }}
       run: make local-pg-setup
 
     - name: Run acceptance tests
