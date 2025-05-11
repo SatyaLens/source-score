@@ -2,13 +2,12 @@ package source
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"log/slog"
 
 	"source-score/pkg/api"
 	"source-score/pkg/db/cnpg"
+	"source-score/pkg/helpers"
 )
 
 type SourceRepository struct {
@@ -21,19 +20,20 @@ func NewSourceRepository(ctx context.Context, client *cnpg.Client) *SourceReposi
 	}
 }
 
-func (sr *SourceRepository) DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error {
+func (sr *SourceRepository) DeleteSource(ctx context.Context, source *api.Source) error {
 	result := sr.client.Delete(ctx, source)
-	slog.InfoContext(
-		ctx,
-		fmt.Sprintf("%d rows affected\n", result.RowsAffected),
-	)
+
+	if result.Error == nil {
+		slog.InfoContext(
+			ctx,
+			fmt.Sprintf("%d rows affected\n", result.RowsAffected),
+		)
+	}
 
 	return result.Error
 }
 
-func (sr *SourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error) {
-	source := &api.Source{}
-	source.UriDigest = uriDigest
+func (sr *SourceRepository) GetSource(ctx context.Context, source *api.Source) (*api.Source, error) {
 	result := sr.client.FindFirst(ctx, source)
 
 	if result.Error != nil {
@@ -44,13 +44,7 @@ func (sr *SourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest 
 }
 
 func (sr *SourceRepository) PutSource(ctx context.Context, sourceInput *api.SourceInput) error {
-	hash := sha256.New()
-	_, err := hash.Write([]byte(sourceInput.Uri))
-	if err != nil {
-		return err
-	}
-
-	uriDigest := hex.EncodeToString(hash.Sum(nil))
+	uriDigest := helpers.GetSHA256Hash(sourceInput.Uri)
 	source := &api.Source{
 		Name:      sourceInput.Name,
 		Summary:   sourceInput.Summary,
@@ -60,10 +54,12 @@ func (sr *SourceRepository) PutSource(ctx context.Context, sourceInput *api.Sour
 	}
 
 	result := sr.client.Create(ctx, source)
-	slog.InfoContext(
-		ctx,
-		fmt.Sprintf("%d rows affected\n", result.RowsAffected),
-	)
+	if result.Error == nil {
+		slog.InfoContext(
+			ctx,
+			fmt.Sprintf("%d rows affected\n", result.RowsAffected),
+		)
+	}
 
 	return result.Error
 }
@@ -83,10 +79,12 @@ func (sr *SourceRepository) UpdateSourceByUriDigest(ctx context.Context, sourceI
 	source.Tags = sourceInput.Tags
 
 	result = sr.client.Update(ctx, source)
-	slog.InfoContext(
-		ctx,
-		fmt.Sprintf("%d rows affected\n", result.RowsAffected),
-	)
+	if result.Error == nil {
+		slog.InfoContext(
+			ctx,
+			fmt.Sprintf("%d rows affected\n", result.RowsAffected),
+		)
+	}
 
 	return result.Error
 }

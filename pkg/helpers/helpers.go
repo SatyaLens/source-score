@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"crypto/sha256"
+	"fmt"
 	"log"
 	"os"
 )
@@ -13,4 +15,8 @@ func DeleteFileIfExists(filePath string) error {
 	}
 
 	return os.Remove(filePath)
+}
+
+func GetSHA256Hash(input string) string {
+	return fmt.Sprintf("%x", sha256.Sum256([]byte(input)))
 }
