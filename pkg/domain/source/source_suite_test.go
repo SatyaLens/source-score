@@ -25,6 +25,7 @@ var (
 	sampleSourceInput1 api.SourceInput
 	sourceRepo         *source.SourceRepository
 	testDB             *gorm.DB
+	uriDigest1         string
 )
 
 func TestSource(t *testing.T) {
@@ -41,6 +42,8 @@ func TestSource(t *testing.T) {
 			Tags:    "tag1",
 			Uri:     "https://sample-uri-1",
 		}
+
+		uriDigest1 = helpers.GetSHA256Hash(sampleSourceInput1.Uri)
 
 		sourceRepo = source.NewSourceRepository(context.TODO(), &cnpg.Client{
 			DB: testDB,
