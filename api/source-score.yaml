@@ -6,6 +6,10 @@ info:
 
 paths:
   /ping:
+    post:
+      responses:
+        201:
+          description: ping posted
     get:
       responses:
         200:
