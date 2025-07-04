@@ -1,6 +1,7 @@
 package api
 
 import (
+	"io"
 	"log/slog"
 	"net/http"
 	"source-score/pkg/handlers"
@@ -43,14 +44,23 @@ func (r *router) UpdateSource(ctx *gin.Context, uriDigest string) {
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
-	incomingMsg := &handlers.IncomingMessage{}
+	message := r.pingHandler.GetPing(ctx)
 
-	err := proto.Unmarshal([]byte(ctx.Param("incomingMessage")), incomingMsg)
+	ctx.JSON(http.StatusOK, gin.H{"data": message})
+}
+
+func (r *router) PostPing(ctx *gin.Context) {
+	body, _ := io.ReadAll(ctx.Request.Body)
+	incomingMsg := &handlers.IncomingMessage{
+		Message: "sample incoming message",
+	}
+
+	err := proto.Unmarshal(body, incomingMsg)
 	if err != nil {
 		panic("failed proto marshalling:: " + err.Error())
 	}
 
-	message := r.pingHandler.GetPing(ctx, incomingMsg)
+	message := r.pingHandler.PostPing(ctx, incomingMsg)
 
 	ctx.JSON(http.StatusOK, gin.H{"data": message})
 }
