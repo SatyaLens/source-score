@@ -6,6 +6,7 @@ import (
 	"source-score/pkg/handlers"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/protobuf/proto"
 )
 
 type router struct {
@@ -42,7 +43,19 @@ func (r *router) UpdateSource(ctx *gin.Context, uriDigest string) {
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
-	message := r.pingHandler.GetPing(ctx)
+	incomingMsg := &handlers.IncomingMessage{
+		Message: "sample mssage",
+	}
+	data, err := proto.Marshal(incomingMsg)
+	if err != nil {
+		panic("failed proto marshalling:: " + err.Error())
+	}
+	err = proto.Unmarshal(data, incomingMsg)
+	if err != nil {
+		panic("failed proto marshalling:: " + err.Error())
+	}
+
+	message := r.pingHandler.GetPing(ctx, incomingMsg)
 
 	ctx.JSON(http.StatusOK, gin.H{"data": message})
 }

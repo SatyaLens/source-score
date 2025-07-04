@@ -14,6 +14,7 @@ func NewPingHandler() *PingHandler {
 	}
 }
 
-func (ph PingHandler) GetPing(ctx context.Context) string {
-	return ph.message
+func (ph PingHandler) GetPing(ctx context.Context, inccomingMsg *IncomingMessage) string {
+
+	return "incoming: " + inccomingMsg.Message + "\nresponse: " + ph.message
 }
