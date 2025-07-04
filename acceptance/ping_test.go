@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -12,12 +13,18 @@ import (
 
 var _ = Describe("API Tests", func() {
 	Context("Testing /ping endpoint", func() {
-		endpoint, err := url.JoinPath(baseUrl, "ping")
+		endpoint, err := url.Parse(path.Join(baseUrl, "ping"))
 		Expect(err).To(BeNil())
+		query := endpoint.Query()
+		query.Add(
+			"incomingMessage",
+			"sample incoming message",
+		)
+		endpoint.RawQuery = query.Encode()
 
 		When("GET request is sent to /ping", func() {
 			It("should get Pong message in reponse", func() {
-				resp, err := http.Get(endpoint)
+				resp, err := http.Get(endpoint.String())
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusOK))
 
@@ -28,7 +35,7 @@ var _ = Describe("API Tests", func() {
 				var respBody responseBody
 				err = json.Unmarshal(body, &respBody)
 				Expect(err).To(BeNil())	
-				Expect(respBody.Data).To(BeEquivalentTo("Pong"))
+				Expect(respBody.Data).To(ContainSubstring("sample incoming message"))
 			})
 		})
 	})

@@ -43,14 +43,9 @@ func (r *router) UpdateSource(ctx *gin.Context, uriDigest string) {
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
-	incomingMsg := &handlers.IncomingMessage{
-		Message: "sample mssage",
-	}
-	data, err := proto.Marshal(incomingMsg)
-	if err != nil {
-		panic("failed proto marshalling:: " + err.Error())
-	}
-	err = proto.Unmarshal(data, incomingMsg)
+	incomingMsg := &handlers.IncomingMessage{}
+
+	err := proto.Unmarshal([]byte(ctx.Param("incomingMessage")), incomingMsg)
 	if err != nil {
 		panic("failed proto marshalling:: " + err.Error())
 	}
