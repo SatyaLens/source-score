@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"path"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -13,7 +12,7 @@ import (
 
 var _ = Describe("API Tests", func() {
 	Context("Testing /ping endpoint", func() {
-		endpoint, err := url.Parse(path.Join(baseUrl, "ping"))
+		endpoint, err := url.Parse(baseUrl + "/" + "ping")
 		Expect(err).To(BeNil())
 		query := endpoint.Query()
 		query.Add(
@@ -34,7 +33,7 @@ var _ = Describe("API Tests", func() {
 
 				var respBody responseBody
 				err = json.Unmarshal(body, &respBody)
-				Expect(err).To(BeNil())	
+				Expect(err).To(BeNil())
 				Expect(respBody.Data).To(ContainSubstring("sample incoming message"))
 			})
 		})
