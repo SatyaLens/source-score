@@ -6,21 +6,15 @@ labels: enhancement
 assignees: ''
 ---
 
-## Problem Description
+## Feature Description
 <!-- Describe the problem you're trying to solve -->
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-## Proposed Solution
+## Proposed Implementation
 <!-- Describe the solution you'd like -->
-A clear and concise description of what you want to happen.
 
-## Alternatives Considered
-<!-- Describe any alternative solutions or features you've considered -->
-A clear and concise description of any alternative solutions or features you've considered.
 
 ## Additional Context
 <!-- Add any other context or screenshots about the feature request here -->
-Add any other context or screenshots about the feature request here.
 
 ## Checklist
 <!-- Please check all applicable items -->
