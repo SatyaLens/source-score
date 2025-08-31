@@ -6,18 +6,3 @@ contact_links:
   - name: Documentation
     url: https://github.com/SatyaLens/source-score/wiki
     about: Please check our documentation before creating issues.
-
-# Configure default settings for issue templates
-defaults:
-  - scope:
-      template: bug_report.md
-    values:
-      labels:
-        - bug
-        - triage
-  - scope:
-      template: feature_request.md
-    values:
-      labels:
-        - enhancement
-        - triage
