@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/SatyaLens/source-score/discussions
+    about: Please ask and answer questions here.
+  - name: Documentation
+    url: https://github.com/SatyaLens/source-score/wiki
+    about: Please check our documentation before creating issues.
