@@ -43,7 +43,7 @@ acceptance-tests: build
 tests: unit-tests acceptance-tests
 
 start: codegen
-	go run main.go
+	go run cmd/app/main.go
 
 k3d-cleanup:
 	@if k3d cluster list | grep -q "^$(TEST_CLUSTER_NAME) "; then \
