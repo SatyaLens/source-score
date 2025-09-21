@@ -24,6 +24,7 @@ var (
 	err                error
 	sampleSourceInput1 api.SourceInput
 	sourceRepo         source.SourceRepoInterface
+	sourceSvc          source.SourceService
 	testDB             *gorm.DB
 )
 
@@ -45,6 +46,7 @@ func TestSource(t *testing.T) {
 		sourceRepo = source.NewSourceRepository(context.TODO(), &cnpg.Client{
 			DB: testDB,
 		})
+		
 	})
 
 	var _ = AfterSuite(func() {
