@@ -5,7 +5,6 @@ import (
 	"source-score/pkg/api"
 )
 
-//go:generate go tool counterfeiter . SourceService
 type SourceService interface {
 	DeleteSourceByUriDigest(ctx context.Context, uriDigest string) error
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)

@@ -11,6 +11,7 @@ import (
 	"source-score/pkg/db/cnpg"
 )
 
+//go:generate go tool counterfeiter . SourceRepoInterface
 type SourceRepoInterface interface {
 	DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
