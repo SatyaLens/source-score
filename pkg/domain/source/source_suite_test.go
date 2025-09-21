@@ -23,7 +23,7 @@ const (
 var (
 	err                error
 	sampleSourceInput1 api.SourceInput
-	sourceRepo         *source.SourceRepository
+	sourceRepo         source.SourceRepoInterface
 	testDB             *gorm.DB
 )
 

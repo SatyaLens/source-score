@@ -11,17 +11,24 @@ import (
 	"source-score/pkg/db/cnpg"
 )
 
-type SourceRepository struct {
+type SourceRepoInterface interface {
+	DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error
+	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
+	PutSource(ctx context.Context, sourceInput *api.SourceInput) error
+	UpdateSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
+}
+
+type sourceRepository struct {
 	client *cnpg.Client
 }
 
-func NewSourceRepository(ctx context.Context, client *cnpg.Client) *SourceRepository {
-	return &SourceRepository{
+func NewSourceRepository(ctx context.Context, client *cnpg.Client) *sourceRepository {
+	return &sourceRepository{
 		client: client,
 	}
 }
 
-func (sr *SourceRepository) DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error {
+func (sr *sourceRepository) DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error {
 	result := sr.client.Delete(ctx, source)
 	slog.InfoContext(
 		ctx,
@@ -31,7 +38,7 @@ func (sr *SourceRepository) DeleteSourceByUriDigest(ctx context.Context, source 
 	return result.Error
 }
 
-func (sr *SourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error) {
+func (sr *sourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error) {
 	source := &api.Source{}
 	source.UriDigest = uriDigest
 	result := sr.client.FindFirst(ctx, source)
@@ -43,7 +50,7 @@ func (sr *SourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest 
 	return source, nil
 }
 
-func (sr *SourceRepository) PutSource(ctx context.Context, sourceInput *api.SourceInput) error {
+func (sr *sourceRepository) PutSource(ctx context.Context, sourceInput *api.SourceInput) error {
 	hash := sha256.New()
 	_, err := hash.Write([]byte(sourceInput.Uri))
 	if err != nil {
@@ -69,7 +76,7 @@ func (sr *SourceRepository) PutSource(ctx context.Context, sourceInput *api.Sour
 }
 
 // Updates source model fields except for `uri` and `uriDigest`
-func (sr *SourceRepository) UpdateSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
+func (sr *sourceRepository) UpdateSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
 	source := &api.Source{}
 	source.UriDigest = uriDigest
 
