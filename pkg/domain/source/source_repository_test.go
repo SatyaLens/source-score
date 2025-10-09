@@ -8,10 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const (
-	uriDigest1 = "8649a4126fb4fc9a750f432b729c8477398cf28ca241403b2cd36a6dc841f441"
-)
-
 var _ = Describe("Source model repository layer unit tests", func() {
 	Context("Happy path", Ordered, func() {
 		When("Adding a new source to the DB with valid input", func() {

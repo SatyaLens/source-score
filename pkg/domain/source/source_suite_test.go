@@ -6,6 +6,7 @@ import (
 	"source-score/pkg/api"
 	"source-score/pkg/db/cnpg"
 	"source-score/pkg/domain/source"
+	"source-score/pkg/domain/source/sourcefakes"
 	"source-score/pkg/helpers"
 	"testing"
 
@@ -17,15 +18,20 @@ import (
 )
 
 const (
+	uriDigest1 = "8649a4126fb4fc9a750f432b729c8477398cf28ca241403b2cd36a6dc841f441"
 	testDBFile = "test_database.db"
 )
 
 var (
 	err                error
+	sampleSource1      api.Source
 	sampleSourceInput1 api.SourceInput
 	sourceRepo         source.SourceRepoInterface
 	sourceSvc          source.SourceService
 	testDB             *gorm.DB
+
+	// fakes
+	fakeSourceRepo = sourcefakes.FakeSourceRepoInterface{}
 )
 
 func TestSource(t *testing.T) {
@@ -43,10 +49,20 @@ func TestSource(t *testing.T) {
 			Uri:     "https://sample-uri-1",
 		}
 
+		sampleSource1 = api.Source{
+			Name:      "Sample Source 1",
+			Score:     1,
+			Summary:   "Sample summary",
+			Tags:      "tag1",
+			Uri:       "https://sample-uri-1",
+			UriDigest: uriDigest1,
+		}
+
 		sourceRepo = source.NewSourceRepository(context.TODO(), &cnpg.Client{
 			DB: testDB,
 		})
-		
+
+		sourceSvc = source.NewSourceService(context.TODO(), &fakeSourceRepo)
 	})
 
 	var _ = AfterSuite(func() {
