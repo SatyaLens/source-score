@@ -58,9 +58,6 @@ func TestSource(t *testing.T) {
 			UriDigest: uriDigest1,
 		}
 
-		// configure fakes
-		fakeSourceRepo.GetSourceByUriDigestReturns(&sampleSource1, nil)
-
 		// configure layers
 		sourceRepo = source.NewSourceRepository(context.TODO(), &cnpg.Client{
 			DB: testDB,

@@ -2,6 +2,7 @@ package source_test
 
 import (
 	"context"
+	"source-score/pkg/api"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -32,26 +33,31 @@ var _ = Describe("Source model service layer unit test", func() {
 			})
 		})
 
-		// When("Updating a source by its uri digest", func() {
-		// 	It("Should update the correct source record in the DB", func() {
-		// 		sourceInput := &api.SourceInput{
-		// 			Name:    "Updated Sample Source 1",
-		// 			Summary: "Updated Sample summary",
-		// 			Tags:    "updated-tag1",
-		// 		}
+		When("Updating a source by its uri digest", func() {
+			It("Should update the correct source record in the DB", func() {
+				sourceInput := &api.SourceInput{
+					Name:    "Updated Sample Source 1",
+					Summary: "Updated Sample summary",
+					Tags:    "updated-tag1",
+				}
+				updatedSource := sampleSource1
+				updatedSource.Name = "Updated Sample Source 1"
+				updatedSource.Summary = "Updated Sample summary"
+				updatedSource.Tags = "updated-tag1"
+				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(1, &sampleSource1, nil)
+				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(2, &updatedSource, nil)
 
-		// 		err := sourceRepo.UpdateSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
-		// 		Expect(err).ToNot(HaveOccurred())
+				err := sourceSvc.UpdateSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
+				Expect(err).ToNot(HaveOccurred())
 
-		// 		source, err := sourceRepo.GetSourceByUriDigest(context.TODO(), uriDigest1)
-		// 		Expect(err).ToNot(HaveOccurred())
-		// 		Expect(source.Name).To(BeEquivalentTo(sourceInput.Name))
-		// 		Expect(source.Summary).To(BeEquivalentTo(sourceInput.Summary))
-		// 		Expect(source.Tags).To(BeEquivalentTo(sourceInput.Tags))
-		// 		Expect(source.Uri).To(BeEquivalentTo(sampleSourceInput1.Uri))
-		// 		Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))
-		// 	})
-		// })
+				source, err := sourceSvc.GetSourceByUriDigest(context.TODO(), uriDigest1)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(source.Name).To(BeEquivalentTo(sourceInput.Name))
+				Expect(source.Summary).To(BeEquivalentTo(sourceInput.Summary))
+				Expect(source.Tags).To(BeEquivalentTo(sourceInput.Tags))
+				Expect(source.Uri).To(BeEquivalentTo(sampleSourceInput1.Uri))
+				Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))			})
+		})
 
 		// When("Deleting a source by its uri digest", func() {
 		// 	It("Should delete the correct source record from the DB", func() {
