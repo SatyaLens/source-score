@@ -51,7 +51,7 @@ func TestSource(t *testing.T) {
 
 		sampleSource1 = api.Source{
 			Name:      "Sample Source 1",
-			Score:     1,
+			Score:     0.5,
 			Summary:   "Sample summary",
 			Tags:      "tag1",
 			Uri:       "https://sample-uri-1",

@@ -140,7 +140,7 @@ components:
           x-oapi-codegen-extra-tags:
             binding: required
         score:
-          type: integer
+          type: number
           format: double
           x-oapi-codegen-extra-tags:
             binding: required
