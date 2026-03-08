@@ -40,7 +40,7 @@ var _ = Describe("Source model service layer unit test", func() {
 					Summary: "Updated Sample summary",
 					Tags:    "updated-tag1",
 				}
-				updatedSource := sampleSource1
+				updatedSource = sampleSource1
 				updatedSource.Name = "Updated Sample Source 1"
 				updatedSource.Summary = "Updated Sample summary"
 				updatedSource.Tags = "updated-tag1"
@@ -49,29 +49,36 @@ var _ = Describe("Source model service layer unit test", func() {
 
 				err := sourceSvc.UpdateSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
 				Expect(err).ToNot(HaveOccurred())
+				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(1)
+				Expect(digest).To(Equal(uriDigest1))
+				_, srcInput := fakeSourceRepo.PutSourceArgsForCall(0)
+				Expect(srcInput.Name).To(Equal(sampleSource1.Name))
+				Expect(srcInput.Summary).To(Equal(sampleSource1.Summary))
+				Expect(srcInput.Tags).To(Equal(sampleSource1.Tags))
 
 				source, err := sourceSvc.GetSourceByUriDigest(context.TODO(), uriDigest1)
 				Expect(err).ToNot(HaveOccurred())
+				_, digest = fakeSourceRepo.GetSourceByUriDigestArgsForCall(2)
+				Expect(digest).To(Equal(uriDigest1))
 				Expect(source.Name).To(BeEquivalentTo(sourceInput.Name))
 				Expect(source.Summary).To(BeEquivalentTo(sourceInput.Summary))
 				Expect(source.Tags).To(BeEquivalentTo(sourceInput.Tags))
 				Expect(source.Uri).To(BeEquivalentTo(sampleSourceInput1.Uri))
-				Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))			})
+				Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))
+			})
 		})
 
-		// When("Deleting a source by its uri digest", func() {
-		// 	It("Should delete the correct source record from the DB", func() {
-		// 		source := &api.Source{
-		// 			UriDigest: uriDigest1,
-		// 		}
+		When("Deleting a source by its uri digest", func() {
+			It("Should delete the correct source record from the DB", func() {
+				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(3, &updatedSource, nil)
 
-		// 		err := sourceRepo.DeleteSourceByUriDigest(context.TODO(), source)
-		// 		Expect(err).ToNot(HaveOccurred())
-
-		// 		_, err = sourceRepo.GetSourceByUriDigest(context.TODO(), uriDigest1)
-		// 		Expect(err).To(HaveOccurred())
-		// 		Expect(err.Error()).To(ContainSubstring("record not found"))
-		// 	})
-		// })
+				err := sourceSvc.DeleteSourceByUriDigest(context.TODO(), uriDigest1)
+				Expect(err).ToNot(HaveOccurred())
+				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(3)
+				Expect(digest).To(Equal(uriDigest1))
+				_, src := fakeSourceRepo.DeleteSourceByUriDigestArgsForCall(0)
+				Expect(*src).To(Equal(updatedSource))
+			})
+		})
 	})
 })

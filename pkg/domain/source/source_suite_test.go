@@ -29,6 +29,7 @@ var (
 	sourceRepo         source.SourceRepoInterface
 	sourceSvc          source.SourceService
 	testDB             *gorm.DB
+	updatedSource      api.Source
 
 	// fakes
 	fakeSourceRepo = sourcefakes.FakeSourceRepoInterface{}
