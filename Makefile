@@ -26,7 +26,7 @@ lint: codegen
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint run ./...
 
 build: codegen
-	go build
+	go build -o ./source-score ./cmd/app
 
 unit-tests:
 	go run github.com/onsi/ginkgo/v2/ginkgo run --skip-package=acceptance --cover --coverprofile=coverage.out ./...

@@ -9,3 +9,5 @@ test_database.db
 
 # secrets
 configs/civo-kubeconfig
+
+temp/
