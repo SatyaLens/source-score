@@ -10,6 +10,7 @@ import (
 	"source-score/pkg/api"
 	"source-score/pkg/conf"
 	"source-score/pkg/helpers"
+	apiServer "source-score/pkg/http"
 	"source-score/pkg/logger"
 )
 
@@ -38,7 +39,7 @@ func main() {
 	}
 
 	server := gin.Default()
-	api.RegisterHandlersWithOptions(server, api.NewRouter(), loggerOpts)
+	api.RegisterHandlersWithOptions(server, apiServer.NewRouter(), loggerOpts)
 
 	err := server.Run()
 	if err != nil {

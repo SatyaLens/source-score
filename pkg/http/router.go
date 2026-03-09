@@ -1,8 +1,9 @@
-package api
+package http
 
 import (
 	"log/slog"
 	"net/http"
+	"source-score/pkg/api"
 	"source-score/pkg/handlers"
 
 	"github.com/gin-gonic/gin"
@@ -19,7 +20,7 @@ func NewRouter() *router {
 }
 
 func (r *router) CreateSource(ctx *gin.Context) {
-	body := SourceInput{}
+	body := api.SourceInput{}
 	// using BindJson method to serialize body with struct
 	if err := ctx.BindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
