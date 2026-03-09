@@ -1,8 +1,11 @@
-package api
+package http
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
+	"source-score/pkg/api"
+	"source-score/pkg/domain/source"
 	"source-score/pkg/handlers"
 
 	"github.com/gin-gonic/gin"
@@ -10,16 +13,18 @@ import (
 
 type router struct {
 	pingHandler *handlers.PingHandler
+	srcHandler  *handlers.SourceHandler
 }
 
-func NewRouter() *router {
+func NewRouter(ctx context.Context, sourceSvc source.SourceService) *router {
 	return &router{
 		pingHandler: handlers.NewPingHandler(),
+		srcHandler:  handlers.NewSourceHandler(ctx, sourceSvc),
 	}
 }
 
 func (r *router) CreateSource(ctx *gin.Context) {
-	body := SourceInput{}
+	body := api.SourceInput{}
 	// using BindJson method to serialize body with struct
 	if err := ctx.BindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

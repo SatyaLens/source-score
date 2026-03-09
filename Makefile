@@ -2,14 +2,14 @@ APP_USER_PASSWORD ?= "sourcescore"
 CNPG_VERSION ?= "1.25.1"
 K3D_VERSION ?= "v5.8.3"
 K3S_IMAGE_VERSION ?= "rancher/k3s:v1.31.8-k3s1-amd64"
-PG_HOST ?= "http://127.0.0.1"
+SERVER_HOST ?= "localhost"
 SUPER_USER_PASSWORD ?= "test_123"
 SERVER_PORT ?= 8070
 TEST_CLUSTER_NAME = "test-env"
 
 # common env setup
 export APP_USER_PASSWORD
-export PG_SERVER=$(PG_HOST):$(SERVER_PORT)
+export PG_HOST=$(SERVER_HOST)
 export PORT=$(SERVER_PORT)
 export SUPER_USER_PASSWORD
 

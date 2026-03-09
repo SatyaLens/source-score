@@ -9,16 +9,16 @@ import (
 )
 
 const (
-	SamplePort   = "8099"
-	SamplePwd    = "sample-pwd"
-	SampleServer = "sample-server"
-	SampleSUPwd  = "super-pwd"
+	SamplePort  = "8099"
+	SamplePwd   = "sample-pwd"
+	SampleHost  = "sample-host"
+	SampleSUPwd = "super-pwd"
 )
 
 var _ = Describe("Conf Tests", func() {
 	When("dotenv path is not set", func() {
 		os.Setenv("APP_USER_PASSWORD", SamplePwd)
-		os.Setenv("PG_SERVER", SampleServer)
+		os.Setenv("PG_HOST", SampleHost)
 		os.Setenv("PORT", SamplePort)
 		os.Setenv("SUPER_USER_PASSWORD", SampleSUPwd)
 
@@ -27,7 +27,7 @@ var _ = Describe("Conf Tests", func() {
 			conf.LoadConfig()
 
 			Expect(conf.Cfg.AppUserPassword).To(BeEquivalentTo(SamplePwd))
-			Expect(conf.Cfg.PgServer).To(BeEquivalentTo(SampleServer))
+			Expect(conf.Cfg.PgHost).To(BeEquivalentTo(SampleHost))
 			Expect(conf.Cfg.Port).To(BeEquivalentTo(SamplePort))
 			Expect(conf.Cfg.SuperUserPassword).To(BeEquivalentTo(SampleSUPwd))
 		})
@@ -39,7 +39,7 @@ var _ = Describe("Conf Tests", func() {
 			conf.LoadConfig()
 
 			Expect(conf.Cfg.AppUserPassword).To(BeEquivalentTo("env-pwd"))
-			Expect(conf.Cfg.PgServer).To(BeEquivalentTo("env-server"))
+			Expect(conf.Cfg.PgHost).To(BeEquivalentTo("env-host"))
 			Expect(conf.Cfg.Port).To(BeEquivalentTo("8999"))
 			Expect(conf.Cfg.SuperUserPassword).To(BeEquivalentTo("user-pwd"))
 		})

@@ -1,15 +1,21 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"log/slog"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
 	"source-score/pkg/api"
 	"source-score/pkg/conf"
+	"source-score/pkg/db/cnpg"
+	"source-score/pkg/domain/source"
 	"source-score/pkg/helpers"
+	apiServer "source-score/pkg/http"
 	"source-score/pkg/logger"
 )
 
@@ -37,8 +43,20 @@ func main() {
 		},
 	}
 
+	// initialize the layers
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Asia/Shanghai",
+		conf.Cfg.PgHost,
+		conf.AppUserName,
+		conf.Cfg.AppUserPassword,
+		conf.DbName,
+	)
+	dbClient := cnpg.NewClient(context.Background(), dsn, &gorm.Config{})
+	srcRepo := source.NewSourceRepository(context.Background(), dbClient)
+	srcSvc := source.NewSourceService(context.Background(), srcRepo)
+
 	server := gin.Default()
-	api.RegisterHandlersWithOptions(server, api.NewRouter(), loggerOpts)
+	api.RegisterHandlersWithOptions(server, apiServer.NewRouter(context.Background(), srcSvc), loggerOpts)
 
 	err := server.Run()
 	if err != nil {
