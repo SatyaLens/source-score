@@ -26,7 +26,7 @@ lint: codegen
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint run ./...
 
 build: codegen
-	go build
+	go build -o ./source-score ./cmd/app
 
 unit-tests:
 	go run github.com/onsi/ginkgo/v2/ginkgo run --skip-package=acceptance --cover --coverprofile=coverage.out ./...
@@ -43,7 +43,7 @@ acceptance-tests: build
 tests: unit-tests acceptance-tests
 
 start: codegen
-	go run main.go
+	go run cmd/app/main.go
 
 k3d-cleanup:
 	@if k3d cluster list | grep -q "^$(TEST_CLUSTER_NAME) "; then \

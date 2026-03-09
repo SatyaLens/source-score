@@ -1,8 +1,12 @@
-issues:
-  exclude:
-    - (.*)_test\.go$
+version: "2"
 
-linters-settings:
-  errcheck:
-    exclude-functions:
-    - (*Logger).Sync
+linters:
+  settings:
+    errcheck:
+      exclude-functions:
+      - (*Logger).Sync
+  exclusions:
+    rules:
+    - path: (.*)_test\.go$
+      linters:
+      - errcheck  

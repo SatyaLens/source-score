@@ -1,0 +1,81 @@
+package source_test
+
+import (
+	"context"
+	"source-score/pkg/api"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+)
+
+var _ = Describe("Source model service layer unit test", func() {
+	Context("Happy path", Ordered, func() {
+		When("Adding a new source with valid input", func() {
+			It("Should pass the data to the repository layer", func() {
+				err := sourceSvc.PostSource(context.TODO(), &sampleSourceInput1)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeSourceRepo.PostSourceCallCount()).To(Equal(1))
+				_, srcInput := fakeSourceRepo.PostSourceArgsForCall(0)
+				Expect(srcInput).To(Equal(&sampleSourceInput1))
+			})
+		})
+
+		When("Retrieving a source by its uri digest", func() {
+			It("Should pass the digest to the repo layer", func() {
+				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(0, &sampleSource1, nil)
+				src, err := sourceSvc.GetSourceByUriDigest(context.TODO(), uriDigest1)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(src).To(Equal(&sampleSource1))
+				Expect(fakeSourceRepo.GetSourceByUriDigestCallCount()).To(Equal(1))
+				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(0)
+				Expect(digest).To(Equal(uriDigest1))
+			})
+		})
+
+		When("Updating a source by its uri digest", func() {
+			It("Should update the correct source record in the DB", func() {
+				sourceInput := &api.SourceInput{
+					Name:    "Updated Sample Source 1",
+					Summary: "Updated Sample summary",
+					Tags:    "updated-tag1",
+				}
+				updatedSource = sampleSource1
+				updatedSource.Name = "Updated Sample Source 1"
+				updatedSource.Summary = "Updated Sample summary"
+				updatedSource.Tags = "updated-tag1"
+				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(1, &updatedSource, nil)
+
+				err := sourceSvc.UpdateSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
+				Expect(err).ToNot(HaveOccurred())
+				_, srcInput := fakeSourceRepo.PostSourceArgsForCall(0)
+				Expect(srcInput.Name).To(Equal(sampleSource1.Name))
+				Expect(srcInput.Summary).To(Equal(sampleSource1.Summary))
+				Expect(srcInput.Tags).To(Equal(sampleSource1.Tags))
+
+				source, err := sourceSvc.GetSourceByUriDigest(context.TODO(), uriDigest1)
+				Expect(err).ToNot(HaveOccurred())
+				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(1)
+				Expect(digest).To(Equal(uriDigest1))
+				Expect(source.Name).To(BeEquivalentTo(sourceInput.Name))
+				Expect(source.Summary).To(BeEquivalentTo(sourceInput.Summary))
+				Expect(source.Tags).To(BeEquivalentTo(sourceInput.Tags))
+				Expect(source.Uri).To(BeEquivalentTo(sampleSourceInput1.Uri))
+				Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))
+			})
+		})
+
+		When("Deleting a source by its uri digest", func() {
+			It("Should delete the correct source record from the DB", func() {
+				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(2, &updatedSource, nil)
+
+				err := sourceSvc.DeleteSourceByUriDigest(context.TODO(), uriDigest1)
+				Expect(err).ToNot(HaveOccurred())
+				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(2)
+				Expect(digest).To(Equal(uriDigest1))
+				_, src := fakeSourceRepo.DeleteSourceByUriDigestArgsForCall(0)
+				Expect(*src).To(Equal(updatedSource))
+			})
+		})
+	})
+})
