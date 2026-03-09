@@ -22,8 +22,8 @@ var _ = Describe("Source model service layer unit test", func() {
 		})
 
 		When("Retrieving a source by its uri digest", func() {
-			fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(0, &sampleSource1, nil)
 			It("Should pass the digest to the repo layer", func() {
+				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(0, &sampleSource1, nil)
 				src, err := sourceSvc.GetSourceByUriDigest(context.TODO(), uriDigest1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(src).To(Equal(&sampleSource1))
