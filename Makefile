@@ -28,18 +28,22 @@ lint: codegen
 build: codegen
 	go generate ./...
 	go build -o ./source-score ./cmd/app
+	chmod +x ./source-score
 
 unit-tests:
 	go run github.com/onsi/ginkgo/v2/ginkgo run --skip-package=acceptance --cover --coverprofile=coverage.out ./...
 
 acceptance-tests: build
-	chmod +x ./source-score
+	docker compose -f acceptance/compose.yaml up -d
+	sleep 120
+	docker ps
 	( \
 		./source-score & BG_PID=$$!; \
 		trap "echo 'terminating the app'; kill $$BG_PID" EXIT; \
 		echo "app running with PID $$BG_PID"; \
 		go run github.com/onsi/ginkgo/v2/ginkgo run --cover --coverprofile=coverage.out acceptance/...; \
 	)
+	docker compose -f acceptance/compose.yaml down
 
 tests: unit-tests acceptance-tests
 

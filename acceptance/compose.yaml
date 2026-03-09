@@ -1,0 +1,11 @@
+services:
+  database:
+    image: postgres:15.17
+    restart: always
+    shm_size: 128mb
+    environment:
+      - POSTGRES_USER=sourcescore
+      - POSTGRES_PASSWORD=sourcescore
+      - POSTGRES_DB=sourcescore
+    ports:
+      - 5432:5432

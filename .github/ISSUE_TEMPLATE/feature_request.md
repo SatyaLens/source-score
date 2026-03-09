@@ -12,7 +12,6 @@ assignees: ''
 ## Proposed Implementation
 <!-- Describe the solution you'd like -->
 
-
 ## Additional Context
 <!-- Add any other context or screenshots about the feature request here -->
 
