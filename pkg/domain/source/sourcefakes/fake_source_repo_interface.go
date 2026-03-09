@@ -35,16 +35,16 @@ type FakeSourceRepoInterface struct {
 		result1 *api.Source
 		result2 error
 	}
-	PutSourceStub        func(context.Context, *api.SourceInput) error
-	putSourceMutex       sync.RWMutex
-	putSourceArgsForCall []struct {
+	PostSourceStub        func(context.Context, *api.SourceInput) error
+	postSourceMutex       sync.RWMutex
+	postSourceArgsForCall []struct {
 		arg1 context.Context
 		arg2 *api.SourceInput
 	}
-	putSourceReturns struct {
+	postSourceReturns struct {
 		result1 error
 	}
-	putSourceReturnsOnCall map[int]struct {
+	postSourceReturnsOnCall map[int]struct {
 		result1 error
 	}
 	UpdateSourceByUriDigestStub        func(context.Context, *api.SourceInput, string) error
@@ -191,17 +191,17 @@ func (fake *FakeSourceRepoInterface) GetSourceByUriDigestReturnsOnCall(i int, re
 	}{result1, result2}
 }
 
-func (fake *FakeSourceRepoInterface) PutSource(arg1 context.Context, arg2 *api.SourceInput) error {
-	fake.putSourceMutex.Lock()
-	ret, specificReturn := fake.putSourceReturnsOnCall[len(fake.putSourceArgsForCall)]
-	fake.putSourceArgsForCall = append(fake.putSourceArgsForCall, struct {
+func (fake *FakeSourceRepoInterface) PostSource(arg1 context.Context, arg2 *api.SourceInput) error {
+	fake.postSourceMutex.Lock()
+	ret, specificReturn := fake.postSourceReturnsOnCall[len(fake.postSourceArgsForCall)]
+	fake.postSourceArgsForCall = append(fake.postSourceArgsForCall, struct {
 		arg1 context.Context
 		arg2 *api.SourceInput
 	}{arg1, arg2})
-	stub := fake.PutSourceStub
-	fakeReturns := fake.putSourceReturns
-	fake.recordInvocation("PutSource", []interface{}{arg1, arg2})
-	fake.putSourceMutex.Unlock()
+	stub := fake.PostSourceStub
+	fakeReturns := fake.postSourceReturns
+	fake.recordInvocation("PostSource", []interface{}{arg1, arg2})
+	fake.postSourceMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -211,44 +211,44 @@ func (fake *FakeSourceRepoInterface) PutSource(arg1 context.Context, arg2 *api.S
 	return fakeReturns.result1
 }
 
-func (fake *FakeSourceRepoInterface) PutSourceCallCount() int {
-	fake.putSourceMutex.RLock()
-	defer fake.putSourceMutex.RUnlock()
-	return len(fake.putSourceArgsForCall)
+func (fake *FakeSourceRepoInterface) PostSourceCallCount() int {
+	fake.postSourceMutex.RLock()
+	defer fake.postSourceMutex.RUnlock()
+	return len(fake.postSourceArgsForCall)
 }
 
-func (fake *FakeSourceRepoInterface) PutSourceCalls(stub func(context.Context, *api.SourceInput) error) {
-	fake.putSourceMutex.Lock()
-	defer fake.putSourceMutex.Unlock()
-	fake.PutSourceStub = stub
+func (fake *FakeSourceRepoInterface) PostSourceCalls(stub func(context.Context, *api.SourceInput) error) {
+	fake.postSourceMutex.Lock()
+	defer fake.postSourceMutex.Unlock()
+	fake.PostSourceStub = stub
 }
 
-func (fake *FakeSourceRepoInterface) PutSourceArgsForCall(i int) (context.Context, *api.SourceInput) {
-	fake.putSourceMutex.RLock()
-	defer fake.putSourceMutex.RUnlock()
-	argsForCall := fake.putSourceArgsForCall[i]
+func (fake *FakeSourceRepoInterface) PostSourceArgsForCall(i int) (context.Context, *api.SourceInput) {
+	fake.postSourceMutex.RLock()
+	defer fake.postSourceMutex.RUnlock()
+	argsForCall := fake.postSourceArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeSourceRepoInterface) PutSourceReturns(result1 error) {
-	fake.putSourceMutex.Lock()
-	defer fake.putSourceMutex.Unlock()
-	fake.PutSourceStub = nil
-	fake.putSourceReturns = struct {
+func (fake *FakeSourceRepoInterface) PostSourceReturns(result1 error) {
+	fake.postSourceMutex.Lock()
+	defer fake.postSourceMutex.Unlock()
+	fake.PostSourceStub = nil
+	fake.postSourceReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeSourceRepoInterface) PutSourceReturnsOnCall(i int, result1 error) {
-	fake.putSourceMutex.Lock()
-	defer fake.putSourceMutex.Unlock()
-	fake.PutSourceStub = nil
-	if fake.putSourceReturnsOnCall == nil {
-		fake.putSourceReturnsOnCall = make(map[int]struct {
+func (fake *FakeSourceRepoInterface) PostSourceReturnsOnCall(i int, result1 error) {
+	fake.postSourceMutex.Lock()
+	defer fake.postSourceMutex.Unlock()
+	fake.PostSourceStub = nil
+	if fake.postSourceReturnsOnCall == nil {
+		fake.postSourceReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.putSourceReturnsOnCall[i] = struct {
+	fake.postSourceReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }

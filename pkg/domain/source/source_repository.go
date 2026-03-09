@@ -15,7 +15,7 @@ import (
 type SourceRepoInterface interface {
 	DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
-	PutSource(ctx context.Context, sourceInput *api.SourceInput) error
+	PostSource(ctx context.Context, sourceInput *api.SourceInput) error
 	UpdateSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
 }
 
@@ -51,7 +51,7 @@ func (sr *sourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest 
 	return source, nil
 }
 
-func (sr *sourceRepository) PutSource(ctx context.Context, sourceInput *api.SourceInput) error {
+func (sr *sourceRepository) PostSource(ctx context.Context, sourceInput *api.SourceInput) error {
 	hash := sha256.New()
 	_, err := hash.Write([]byte(sourceInput.Uri))
 	if err != nil {

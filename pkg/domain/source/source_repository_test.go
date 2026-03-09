@@ -12,7 +12,7 @@ var _ = Describe("Source model repository layer unit tests", func() {
 	Context("Happy path", Ordered, func() {
 		When("Adding a new source to the DB with valid input", func() {
 			It("Should create the source record in the DB", func() {
-				err := sourceRepo.PutSource(context.TODO(), &sampleSourceInput1)
+				err := sourceRepo.PostSource(context.TODO(), &sampleSourceInput1)
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})

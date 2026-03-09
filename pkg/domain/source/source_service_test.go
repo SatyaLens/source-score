@@ -12,11 +12,11 @@ var _ = Describe("Source model service layer unit test", func() {
 	Context("Happy path", Ordered, func() {
 		When("Adding a new source with valid input", func() {
 			It("Should pass the data to the repository layer", func() {
-				err := sourceSvc.PutSource(context.TODO(), &sampleSourceInput1)
+				err := sourceSvc.PostSource(context.TODO(), &sampleSourceInput1)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeSourceRepo.PutSourceCallCount()).To(Equal(1))
-				_, srcInput := fakeSourceRepo.PutSourceArgsForCall(0)
+				Expect(fakeSourceRepo.PostSourceCallCount()).To(Equal(1))
+				_, srcInput := fakeSourceRepo.PostSourceArgsForCall(0)
 				Expect(srcInput).To(Equal(&sampleSourceInput1))
 			})
 		})
@@ -51,7 +51,7 @@ var _ = Describe("Source model service layer unit test", func() {
 				Expect(err).ToNot(HaveOccurred())
 				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(1)
 				Expect(digest).To(Equal(uriDigest1))
-				_, srcInput := fakeSourceRepo.PutSourceArgsForCall(0)
+				_, srcInput := fakeSourceRepo.PostSourceArgsForCall(0)
 				Expect(srcInput.Name).To(Equal(sampleSource1.Name))
 				Expect(srcInput.Summary).To(Equal(sampleSource1.Summary))
 				Expect(srcInput.Tags).To(Equal(sampleSource1.Tags))
