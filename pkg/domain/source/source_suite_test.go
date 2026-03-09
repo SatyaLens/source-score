@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 	"source-score/pkg/api"
-	"source-score/pkg/db/cnpg"
+	"source-score/pkg/db/pgsql"
 	"source-score/pkg/domain/source"
 	"source-score/pkg/domain/source/sourcefakes"
 	"source-score/pkg/helpers"
@@ -60,7 +60,7 @@ func TestSource(t *testing.T) {
 		}
 
 		// configure layers
-		sourceRepo = source.NewSourceRepository(context.TODO(), &cnpg.Client{
+		sourceRepo = source.NewSourceRepository(context.TODO(), &pgsql.Client{
 			DB: testDB,
 		})
 		sourceSvc = source.NewSourceService(context.TODO(), &fakeSourceRepo)

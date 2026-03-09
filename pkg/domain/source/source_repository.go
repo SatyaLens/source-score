@@ -8,7 +8,7 @@ import (
 	"log/slog"
 
 	"source-score/pkg/api"
-	"source-score/pkg/db/cnpg"
+	"source-score/pkg/db/pgsql"
 )
 
 //go:generate go tool counterfeiter . SourceRepository
@@ -20,10 +20,10 @@ type SourceRepository interface {
 }
 
 type sourceRepository struct {
-	client *cnpg.Client
+	client *pgsql.Client
 }
 
-func NewSourceRepository(ctx context.Context, client *cnpg.Client) SourceRepository {
+func NewSourceRepository(ctx context.Context, client *pgsql.Client) SourceRepository {
 	return &sourceRepository{
 		client: client,
 	}
