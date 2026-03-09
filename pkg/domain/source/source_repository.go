@@ -86,9 +86,15 @@ func (sr *sourceRepository) UpdateSourceByUriDigest(ctx context.Context, sourceI
 		return result.Error
 	}
 
-	source.Name = sourceInput.Name
-	source.Summary = sourceInput.Summary
-	source.Tags = sourceInput.Tags
+	if sourceInput.Name != "" {
+		source.Name = sourceInput.Name
+	}
+	if sourceInput.Summary != "" {
+		source.Summary = sourceInput.Summary
+	}
+	if sourceInput.Tags != "" {
+		source.Tags = sourceInput.Tags
+	}
 
 	result = sr.client.Update(ctx, source)
 	slog.InfoContext(

@@ -44,13 +44,10 @@ var _ = Describe("Source model service layer unit test", func() {
 				updatedSource.Name = "Updated Sample Source 1"
 				updatedSource.Summary = "Updated Sample summary"
 				updatedSource.Tags = "updated-tag1"
-				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(1, &sampleSource1, nil)
-				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(2, &updatedSource, nil)
+				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(1, &updatedSource, nil)
 
 				err := sourceSvc.UpdateSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
 				Expect(err).ToNot(HaveOccurred())
-				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(1)
-				Expect(digest).To(Equal(uriDigest1))
 				_, srcInput := fakeSourceRepo.PostSourceArgsForCall(0)
 				Expect(srcInput.Name).To(Equal(sampleSource1.Name))
 				Expect(srcInput.Summary).To(Equal(sampleSource1.Summary))
@@ -58,7 +55,7 @@ var _ = Describe("Source model service layer unit test", func() {
 
 				source, err := sourceSvc.GetSourceByUriDigest(context.TODO(), uriDigest1)
 				Expect(err).ToNot(HaveOccurred())
-				_, digest = fakeSourceRepo.GetSourceByUriDigestArgsForCall(2)
+				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(1)
 				Expect(digest).To(Equal(uriDigest1))
 				Expect(source.Name).To(BeEquivalentTo(sourceInput.Name))
 				Expect(source.Summary).To(BeEquivalentTo(sourceInput.Summary))
@@ -70,11 +67,11 @@ var _ = Describe("Source model service layer unit test", func() {
 
 		When("Deleting a source by its uri digest", func() {
 			It("Should delete the correct source record from the DB", func() {
-				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(3, &updatedSource, nil)
+				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(2, &updatedSource, nil)
 
 				err := sourceSvc.DeleteSourceByUriDigest(context.TODO(), uriDigest1)
 				Expect(err).ToNot(HaveOccurred())
-				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(3)
+				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(2)
 				Expect(digest).To(Equal(uriDigest1))
 				_, src := fakeSourceRepo.DeleteSourceByUriDigestArgsForCall(0)
 				Expect(*src).To(Equal(updatedSource))

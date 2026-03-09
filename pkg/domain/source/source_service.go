@@ -45,20 +45,5 @@ func (svc *sourceService) PostSource(ctx context.Context, sourceInput *api.Sourc
 }
 
 func (svc *sourceService) UpdateSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
-	source, err := svc.sourceRepo.GetSourceByUriDigest(ctx, uriDigest)
-	if err != nil {
-		return err
-	}
-
-	if sourceInput.Name == "" {
-		sourceInput.Name = source.Name
-	}
-	if sourceInput.Summary == "" {
-		sourceInput.Summary = source.Summary
-	}
-	if sourceInput.Tags == "" {
-		sourceInput.Tags = source.Tags
-	}
-
 	return svc.sourceRepo.UpdateSourceByUriDigest(ctx, sourceInput, uriDigest)
 }
