@@ -12,11 +12,11 @@ type Client struct {
 	DB *gorm.DB
 }
 
-func NewClient(ctx context.Context, dbURL string, config *gorm.Config) *Client {
+func NewClient(ctx context.Context, dsn string, config *gorm.Config) *Client {
 	client := new(Client)
-	DB, err := gorm.Open(postgres.Open(dbURL), config)
+	DB, err := gorm.Open(postgres.Open(dsn), config)
 	if err != nil {
-		log.Fatalf("failed to open connection with database:%s :: %s", dbURL, err)
+		log.Fatalf("failed to open connection with database: %s", err)
 	}
 
 	client.DB = DB

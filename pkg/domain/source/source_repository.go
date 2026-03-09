@@ -11,8 +11,8 @@ import (
 	"source-score/pkg/db/cnpg"
 )
 
-//go:generate go tool counterfeiter . SourceRepoInterface
-type SourceRepoInterface interface {
+//go:generate go tool counterfeiter . SourceRepository
+type SourceRepository interface {
 	DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) error
@@ -23,7 +23,7 @@ type sourceRepository struct {
 	client *cnpg.Client
 }
 
-func NewSourceRepository(ctx context.Context, client *cnpg.Client) *sourceRepository {
+func NewSourceRepository(ctx context.Context, client *cnpg.Client) SourceRepository {
 	return &sourceRepository{
 		client: client,
 	}

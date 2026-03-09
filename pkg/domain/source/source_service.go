@@ -13,10 +13,10 @@ type SourceService interface {
 }
 
 type sourceService struct {
-	sourceRepo SourceRepoInterface
+	sourceRepo SourceRepository
 }
 
-func NewSourceService(ctx context.Context, sourceRepo SourceRepoInterface) *sourceService {
+func NewSourceService(ctx context.Context, sourceRepo SourceRepository) SourceService {
 	return &sourceService{
 		sourceRepo: sourceRepo,
 	}

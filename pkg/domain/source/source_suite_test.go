@@ -26,13 +26,13 @@ var (
 	err                error
 	sampleSource1      api.Source
 	sampleSourceInput1 api.SourceInput
-	sourceRepo         source.SourceRepoInterface
+	sourceRepo         source.SourceRepository
 	sourceSvc          source.SourceService
 	testDB             *gorm.DB
 	updatedSource      api.Source
 
 	// fakes
-	fakeSourceRepo = sourcefakes.FakeSourceRepoInterface{}
+	fakeSourceRepo = sourcefakes.FakeSourceRepository{}
 )
 
 func TestSource(t *testing.T) {
