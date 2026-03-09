@@ -26,6 +26,7 @@ lint: codegen
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint run ./...
 
 build: codegen
+	go generate ./...
 	go build -o ./source-score ./cmd/app
 
 unit-tests:
