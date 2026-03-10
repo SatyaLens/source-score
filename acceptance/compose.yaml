@@ -9,3 +9,10 @@ services:
       - POSTGRES_DB=sourcescore
     ports:
       - 5432:5432
+  app:
+    image: golang:1.25-bookworm
+    volumes:
+      - ./source-score:/app/source-score
+    command: /app/source-score
+    ports:
+      - "8080:8080"

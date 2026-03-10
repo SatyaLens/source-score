@@ -4,13 +4,11 @@ K3D_VERSION ?= "v5.8.3"
 K3S_IMAGE_VERSION ?= "rancher/k3s:v1.31.8-k3s1-amd64"
 SERVER_HOST ?= "localhost"
 SUPER_USER_PASSWORD ?= "test_123"
-SERVER_PORT ?= 8070
 TEST_CLUSTER_NAME = "test-env"
 
 # common env setup
 export APP_USER_PASSWORD
 export PG_HOST=$(SERVER_HOST)
-export PORT=$(SERVER_PORT)
 export SUPER_USER_PASSWORD
 
 install-k3d-cli:
@@ -35,8 +33,6 @@ unit-tests:
 
 acceptance-tests: build
 	docker compose -f acceptance/compose.yaml up -d
-	sleep 120
-	docker ps
 	( \
 		./source-score & BG_PID=$$!; \
 		trap "echo 'terminating the app'; kill $$BG_PID" EXIT; \
@@ -46,9 +42,6 @@ acceptance-tests: build
 	docker compose -f acceptance/compose.yaml down
 
 tests: unit-tests acceptance-tests
-
-start: codegen
-	go run cmd/app/main.go
 
 k3d-cleanup:
 	@if k3d cluster list | grep -q "^$(TEST_CLUSTER_NAME) "; then \
