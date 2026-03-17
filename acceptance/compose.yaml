@@ -10,9 +10,13 @@ services:
     ports:
       - 5432:5432
   app:
-    image: golang:1.25-bookworm
-    volumes:
-      - ./source-score:/app/source-score
-    command: /app/source-score
+    build:
+      context: ../
+      dockerfile: Dockerfile
+      no_cache: true
+    depends_on:
+      database:
+        condition: service_started
+    restart: always
     ports:
       - "8080:8080"

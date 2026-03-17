@@ -31,14 +31,15 @@ build: codegen
 unit-tests:
 	go run github.com/onsi/ginkgo/v2/ginkgo run --skip-package=acceptance --cover --coverprofile=coverage.out ./...
 
-acceptance-tests: build
+acceptance-tests:
 	docker compose -f acceptance/compose.yaml up -d
-	( \
-		./source-score & BG_PID=$$!; \
-		trap "echo 'terminating the app'; kill $$BG_PID" EXIT; \
-		echo "app running with PID $$BG_PID"; \
-		go run github.com/onsi/ginkgo/v2/ginkgo run --cover --coverprofile=coverage.out acceptance/...; \
-	)
+	cd acceptance && go run github.com/onsi/ginkgo/v2/ginkgo -r ./... && cd -
+# 	( \
+# 		./source-score & BG_PID=$$!; \
+# 		trap "echo 'terminating the app'; kill $$BG_PID" EXIT; \
+# 		echo "app running with PID $$BG_PID"; \
+# 		go run github.com/onsi/ginkgo/v2/ginkgo run --cover --coverprofile=coverage.out acceptance/...; \
+# 	)p
 	docker compose -f acceptance/compose.yaml down
 
 tests: unit-tests acceptance-tests
