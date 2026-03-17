@@ -1,4 +1,4 @@
-package cnpg
+package pgsql
 
 import (
 	"context"

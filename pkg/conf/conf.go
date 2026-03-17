@@ -15,7 +15,7 @@ const (
 type conf struct {
 	AppUserPassword   string `env:"APP_USER_PASSWORD" yaml:"APP_USER_PASSWORD" env-required:"true"`
 	PgHost            string `env:"PG_HOST" yaml:"PG_HOST" env-required:"true"`
-	Port              string `env:"PORT" yaml:"PORT" env-required:"true"`
+	Port              string `env:"PORT" yaml:"PORT"`
 	SuperUserPassword string `env:"SUPER_USER_PASSWORD" yaml:"SUPER_USER_PASSWORD" env-required:"true"`
 }
 

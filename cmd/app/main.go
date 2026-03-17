@@ -12,7 +12,7 @@ import (
 
 	"source-score/pkg/api"
 	"source-score/pkg/conf"
-	"source-score/pkg/db/cnpg"
+	"source-score/pkg/db/pgsql"
 	"source-score/pkg/domain/source"
 	"source-score/pkg/helpers"
 	apiServer "source-score/pkg/http"
@@ -51,7 +51,7 @@ func main() {
 		conf.Cfg.AppUserPassword,
 		conf.DbName,
 	)
-	dbClient := cnpg.NewClient(context.Background(), dsn, &gorm.Config{})
+	dbClient := pgsql.NewClient(context.Background(), dsn, &gorm.Config{})
 	srcRepo := source.NewSourceRepository(context.Background(), dbClient)
 	srcSvc := source.NewSourceService(context.Background(), srcRepo)
 

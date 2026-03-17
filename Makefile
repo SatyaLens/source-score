@@ -4,13 +4,11 @@ K3D_VERSION ?= "v5.8.3"
 K3S_IMAGE_VERSION ?= "rancher/k3s:v1.31.8-k3s1-amd64"
 SERVER_HOST ?= "localhost"
 SUPER_USER_PASSWORD ?= "test_123"
-SERVER_PORT ?= 8070
 TEST_CLUSTER_NAME = "test-env"
 
 # common env setup
 export APP_USER_PASSWORD
 export PG_HOST=$(SERVER_HOST)
-export PORT=$(SERVER_PORT)
 export SUPER_USER_PASSWORD
 
 install-k3d-cli:
@@ -26,24 +24,22 @@ lint: codegen
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint run ./...
 
 build: codegen
+	go generate ./...
 	go build -o ./source-score ./cmd/app
+	chmod +x ./source-score
 
 unit-tests:
 	go run github.com/onsi/ginkgo/v2/ginkgo run --skip-package=acceptance --cover --coverprofile=coverage.out ./...
 
-acceptance-tests: build
-	chmod +x ./source-score
-	( \
-		./source-score & BG_PID=$$!; \
-		trap "echo 'terminating the app'; kill $$BG_PID" EXIT; \
-		echo "app running with PID $$BG_PID"; \
-		go run github.com/onsi/ginkgo/v2/ginkgo run --cover --coverprofile=coverage.out acceptance/...; \
-	)
+acceptance-tests:
+	docker compose -f acceptance/compose.yaml up -d
+	sleep 20 && cd acceptance && go run github.com/onsi/ginkgo/v2/ginkgo -r ./... && cd -
 
 tests: unit-tests acceptance-tests
 
-start: codegen
-	go run cmd/app/main.go
+cleanup-containers:
+	docker compose -f acceptance/compose.yaml down -v
+	docker rmi acceptance-app:latest
 
 k3d-cleanup:
 	@if k3d cluster list | grep -q "^$(TEST_CLUSTER_NAME) "; then \
