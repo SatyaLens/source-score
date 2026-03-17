@@ -2,13 +2,13 @@ services:
   database:
     image: postgres:15.17
     restart: always
-    shm_size: 128mb
+    shm_size: 256mb
     environment:
-      - POSTGRES_USER=sourcescore
-      - POSTGRES_PASSWORD=sourcescore
-      - POSTGRES_DB=sourcescore
+    - POSTGRES_USER=sourcescore
+    - POSTGRES_PASSWORD=sourcescore
+    - POSTGRES_DB=sourcescore
     ports:
-      - 5432:5432
+    - 5432:5432
   app:
     build:
       context: ../
@@ -18,5 +18,9 @@ services:
       database:
         condition: service_started
     restart: always
+    environment:
+    - APP_USER_PASSWORD=sourcescore
+    - PG_HOST=database
+    - SUPER_USER_PASSWORD=sourcescore
     ports:
-      - "8080:8080"
+    - "8080:8080"

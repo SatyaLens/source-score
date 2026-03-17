@@ -33,16 +33,13 @@ unit-tests:
 
 acceptance-tests:
 	docker compose -f acceptance/compose.yaml up -d
-	cd acceptance && go run github.com/onsi/ginkgo/v2/ginkgo -r ./... && cd -
-# 	( \
-# 		./source-score & BG_PID=$$!; \
-# 		trap "echo 'terminating the app'; kill $$BG_PID" EXIT; \
-# 		echo "app running with PID $$BG_PID"; \
-# 		go run github.com/onsi/ginkgo/v2/ginkgo run --cover --coverprofile=coverage.out acceptance/...; \
-# 	)p
-	docker compose -f acceptance/compose.yaml down
+	sleep 20 && cd acceptance && go run github.com/onsi/ginkgo/v2/ginkgo -r ./... && cd -
 
 tests: unit-tests acceptance-tests
+
+cleanup-containers:
+	docker compose -f acceptance/compose.yaml down -v
+	docker rmi acceptance-app:latest
 
 k3d-cleanup:
 	@if k3d cluster list | grep -q "^$(TEST_CLUSTER_NAME) "; then \

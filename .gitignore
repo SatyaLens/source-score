@@ -11,3 +11,4 @@ test_database.db
 configs/civo-kubeconfig
 
 temp/
+.aider*
