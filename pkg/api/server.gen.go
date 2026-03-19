@@ -43,7 +43,7 @@ type UpdateSourceJSONRequestBody = SourceInput
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (POST /api/v1/sources)
+	// (POST /api/v1/source)
 	CreateSource(c *gin.Context)
 
 	// (DELETE /api/v1/sources/{uriDigest})
@@ -193,7 +193,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.POST(options.BaseURL+"/api/v1/sources", wrapper.CreateSource)
+	router.POST(options.BaseURL+"/api/v1/source", wrapper.CreateSource)
 	router.DELETE(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.DeleteSource)
 	router.GET(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.GetSource)
 	router.PUT(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.UpdateSource)
