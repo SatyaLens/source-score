@@ -2,9 +2,7 @@ package http
 
 import (
 	"context"
-	"log/slog"
 	"net/http"
-	"source-score/pkg/api"
 	"source-score/pkg/domain/source"
 	"source-score/pkg/handlers"
 
@@ -24,26 +22,19 @@ func NewRouter(ctx context.Context, sourceSvc source.SourceService) *router {
 }
 
 func (r *router) CreateSource(ctx *gin.Context) {
-	body := api.SourceInput{}
-	// using BindJson method to serialize body with struct
-	if err := ctx.BindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		_ = ctx.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-	slog.InfoContext(ctx, "unimplemented")
+	r.srcHandler.PostSource(ctx)
 }
 
 func (r *router) DeleteSource(ctx *gin.Context, uriDigest string) {
-	slog.InfoContext(ctx, "unimplemented")
+	r.srcHandler.DeleteSourceByUriDigest(ctx)
 }
 
 func (r *router) GetSource(ctx *gin.Context, uriDigest string) {
-	slog.InfoContext(ctx, "unimplemented")
+	r.srcHandler.GetSourceByUriDigest(ctx)
 }
 
 func (r *router) UpdateSource(ctx *gin.Context, uriDigest string) {
-	slog.InfoContext(ctx, "unimplemented")
+	r.srcHandler.PutSourceByUriDigest(ctx)
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
