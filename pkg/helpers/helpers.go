@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -13,4 +14,12 @@ func DeleteFileIfExists(filePath string) error {
 	}
 
 	return os.Remove(filePath)
+}
+
+// TODO: add uri digest validation here
+func ValidateUriDigest(uriDigest string) error {
+	if uriDigest == "" {
+		return fmt.Errorf("invalid uri digest")
+	}
+	return nil
 }

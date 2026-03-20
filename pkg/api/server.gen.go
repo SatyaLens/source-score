@@ -43,16 +43,16 @@ type UpdateSourceJSONRequestBody = SourceInput
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (POST /api/v1/sources)
+	// (POST /api/v1/source)
 	CreateSource(c *gin.Context)
 
-	// (DELETE /api/v1/sources/{uriDigest})
+	// (DELETE /api/v1/source/{uriDigest})
 	DeleteSource(c *gin.Context, uriDigest string)
 
-	// (GET /api/v1/sources/{uriDigest})
+	// (GET /api/v1/source/{uriDigest})
 	GetSource(c *gin.Context, uriDigest string)
 
-	// (PUT /api/v1/sources/{uriDigest})
+	// (PUT /api/v1/source/{uriDigest})
 	UpdateSource(c *gin.Context, uriDigest string)
 
 	// (GET /ping)
@@ -193,9 +193,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.POST(options.BaseURL+"/api/v1/sources", wrapper.CreateSource)
-	router.DELETE(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.DeleteSource)
-	router.GET(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.GetSource)
-	router.PUT(options.BaseURL+"/api/v1/sources/:uriDigest", wrapper.UpdateSource)
+	router.POST(options.BaseURL+"/api/v1/source", wrapper.CreateSource)
+	router.DELETE(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.DeleteSource)
+	router.GET(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.GetSource)
+	router.PUT(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.UpdateSource)
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 }

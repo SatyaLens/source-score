@@ -16,7 +16,7 @@ type SourceRepository interface {
 	DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) error
-	UpdateSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
+	PutSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
 }
 
 type sourceRepository struct {
@@ -77,7 +77,7 @@ func (sr *sourceRepository) PostSource(ctx context.Context, sourceInput *api.Sou
 }
 
 // Updates source model fields except for `uri` and `uriDigest`
-func (sr *sourceRepository) UpdateSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
+func (sr *sourceRepository) PutSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
 	source := &api.Source{}
 	source.UriDigest = uriDigest
 

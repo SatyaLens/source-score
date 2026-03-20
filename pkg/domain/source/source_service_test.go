@@ -46,7 +46,7 @@ var _ = Describe("Source model service layer unit test", func() {
 				updatedSource.Tags = "updated-tag1"
 				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(1, &updatedSource, nil)
 
-				err := sourceSvc.UpdateSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
+				err := sourceSvc.PutSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
 				Expect(err).ToNot(HaveOccurred())
 				_, srcInput := fakeSourceRepo.PostSourceArgsForCall(0)
 				Expect(srcInput.Name).To(Equal(sampleSource1.Name))
