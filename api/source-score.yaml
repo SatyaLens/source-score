@@ -34,7 +34,7 @@ paths:
           #     schema:
           #       $ref: '#/components/schemas/Source'
 
-  /api/v1/sources/{uriDigest}:
+  /api/v1/source/{uriDigest}:
     get:
       tags:
         - source

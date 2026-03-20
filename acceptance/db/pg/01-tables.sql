@@ -1,6 +1,5 @@
 CREATE TABLE
     sources (
-        id BIGSERIAL,
         name TEXT,
         score SMALLINT DEFAULT 0 CHECK (
             score >= 0
@@ -15,7 +14,6 @@ CREATE TABLE
 
 CREATE TABLE
     claims (
-        id BIGSERIAL,
         source_uri TEXT,
         summary TEXT,
         title TEXT,
@@ -26,7 +24,6 @@ CREATE TABLE
 
 CREATE TABLE
     proofs (
-        id BIGSERIAL,
         claim_uri TEXT,
         reviewed_by TEXT,
         uri TEXT PRIMARY KEY,

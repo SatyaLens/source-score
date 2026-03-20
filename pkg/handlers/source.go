@@ -24,10 +24,10 @@ func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context) {
 	uriDigest := ctx.Param("uriDigest")
 
 	// TODO: add basic validation for uriDigest
-	if uriDigest == "" {
+	if err := helpers.ValidateUriDigest(uriDigest); err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
-			gin.H{"error": "invalid uri digest"},
+			gin.H{"error": err.Error()},
 		)
 		return
 	}
