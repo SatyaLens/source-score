@@ -21,7 +21,7 @@ func NewSourceHandler(ctx context.Context, sourceSvc source.SourceService) *Sour
 }
 
 func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context) {
-	uriDigest := ctx.Param("uri_digest")
+	uriDigest := ctx.Param("uriDigest")
 
 	// TODO: add basic validation for uriDigest
 	if uriDigest == "" {
@@ -49,7 +49,7 @@ func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context) {
 }
 
 func (sh *SourceHandler) GetSourceByUriDigest(ctx *gin.Context) {
-	uriDigest := ctx.Param("uri_digest")
+	uriDigest := ctx.Param("uriDigest")
 
 	// TODO: add basic validation for uriDigest
 	if err := helpers.ValidateUriDigest(uriDigest); err != nil {
@@ -77,7 +77,6 @@ func (sh *SourceHandler) GetSourceByUriDigest(ctx *gin.Context) {
 }
 
 func (sh *SourceHandler) PostSource(ctx *gin.Context) {
-	// var sourceInput *api.SourceInput
 	sourceInput := &api.SourceInput{}
 
 	// TODO: add basic validation for source input
@@ -106,7 +105,7 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 }
 
 func (sh *SourceHandler) PutSourceByUriDigest(ctx *gin.Context) {
-	uriDigest := ctx.Param("uri_digest")
+	uriDigest := ctx.Param("uriDigest")
 
 	// TODO: add basic validation for uriDigest
 	if err := helpers.ValidateUriDigest(uriDigest); err != nil {
@@ -117,7 +116,7 @@ func (sh *SourceHandler) PutSourceByUriDigest(ctx *gin.Context) {
 		return
 	}
 
-	var sourceInput *api.SourceInput
+	sourceInput := &api.SourceInput{}
 
 	err := ctx.ShouldBindJSON(sourceInput)
 	if err != nil {
@@ -127,8 +126,6 @@ func (sh *SourceHandler) PutSourceByUriDigest(ctx *gin.Context) {
 		)
 		return
 	}
-
-	err = sh.sourceSvc.PutSourceByUriDigest(ctx, sourceInput, uriDigest)
 
 	if err = sh.sourceSvc.PutSourceByUriDigest(ctx, sourceInput, uriDigest); err != nil {
 		ctx.JSON(

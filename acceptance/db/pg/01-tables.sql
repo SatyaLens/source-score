@@ -6,10 +6,10 @@ CREATE TABLE
             score >= 0
             AND score <= 100
         ),
-        uri_digest TEXT,
+        uri_digest TEXT PRIMARY KEY,
         summary TEXT,
         tags TEXT,
-        uri TEXT PRIMARY KEY
+        uri TEXT
     );
 
 
@@ -21,7 +21,7 @@ CREATE TABLE
         title TEXT,
         uri TEXT PRIMARY KEY,
         validity BOOLEAN DEFAULT FALSE,
-        CONSTRAINT fk_source FOREIGN KEY (source_uri) REFERENCES sources (uri) ON DELETE CASCADE
+        CONSTRAINT fk_source FOREIGN KEY (source_uri) REFERENCES sources (uri_digest) ON DELETE CASCADE
     );
 
 CREATE TABLE
