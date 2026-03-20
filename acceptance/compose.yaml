@@ -9,6 +9,9 @@ services:
     - POSTGRES_DB=sourcescore
     ports:
     - 5432:5432
+    volumes:
+    - /home/amit/Public/source-score/acceptance/db/pg:/docker-entrypoint-initdb.d
+    - postgres_data:/var/lib/postgresql/data
   app:
     build:
       context: ../
@@ -24,3 +27,14 @@ services:
     - SUPER_USER_PASSWORD=sourcescore
     ports:
     - "8080:8080"
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+    - 8081:8080
+    depends_on:
+      database:
+        condition: service_started
+
+volumes:
+  postgres_data:

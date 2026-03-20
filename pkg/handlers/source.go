@@ -77,7 +77,8 @@ func (sh *SourceHandler) GetSourceByUriDigest(ctx *gin.Context) {
 }
 
 func (sh *SourceHandler) PostSource(ctx *gin.Context) {
-	var sourceInput api.SourceInput
+	// var sourceInput *api.SourceInput
+	sourceInput := &api.SourceInput{}
 
 	// TODO: add basic validation for source input
 	err := ctx.ShouldBindJSON(sourceInput)
@@ -89,7 +90,7 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 		return
 	}
 
-	err = sh.sourceSvc.PostSource(ctx, &sourceInput)
+	err = sh.sourceSvc.PostSource(ctx, sourceInput)
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
@@ -116,7 +117,7 @@ func (sh *SourceHandler) PutSourceByUriDigest(ctx *gin.Context) {
 		return
 	}
 
-	var sourceInput api.SourceInput
+	var sourceInput *api.SourceInput
 
 	err := ctx.ShouldBindJSON(sourceInput)
 	if err != nil {
@@ -127,9 +128,9 @@ func (sh *SourceHandler) PutSourceByUriDigest(ctx *gin.Context) {
 		return
 	}
 
-	err = sh.sourceSvc.PutSourceByUriDigest(ctx, &sourceInput, uriDigest)
+	err = sh.sourceSvc.PutSourceByUriDigest(ctx, sourceInput, uriDigest)
 
-	if err = sh.sourceSvc.PutSourceByUriDigest(ctx, &sourceInput, uriDigest); err != nil {
+	if err = sh.sourceSvc.PutSourceByUriDigest(ctx, sourceInput, uriDigest); err != nil {
 		ctx.JSON(
 			http.StatusNotFound,
 			gin.H{"error": err.Error()},

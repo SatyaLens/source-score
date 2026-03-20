@@ -31,8 +31,10 @@ build: codegen
 unit-tests:
 	go run github.com/onsi/ginkgo/v2/ginkgo run --skip-package=acceptance --cover --coverprofile=coverage.out ./...
 
-acceptance-tests:
+start-containers:
 	docker compose -f acceptance/compose.yaml up -d
+
+acceptance-tests: start-containers
 	sleep 20 && cd acceptance && go run github.com/onsi/ginkgo/v2/ginkgo -r ./... && cd -
 
 tests: unit-tests acceptance-tests
