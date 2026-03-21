@@ -104,28 +104,15 @@ components:
 
     SourceInput:
       type: object
-      required:
-        - name
-        - summary
-        - tags
-        - uri
       properties:
         name:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
         summary:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
         tags:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
         uri:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
 
     Source:
       type: object
