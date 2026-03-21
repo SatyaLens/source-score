@@ -53,17 +53,17 @@ func (sr *sourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest 
 
 func (sr *sourceRepository) PostSource(ctx context.Context, sourceInput *api.SourceInput) error {
 	hash := sha256.New()
-	_, err := hash.Write([]byte(*sourceInput.Uri))
+	_, err := hash.Write([]byte(sourceInput.Uri))
 	if err != nil {
 		return err
 	}
 
 	uriDigest := hex.EncodeToString(hash.Sum(nil))
 	source := &api.Source{
-		Name:      *sourceInput.Name,
-		Summary:   *sourceInput.Summary,
-		Tags:      *sourceInput.Tags,
-		Uri:       *sourceInput.Uri,
+		Name:      sourceInput.Name,
+		Summary:   sourceInput.Summary,
+		Tags:      sourceInput.Tags,
+		Uri:       sourceInput.Uri,
 		UriDigest: uriDigest,
 	}
 
@@ -86,14 +86,14 @@ func (sr *sourceRepository) PatchSourceByUriDigest(ctx context.Context, sourceIn
 		return result.Error
 	}
 
-	if *sourceInput.Name != "" {
-		source.Name = *sourceInput.Name
+	if sourceInput.Name != "" {
+		source.Name = sourceInput.Name
 	}
-	if *sourceInput.Summary != "" {
-		source.Summary = *sourceInput.Summary
+	if sourceInput.Summary != "" {
+		source.Summary = sourceInput.Summary
 	}
-	if *sourceInput.Tags != "" {
-		source.Tags = *sourceInput.Tags
+	if sourceInput.Tags != "" {
+		source.Tags = sourceInput.Tags
 	}
 
 	result = sr.client.Update(ctx, source)

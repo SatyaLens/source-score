@@ -35,6 +35,19 @@ type FakeSourceRepository struct {
 		result1 *api.Source
 		result2 error
 	}
+	PatchSourceByUriDigestStub        func(context.Context, *api.SourceInput, string) error
+	patchSourceByUriDigestMutex       sync.RWMutex
+	patchSourceByUriDigestArgsForCall []struct {
+		arg1 context.Context
+		arg2 *api.SourceInput
+		arg3 string
+	}
+	patchSourceByUriDigestReturns struct {
+		result1 error
+	}
+	patchSourceByUriDigestReturnsOnCall map[int]struct {
+		result1 error
+	}
 	PostSourceStub        func(context.Context, *api.SourceInput) error
 	postSourceMutex       sync.RWMutex
 	postSourceArgsForCall []struct {
@@ -45,19 +58,6 @@ type FakeSourceRepository struct {
 		result1 error
 	}
 	postSourceReturnsOnCall map[int]struct {
-		result1 error
-	}
-	PutSourceByUriDigestStub        func(context.Context, *api.SourceInput, string) error
-	putSourceByUriDigestMutex       sync.RWMutex
-	putSourceByUriDigestArgsForCall []struct {
-		arg1 context.Context
-		arg2 *api.SourceInput
-		arg3 string
-	}
-	putSourceByUriDigestReturns struct {
-		result1 error
-	}
-	putSourceByUriDigestReturnsOnCall map[int]struct {
 		result1 error
 	}
 	invocations      map[string][][]interface{}
@@ -191,6 +191,69 @@ func (fake *FakeSourceRepository) GetSourceByUriDigestReturnsOnCall(i int, resul
 	}{result1, result2}
 }
 
+func (fake *FakeSourceRepository) PatchSourceByUriDigest(arg1 context.Context, arg2 *api.SourceInput, arg3 string) error {
+	fake.patchSourceByUriDigestMutex.Lock()
+	ret, specificReturn := fake.patchSourceByUriDigestReturnsOnCall[len(fake.patchSourceByUriDigestArgsForCall)]
+	fake.patchSourceByUriDigestArgsForCall = append(fake.patchSourceByUriDigestArgsForCall, struct {
+		arg1 context.Context
+		arg2 *api.SourceInput
+		arg3 string
+	}{arg1, arg2, arg3})
+	stub := fake.PatchSourceByUriDigestStub
+	fakeReturns := fake.patchSourceByUriDigestReturns
+	fake.recordInvocation("PatchSourceByUriDigest", []interface{}{arg1, arg2, arg3})
+	fake.patchSourceByUriDigestMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeSourceRepository) PatchSourceByUriDigestCallCount() int {
+	fake.patchSourceByUriDigestMutex.RLock()
+	defer fake.patchSourceByUriDigestMutex.RUnlock()
+	return len(fake.patchSourceByUriDigestArgsForCall)
+}
+
+func (fake *FakeSourceRepository) PatchSourceByUriDigestCalls(stub func(context.Context, *api.SourceInput, string) error) {
+	fake.patchSourceByUriDigestMutex.Lock()
+	defer fake.patchSourceByUriDigestMutex.Unlock()
+	fake.PatchSourceByUriDigestStub = stub
+}
+
+func (fake *FakeSourceRepository) PatchSourceByUriDigestArgsForCall(i int) (context.Context, *api.SourceInput, string) {
+	fake.patchSourceByUriDigestMutex.RLock()
+	defer fake.patchSourceByUriDigestMutex.RUnlock()
+	argsForCall := fake.patchSourceByUriDigestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeSourceRepository) PatchSourceByUriDigestReturns(result1 error) {
+	fake.patchSourceByUriDigestMutex.Lock()
+	defer fake.patchSourceByUriDigestMutex.Unlock()
+	fake.PatchSourceByUriDigestStub = nil
+	fake.patchSourceByUriDigestReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeSourceRepository) PatchSourceByUriDigestReturnsOnCall(i int, result1 error) {
+	fake.patchSourceByUriDigestMutex.Lock()
+	defer fake.patchSourceByUriDigestMutex.Unlock()
+	fake.PatchSourceByUriDigestStub = nil
+	if fake.patchSourceByUriDigestReturnsOnCall == nil {
+		fake.patchSourceByUriDigestReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.patchSourceByUriDigestReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeSourceRepository) PostSource(arg1 context.Context, arg2 *api.SourceInput) error {
 	fake.postSourceMutex.Lock()
 	ret, specificReturn := fake.postSourceReturnsOnCall[len(fake.postSourceArgsForCall)]
@@ -249,69 +312,6 @@ func (fake *FakeSourceRepository) PostSourceReturnsOnCall(i int, result1 error) 
 		})
 	}
 	fake.postSourceReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeSourceRepository) PutSourceByUriDigest(arg1 context.Context, arg2 *api.SourceInput, arg3 string) error {
-	fake.putSourceByUriDigestMutex.Lock()
-	ret, specificReturn := fake.putSourceByUriDigestReturnsOnCall[len(fake.putSourceByUriDigestArgsForCall)]
-	fake.putSourceByUriDigestArgsForCall = append(fake.putSourceByUriDigestArgsForCall, struct {
-		arg1 context.Context
-		arg2 *api.SourceInput
-		arg3 string
-	}{arg1, arg2, arg3})
-	stub := fake.PutSourceByUriDigestStub
-	fakeReturns := fake.putSourceByUriDigestReturns
-	fake.recordInvocation("PutSourceByUriDigest", []interface{}{arg1, arg2, arg3})
-	fake.putSourceByUriDigestMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *FakeSourceRepository) PutSourceByUriDigestCallCount() int {
-	fake.putSourceByUriDigestMutex.RLock()
-	defer fake.putSourceByUriDigestMutex.RUnlock()
-	return len(fake.putSourceByUriDigestArgsForCall)
-}
-
-func (fake *FakeSourceRepository) PutSourceByUriDigestCalls(stub func(context.Context, *api.SourceInput, string) error) {
-	fake.putSourceByUriDigestMutex.Lock()
-	defer fake.putSourceByUriDigestMutex.Unlock()
-	fake.PutSourceByUriDigestStub = stub
-}
-
-func (fake *FakeSourceRepository) PutSourceByUriDigestArgsForCall(i int) (context.Context, *api.SourceInput, string) {
-	fake.putSourceByUriDigestMutex.RLock()
-	defer fake.putSourceByUriDigestMutex.RUnlock()
-	argsForCall := fake.putSourceByUriDigestArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
-}
-
-func (fake *FakeSourceRepository) PutSourceByUriDigestReturns(result1 error) {
-	fake.putSourceByUriDigestMutex.Lock()
-	defer fake.putSourceByUriDigestMutex.Unlock()
-	fake.PutSourceByUriDigestStub = nil
-	fake.putSourceByUriDigestReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeSourceRepository) PutSourceByUriDigestReturnsOnCall(i int, result1 error) {
-	fake.putSourceByUriDigestMutex.Lock()
-	defer fake.putSourceByUriDigestMutex.Unlock()
-	fake.PutSourceByUriDigestStub = nil
-	if fake.putSourceByUriDigestReturnsOnCall == nil {
-		fake.putSourceByUriDigestReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.putSourceByUriDigestReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }

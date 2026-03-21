@@ -45,5 +45,5 @@ func (svc *sourceService) PostSource(ctx context.Context, sourceInput *api.Sourc
 }
 
 func (svc *sourceService) PutSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
-	return svc.sourceRepo.PutSourceByUriDigest(ctx, sourceInput, uriDigest)
+	return svc.sourceRepo.PatchSourceByUriDigest(ctx, sourceInput, uriDigest)
 }
