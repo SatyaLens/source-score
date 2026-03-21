@@ -9,7 +9,7 @@ type SourceService interface {
 	DeleteSourceByUriDigest(ctx context.Context, uriDigest string) error
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) error
-	PutSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
+	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
 }
 
 type sourceService struct {
@@ -44,6 +44,6 @@ func (svc *sourceService) PostSource(ctx context.Context, sourceInput *api.Sourc
 	return svc.sourceRepo.PostSource(ctx, sourceInput)
 }
 
-func (svc *sourceService) PutSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
+func (svc *sourceService) PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
 	return svc.sourceRepo.PatchSourceByUriDigest(ctx, sourceInput, uriDigest)
 }
