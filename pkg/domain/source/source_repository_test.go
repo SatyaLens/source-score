@@ -37,7 +37,7 @@ var _ = Describe("Source model repository layer unit tests", func() {
 					Tags:    "updated-tag1",
 				}
 
-				err := sourceRepo.PutSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
+				err := sourceRepo.PatchSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
 				Expect(err).ToNot(HaveOccurred())
 
 				source, err := sourceRepo.GetSourceByUriDigest(context.TODO(), uriDigest1)

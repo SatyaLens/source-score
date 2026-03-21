@@ -16,6 +16,7 @@ install-k3d-cli:
 
 codegen:
 	go mod tidy
+	go generate ./...
 	mkdir -p pkg/api
 	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=configs/config.yaml api/source-score.yaml
 	go mod tidy
@@ -24,7 +25,6 @@ lint: codegen
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint run ./...
 
 build: codegen
-	go generate ./...
 	go build -o ./source-score ./cmd/app
 	chmod +x ./source-score
 

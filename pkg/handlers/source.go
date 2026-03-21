@@ -104,7 +104,7 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 	)
 }
 
-func (sh *SourceHandler) PutSourceByUriDigest(ctx *gin.Context) {
+func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context) {
 	uriDigest := ctx.Param("uriDigest")
 
 	// TODO: add basic validation for uriDigest
@@ -127,7 +127,7 @@ func (sh *SourceHandler) PutSourceByUriDigest(ctx *gin.Context) {
 		return
 	}
 
-	if err = sh.sourceSvc.PutSourceByUriDigest(ctx, sourceInput, uriDigest); err != nil {
+	if err = sh.sourceSvc.PatchSourceByUriDigest(ctx, sourceInput, uriDigest); err != nil {
 		ctx.JSON(
 			http.StatusNotFound,
 			gin.H{"error": err.Error()},
