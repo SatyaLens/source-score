@@ -16,7 +16,7 @@ type SourceRepository interface {
 	DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) error
-	PutSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
+	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
 }
 
 type sourceRepository struct {
@@ -53,17 +53,17 @@ func (sr *sourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest 
 
 func (sr *sourceRepository) PostSource(ctx context.Context, sourceInput *api.SourceInput) error {
 	hash := sha256.New()
-	_, err := hash.Write([]byte(sourceInput.Uri))
+	_, err := hash.Write([]byte(*sourceInput.Uri))
 	if err != nil {
 		return err
 	}
 
 	uriDigest := hex.EncodeToString(hash.Sum(nil))
 	source := &api.Source{
-		Name:      sourceInput.Name,
-		Summary:   sourceInput.Summary,
-		Tags:      sourceInput.Tags,
-		Uri:       sourceInput.Uri,
+		Name:      *sourceInput.Name,
+		Summary:   *sourceInput.Summary,
+		Tags:      *sourceInput.Tags,
+		Uri:       *sourceInput.Uri,
 		UriDigest: uriDigest,
 	}
 
@@ -77,7 +77,7 @@ func (sr *sourceRepository) PostSource(ctx context.Context, sourceInput *api.Sou
 }
 
 // Updates source model fields except for `uri` and `uriDigest`
-func (sr *sourceRepository) PutSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
+func (sr *sourceRepository) PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
 	source := &api.Source{}
 	source.UriDigest = uriDigest
 
@@ -86,14 +86,14 @@ func (sr *sourceRepository) PutSourceByUriDigest(ctx context.Context, sourceInpu
 		return result.Error
 	}
 
-	if sourceInput.Name != "" {
-		source.Name = sourceInput.Name
+	if *sourceInput.Name != "" {
+		source.Name = *sourceInput.Name
 	}
-	if sourceInput.Summary != "" {
-		source.Summary = sourceInput.Summary
+	if *sourceInput.Summary != "" {
+		source.Summary = *sourceInput.Summary
 	}
-	if sourceInput.Tags != "" {
-		source.Tags = sourceInput.Tags
+	if *sourceInput.Tags != "" {
+		source.Tags = *sourceInput.Tags
 	}
 
 	result = sr.client.Update(ctx, source)

@@ -8,6 +8,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const (
+	updatedName = "Updated Sample Source 1"
+	updatedSummary = "Updated Sample summary"
+	upatedTags = "updated-tag1"
+)
+
 var _ = Describe("Source model repository layer unit tests", func() {
 	Context("Happy path", Ordered, func() {
 		When("Adding a new source to the DB with valid input", func() {
@@ -32,9 +38,9 @@ var _ = Describe("Source model repository layer unit tests", func() {
 		When("Updating a source by its uri digest", func() {
 			It("Should update the correct source record in the DB", func() {
 				sourceInput := &api.SourceInput{
-					Name:    "Updated Sample Source 1",
-					Summary: "Updated Sample summary",
-					Tags:    "updated-tag1",
+					Name:    &updatedName,
+					Summary: updatedSummary,
+					Tags:    updatedTags,
 				}
 
 				err := sourceRepo.PutSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)

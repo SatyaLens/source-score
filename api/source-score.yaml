@@ -53,29 +53,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/Source'
 
-    put:
+    patch:
       tags:
         - source
-      operationId: updateSource
+      operationId: patchSource
       parameters:
-        - in: path
-          name: uriDigest
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: uriDigest
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/SourceInput'
       responses:
-        200:
+        204:
           description: source updated
-          # TODO: uncomment after Put returns the updated Source
-          # content:
-          #   application/json:
-          #     schema:
-          #       $ref: '#/components/schemas/Source'
 
     delete:
       tags:
