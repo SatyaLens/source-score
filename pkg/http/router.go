@@ -33,8 +33,8 @@ func (r *router) GetSource(ctx *gin.Context, uriDigest string) {
 	r.srcHandler.GetSourceByUriDigest(ctx)
 }
 
-func (r *router) UpdateSource(ctx *gin.Context, uriDigest string) {
-	r.srcHandler.PutSourceByUriDigest(ctx)
+func (r *router) PatchSource(ctx *gin.Context, uriDigest string) {
+	r.srcHandler.PatchSourceByUriDigest(ctx)
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
