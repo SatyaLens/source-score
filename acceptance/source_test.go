@@ -32,6 +32,7 @@ var _ = Describe("Source model tests", func() {
 					bytes.NewBuffer(body),
 				)
 				Expect(err).To(BeNil())
+				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 			})
 		})
@@ -42,6 +43,7 @@ var _ = Describe("Source model tests", func() {
 				Expect(err).To(BeNil())
 				resp, err := http.Get(srcUrl)
 				Expect(err).To(BeNil())
+				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
 			})
 		})
@@ -64,14 +66,18 @@ var _ = Describe("Source model tests", func() {
 					bytes.NewBuffer(reqBody))
 				Expect(err).To(BeNil())
 				req.Header.Set("Content-Type", "application/json")
-				_, err = client.Do(req)
+				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
+				resp.Body.Close()
 
 				By("verifying source got updated")
 				var src api.Source
-				resp, err := http.Get(srcUrl)
+				resp, err = http.Get(srcUrl)
 				Expect(err).To(BeNil())
+				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
 				err = json.NewDecoder(resp.Body).Decode(&src)
 				Expect(err).To(BeNil())
 				Expect(src.Name).To(Equal(updatedName))
@@ -93,6 +99,7 @@ var _ = Describe("Source model tests", func() {
 
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
+				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 
 				By("verifying source got deleted")
