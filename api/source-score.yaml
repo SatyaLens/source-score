@@ -18,7 +18,7 @@ paths:
   /api/v1/source:
     post:
       tags:
-        - source
+      - source
       operationId: createSource
       requestBody:
         content:
@@ -28,23 +28,22 @@ paths:
       responses:
         201:
           description: source created
-          # TODO: uncomment after Post returns the created Source
-          # content:
-          #   application/json:
-          #     schema:
-          #       $ref: '#/components/schemas/Source'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSourceResponse'
 
   /api/v1/source/{uriDigest}:
     get:
       tags:
-        - source
+      - source
       operationId: getSource
       parameters:
-        - in: path
-          name: uriDigest
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: uriDigest
+        required: true
+        schema:
+          type: string
       responses:
         200:
           description: source returned
@@ -74,14 +73,14 @@ paths:
 
     delete:
       tags:
-        - source
+      - source
       operationId: deleteSource
       parameters:
-        - in: path
-          name: uriDigest
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: uriDigest
+        required: true
+        schema:
+          type: string
       responses:
         204:
           description: source deleted
@@ -91,7 +90,7 @@ components:
     Pong:
       type: object
       required:
-        - pong
+      - pong
       properties:
         pong:
           type: string
@@ -112,12 +111,12 @@ components:
     Source:
       type: object
       required:
-        - name
-        - score
-        - summary
-        - tags
-        - uri
-        - uriDigest
+      - name
+      - score
+      - summary
+      - tags
+      - uri
+      - uriDigest
       properties:
         name:
           type: string
@@ -142,6 +141,16 @@ components:
           x-oapi-codegen-extra-tags:
             binding: required
         uri:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+
+    CreateSourceResponse:
+      type: object
+      required:
+      - uriDigest
+      properties:
+        uriDigest:
           type: string
           x-oapi-codegen-extra-tags:
             binding: required

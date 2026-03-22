@@ -48,17 +48,19 @@ type FakeSourceRepository struct {
 	patchSourceByUriDigestReturnsOnCall map[int]struct {
 		result1 error
 	}
-	PostSourceStub        func(context.Context, *api.SourceInput) error
+	PostSourceStub        func(context.Context, *api.SourceInput) (string, error)
 	postSourceMutex       sync.RWMutex
 	postSourceArgsForCall []struct {
 		arg1 context.Context
 		arg2 *api.SourceInput
 	}
 	postSourceReturns struct {
-		result1 error
+		result1 string
+		result2 error
 	}
 	postSourceReturnsOnCall map[int]struct {
-		result1 error
+		result1 string
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -254,7 +256,7 @@ func (fake *FakeSourceRepository) PatchSourceByUriDigestReturnsOnCall(i int, res
 	}{result1}
 }
 
-func (fake *FakeSourceRepository) PostSource(arg1 context.Context, arg2 *api.SourceInput) error {
+func (fake *FakeSourceRepository) PostSource(arg1 context.Context, arg2 *api.SourceInput) (string, error) {
 	fake.postSourceMutex.Lock()
 	ret, specificReturn := fake.postSourceReturnsOnCall[len(fake.postSourceArgsForCall)]
 	fake.postSourceArgsForCall = append(fake.postSourceArgsForCall, struct {
@@ -269,9 +271,9 @@ func (fake *FakeSourceRepository) PostSource(arg1 context.Context, arg2 *api.Sou
 		return stub(arg1, arg2)
 	}
 	if specificReturn {
-		return ret.result1
+		return ret.result1, ret.result2
 	}
-	return fakeReturns.result1
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeSourceRepository) PostSourceCallCount() int {
@@ -280,7 +282,7 @@ func (fake *FakeSourceRepository) PostSourceCallCount() int {
 	return len(fake.postSourceArgsForCall)
 }
 
-func (fake *FakeSourceRepository) PostSourceCalls(stub func(context.Context, *api.SourceInput) error) {
+func (fake *FakeSourceRepository) PostSourceCalls(stub func(context.Context, *api.SourceInput) (string, error)) {
 	fake.postSourceMutex.Lock()
 	defer fake.postSourceMutex.Unlock()
 	fake.PostSourceStub = stub
@@ -293,27 +295,30 @@ func (fake *FakeSourceRepository) PostSourceArgsForCall(i int) (context.Context,
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeSourceRepository) PostSourceReturns(result1 error) {
+func (fake *FakeSourceRepository) PostSourceReturns(result1 string, result2 error) {
 	fake.postSourceMutex.Lock()
 	defer fake.postSourceMutex.Unlock()
 	fake.PostSourceStub = nil
 	fake.postSourceReturns = struct {
-		result1 error
-	}{result1}
+		result1 string
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeSourceRepository) PostSourceReturnsOnCall(i int, result1 error) {
+func (fake *FakeSourceRepository) PostSourceReturnsOnCall(i int, result1 string, result2 error) {
 	fake.postSourceMutex.Lock()
 	defer fake.postSourceMutex.Unlock()
 	fake.PostSourceStub = nil
 	if fake.postSourceReturnsOnCall == nil {
 		fake.postSourceReturnsOnCall = make(map[int]struct {
-			result1 error
+			result1 string
+			result2 error
 		})
 	}
 	fake.postSourceReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
+		result1 string
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeSourceRepository) Invocations() map[string][][]interface{} {

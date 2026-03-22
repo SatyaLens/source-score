@@ -11,6 +11,11 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// CreateSourceResponse defines model for CreateSourceResponse.
+type CreateSourceResponse struct {
+	UriDigest string `binding:"required" json:"uriDigest"`
+}
+
 // Pong defines model for Pong.
 type Pong struct {
 	Pong string `json:"pong"`
