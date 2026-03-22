@@ -136,7 +136,7 @@ func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context) {
 	}
 
 	ctx.JSON(
-		http.StatusOK,
+		http.StatusNoContent,
 		gin.H{},
 	)
 }
