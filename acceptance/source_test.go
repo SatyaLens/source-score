@@ -34,6 +34,11 @@ var _ = Describe("Source model tests", func() {
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				var respBody api.CreateSourceResponse
+				err = json.NewDecoder(resp.Body).Decode(&respBody)
+				Expect(err).To(BeNil())
+				Expect(respBody.UriDigest).To(Equal(uriDigest1))
 			})
 		})
 

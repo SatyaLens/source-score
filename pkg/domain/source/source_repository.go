@@ -15,7 +15,7 @@ import (
 type SourceRepository interface {
 	DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
-	PostSource(ctx context.Context, sourceInput *api.SourceInput) error
+	PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error)
 	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
 }
 
@@ -51,11 +51,11 @@ func (sr *sourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest 
 	return source, nil
 }
 
-func (sr *sourceRepository) PostSource(ctx context.Context, sourceInput *api.SourceInput) error {
+func (sr *sourceRepository) PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error) {
 	hash := sha256.New()
 	_, err := hash.Write([]byte(sourceInput.Uri))
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	uriDigest := hex.EncodeToString(hash.Sum(nil))
@@ -73,7 +73,11 @@ func (sr *sourceRepository) PostSource(ctx context.Context, sourceInput *api.Sou
 		fmt.Sprintf("%d rows affected\n", result.RowsAffected),
 	)
 
-	return result.Error
+	if result.Error != nil {
+		return "", result.Error
+	}
+
+	return uriDigest, nil
 }
 
 // Updates source model fields except for `uri` and `uriDigest`

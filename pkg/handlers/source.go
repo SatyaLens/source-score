@@ -86,7 +86,7 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 		return
 	}
 
-	err = sh.sourceSvc.PostSource(ctx, sourceInput)
+	digest, err := sh.sourceSvc.PostSource(ctx, sourceInput)
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
@@ -95,7 +95,10 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(
+		http.StatusCreated,
+		api.CreateSourceResponse{UriDigest: digest},
+	)
 }
 
 func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context) {

@@ -12,8 +12,10 @@ var _ = Describe("Source model service layer unit test", func() {
 	Context("Happy path", Ordered, func() {
 		When("Adding a new source with valid input", func() {
 			It("Should pass the data to the repository layer", func() {
-				err := sourceSvc.PostSource(context.TODO(), &sampleSourceInput1)
+				fakeSourceRepo.PostSourceReturnsOnCall(0, uriDigest1, nil)
+				digest, err := sourceSvc.PostSource(context.TODO(), &sampleSourceInput1)
 				Expect(err).ToNot(HaveOccurred())
+				Expect(digest).To(Equal(uriDigest1))
 
 				Expect(fakeSourceRepo.PostSourceCallCount()).To(Equal(1))
 				_, srcInput := fakeSourceRepo.PostSourceArgsForCall(0)
