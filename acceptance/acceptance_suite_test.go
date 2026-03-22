@@ -3,7 +3,9 @@ package acceptance_test
 import (
 	"log"
 	"net"
+	"net/http"
 	"os"
+	"source-score/pkg/api"
 	"source-score/pkg/helpers"
 	"testing"
 	"time"
@@ -16,10 +18,21 @@ type responseBody struct {
 	Data string `json:"data"`
 }
 
+const (
+	uriDigest1 = "8649a4126fb4fc9a750f432b729c8477398cf28ca241403b2cd36a6dc841f441"
+)
+
 var (
 	baseUrl string
 
+	client     = &http.Client{Timeout: 10 * time.Second}
 	serverPort = os.Getenv("PORT")
+	sourceInput1 = api.SourceInput{
+		Name:    "Sample Source 1",
+		Summary: "Sample summary",
+		Tags:    "tag1",
+		Uri:     "https://sample-uri-1",
+	}
 )
 
 func TestSourceScore(t *testing.T) {

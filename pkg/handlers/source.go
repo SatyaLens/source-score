@@ -42,10 +42,7 @@ func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(
-		http.StatusNoContent,
-		gin.H{},
-	)
+	ctx.Status(http.StatusNoContent)
 }
 
 func (sh *SourceHandler) GetSourceByUriDigest(ctx *gin.Context) {
@@ -98,10 +95,7 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(
-		http.StatusCreated,
-		gin.H{},
-	)
+	ctx.Status(http.StatusCreated)
 }
 
 func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context) {
@@ -135,8 +129,5 @@ func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(
-		http.StatusOK,
-		gin.H{},
-	)
+	ctx.Status(http.StatusNoContent)
 }
