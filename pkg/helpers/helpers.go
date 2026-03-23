@@ -1,9 +1,12 @@
 package helpers
 
 import (
-	"fmt"
 	"log"
+	"net/url"
 	"os"
+	"strings"
+
+	"github.com/go-playground/validator/v10"
 )
 
 func DeleteFileIfExists(filePath string) error {
@@ -16,10 +19,16 @@ func DeleteFileIfExists(filePath string) error {
 	return os.Remove(filePath)
 }
 
-// TODO: add uri digest validation here
-func ValidateUriDigest(uriDigest string) error {
-	if uriDigest == "" {
-		return fmt.Errorf("invalid uri digest")
-	}
-	return nil
+func ValidateNonEmpty(fl validator.FieldLevel) bool {
+	return !(fl.Field().String() == "")
+}
+
+func ValidateNoSpace(fl validator.FieldLevel) bool {
+	return !strings.ContainsAny(fl.Field().String(), " \t\n\r")
+}
+
+func ValidateHttpsURL(fl validator.FieldLevel) bool {
+	raw := fl.Field().String()
+	u, err := url.ParseRequestURI(raw)
+	return err == nil && u.Scheme == "https" && u.Host != ""
 }

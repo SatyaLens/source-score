@@ -33,10 +33,10 @@ type Source struct {
 
 // SourceInput defines model for SourceInput.
 type SourceInput struct {
-	Name    string `json:"name,omitempty"`
-	Summary string `json:"summary,omitempty"`
-	Tags    string `json:"tags,omitempty"`
-	Uri     string `json:"uri,omitempty"`
+	Name    string `json:"name,omitempty" validate:"nonempty"`
+	Summary string `json:"summary,omitempty" validate:"nonempty"`
+	Tags    string `json:"tags,omitempty" validate:"nonempty,nospace"`
+	Uri     string `json:"uri,omitempty" validate:"nonempty,httpsurl"`
 }
 
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.
