@@ -68,7 +68,7 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 	digest, err := sh.sourceSvc.PostSource(ctx, sourceInput)
 	if err != nil {
 		switch {
-		case errors.Is(err, apperrors.InvalidSource):
+		case errors.Is(err, apperrors.ErrInvalidSource):
 			ctx.JSON(
 				http.StatusBadRequest,
 				gin.H{"error": err.Error()},

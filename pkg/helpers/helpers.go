@@ -20,7 +20,7 @@ func DeleteFileIfExists(filePath string) error {
 }
 
 func ValidateNonEmpty(fl validator.FieldLevel) bool {
-	return !(fl.Field().String() == "")
+	return fl.Field().String() != ""
 }
 
 func ValidateNoSpace(fl validator.FieldLevel) bool {
