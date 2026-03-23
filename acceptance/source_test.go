@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"source-score/pkg/api"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -111,6 +112,134 @@ var _ = Describe("Source model tests", func() {
 				resp, err = http.Get(srcUrl)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+			})
+		})
+	})
+
+	Context("Validation tests", func() {
+		When("POST request with empty name is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidInput := api.SourceInput{
+					Name:    "",
+					Summary: "valid summary",
+					Tags:    "tag1,tag2",
+					Uri:     "https://example.com",
+				}
+				body, _ := json.Marshal(invalidInput)
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("name validation failed"))
+			})
+		})
+
+		When("POST request with empty summary is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidInput := api.SourceInput{
+					Name:    "valid name",
+					Summary: "",
+					Tags:    "tag1,tag2",
+					Uri:     "https://example.com",
+				}
+				body, _ := json.Marshal(invalidInput)
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("summary validation failed"))
+			})
+		})
+
+		When("POST request with empty tags is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidInput := api.SourceInput{
+					Name:    "valid name",
+					Summary: "valid summary",
+					Tags:    "",
+					Uri:     "https://example.com",
+				}
+				body, _ := json.Marshal(invalidInput)
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("tags validation failed"))
+			})
+		})
+
+		When("POST request with tags containing spaces is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidInput := api.SourceInput{
+					Name:    "valid name",
+					Summary: "valid summary",
+					Tags:    "tag1, tag2",
+					Uri:     "https://example.com",
+				}
+				body, _ := json.Marshal(invalidInput)
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("tags validation failed"))
+			})
+		})
+
+		When("POST request with empty uri is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidInput := api.SourceInput{
+					Name:    "valid name",
+					Summary: "valid summary",
+					Tags:    "tag1,tag2",
+					Uri:     "",
+				}
+				body, _ := json.Marshal(invalidInput)
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("uri validation failed"))
+			})
+		})
+
+		When("POST request with non-https uri is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidInput := api.SourceInput{
+					Name:    "valid name",
+					Summary: "valid summary",
+					Tags:    "tag1,tag2",
+					Uri:     "http://example.com",
+				}
+				body, _ := json.Marshal(invalidInput)
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("uri validation failed"))
 			})
 		})
 	})

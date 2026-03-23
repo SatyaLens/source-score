@@ -101,12 +101,20 @@ components:
       properties:
         name:
           type: string
+          x-oapi-codegen-extra-tags:
+            validate: nonempty
         summary:
           type: string
+          x-oapi-codegen-extra-tags:
+            validate: nonempty
         tags:
           type: string
+          x-oapi-codegen-extra-tags:
+            validate: nonempty,nospace
         uri:
           type: string
+          x-oapi-codegen-extra-tags:
+            validate: nonempty,httpsurl
 
     Source:
       type: object

@@ -2,7 +2,18 @@ package source
 
 import (
 	"context"
+	"fmt"
 	"source-score/pkg/api"
+	"source-score/pkg/apperrors"
+	"strings"
+
+	"source-score/pkg/helpers"
+
+	"github.com/go-playground/validator/v10"
+)
+
+var (
+	validate = validator.New()
 )
 
 type SourceService interface {
@@ -14,6 +25,18 @@ type SourceService interface {
 
 type sourceService struct {
 	sourceRepo SourceRepository
+}
+
+func init() {
+	if err := validate.RegisterValidation("nonempty", helpers.ValidateNonEmpty); err != nil {
+		panic(fmt.Sprintf("failed to register nonempty validator with error: %v", err))
+	}
+	if err := validate.RegisterValidation("httpsurl", helpers.ValidateHttpsURL); err != nil {
+		panic(fmt.Sprintf("failed to register httpsurl validator with error: %v", err))
+	}
+	if err := validate.RegisterValidation("nospace", helpers.ValidateNoSpace); err != nil {
+		panic(fmt.Sprintf("failed to register nospace validator with error: %v", err))
+	}
 }
 
 func NewSourceService(ctx context.Context, sourceRepo SourceRepository) SourceService {
@@ -41,6 +64,21 @@ func (svc *sourceService) GetSourceByUriDigest(ctx context.Context, uriDigest st
 }
 
 func (svc *sourceService) PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error) {
+	err := validate.Struct(sourceInput)
+	if err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			return "", fmt.Errorf("%w: %s", apperrors.ErrValidationLogic, err.Error())
+		}
+		combinedErrs := ""
+		for _, e := range err.(validator.ValidationErrors) {
+			combinedErrs = fmt.Sprintf(
+				"%s\n%s validation failed for value %v with error %s",
+				combinedErrs, e.Field(), e.Value(), e.Tag(),
+			)
+		}
+		combinedErrs = strings.TrimSpace(combinedErrs)
+		return "", fmt.Errorf("%w: %s", apperrors.ErrInvalidSource, combinedErrs)
+	}
 	return svc.sourceRepo.PostSource(ctx, sourceInput)
 }
 
