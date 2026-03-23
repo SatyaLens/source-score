@@ -62,7 +62,7 @@ func (svc *sourceService) PostSource(ctx context.Context, sourceInput *api.Sourc
 	err := validate.Struct(sourceInput)
 	if err != nil {
 		if errors.Is(err, &validator.InvalidValidationError{}) {
-			return "", fmt.Errorf(err.Error(), apperrors.ValidationLogic)
+			return "", fmt.Errorf("%w: %s", apperrors.ValidationLogic, err.Error())
 		}
 		combinedErrs := ""
 		for _, e := range err.(validator.ValidationErrors) {
@@ -72,7 +72,7 @@ func (svc *sourceService) PostSource(ctx context.Context, sourceInput *api.Sourc
 			)
 		}
 		combinedErrs = strings.TrimSpace(combinedErrs)
-		return "", fmt.Errorf(combinedErrs, apperrors.InvalidSource)
+		return "", fmt.Errorf("%w: %s", apperrors.InvalidSource, combinedErrs)
 	}
 	return svc.sourceRepo.PostSource(ctx, sourceInput)
 }

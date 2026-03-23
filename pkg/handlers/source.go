@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"source-score/pkg/api"
+	"source-score/pkg/apperrors"
 	"source-score/pkg/domain/source"
 
 	"github.com/gin-gonic/gin"
@@ -54,7 +56,6 @@ func (sh *SourceHandler) GetSourceByUriDigest(ctx *gin.Context) {
 
 func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 	sourceInput := &api.SourceInput{}
-	// TODO: add basic validation for source input
 	err := ctx.ShouldBindJSON(sourceInput)
 	if err != nil {
 		ctx.JSON(
@@ -66,10 +67,18 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 
 	digest, err := sh.sourceSvc.PostSource(ctx, sourceInput)
 	if err != nil {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
-		)
+		switch {
+		case errors.Is(err, apperrors.InvalidSource):
+			ctx.JSON(
+				http.StatusBadRequest,
+				gin.H{"error": err.Error()},
+			)
+		default:
+			ctx.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": err.Error()},
+			)
+		}
 		return
 	}
 
