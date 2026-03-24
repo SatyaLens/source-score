@@ -26,11 +26,11 @@ func (r *router) CreateSource(ctx *gin.Context) {
 }
 
 func (r *router) DeleteSource(ctx *gin.Context, uriDigest string) {
-	r.srcHandler.DeleteSourceByUriDigest(ctx)
+	r.srcHandler.DeleteSourceByUriDigest(ctx, uriDigest)
 }
 
 func (r *router) GetSource(ctx *gin.Context, uriDigest string) {
-	r.srcHandler.GetSourceByUriDigest(ctx)
+	r.srcHandler.GetSourceByUriDigest(ctx, uriDigest)
 }
 
 func (r *router) GetSources(ctx *gin.Context) {
@@ -38,7 +38,7 @@ func (r *router) GetSources(ctx *gin.Context) {
 }
 
 func (r *router) PatchSource(ctx *gin.Context, uriDigest string) {
-	r.srcHandler.PatchSourceByUriDigest(ctx)
+	r.srcHandler.PatchSourceByUriDigest(ctx, uriDigest)
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
