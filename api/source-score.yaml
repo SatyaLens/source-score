@@ -15,6 +15,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/Pong'
 
+  /api/v1/sources:
+    get:
+      tags:
+      - sources
+      operationId: getSources
+      responses:
+        200:
+          description: source returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Source'
+
   /api/v1/source:
     post:
       tags:

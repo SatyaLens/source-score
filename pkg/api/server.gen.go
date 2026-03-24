@@ -60,6 +60,9 @@ type ServerInterface interface {
 	// (PATCH /api/v1/source/{uriDigest})
 	PatchSource(c *gin.Context, uriDigest string)
 
+	// (GET /api/v1/sources)
+	GetSources(c *gin.Context)
+
 	// (GET /ping)
 	GetPing(c *gin.Context)
 }
@@ -158,6 +161,19 @@ func (siw *ServerInterfaceWrapper) PatchSource(c *gin.Context) {
 	siw.Handler.PatchSource(c, uriDigest)
 }
 
+// GetSources operation middleware
+func (siw *ServerInterfaceWrapper) GetSources(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetSources(c)
+}
+
 // GetPing operation middleware
 func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
 
@@ -202,5 +218,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.DeleteSource)
 	router.GET(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.GetSource)
 	router.PATCH(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.PatchSource)
+	router.GET(options.BaseURL+"/api/v1/sources", wrapper.GetSources)
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 }
