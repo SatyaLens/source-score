@@ -43,6 +43,10 @@ func (client *Client) FindFirst(ctx context.Context, record interface{}) *gorm.D
 	return client.DB.First(record)
 }
 
+func (client *Client) FindAll(ctx context.Context, records interface{}) *gorm.DB {
+	return client.DB.Find(records)
+}
+
 func (client *Client) Update(ctx context.Context, record interface{}) *gorm.DB {
 	return client.DB.Save(record)
 }

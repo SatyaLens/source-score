@@ -36,6 +36,22 @@ func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
+func (sh *SourceHandler) GetSources(ctx *gin.Context) {
+	sources, err := sh.sourceSvc.GetSources(ctx)
+	if err != nil {
+		ctx.JSON(
+			http.StatusInternalServerError,
+			gin.H{"error": err.Error()},
+		)
+		return
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		sources,
+	)
+}
+
 func (sh *SourceHandler) GetSourceByUriDigest(ctx *gin.Context) {
 	uriDigest := ctx.Param("uriDigest")
 	source, err := sh.sourceSvc.GetSourceByUriDigest(ctx, uriDigest)

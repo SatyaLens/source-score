@@ -18,6 +18,7 @@ var (
 
 type SourceService interface {
 	DeleteSourceByUriDigest(ctx context.Context, uriDigest string) error
+	GetSources(ctx context.Context) ([]api.Source, error)
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error)
 	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
@@ -54,13 +55,12 @@ func (svc *sourceService) DeleteSourceByUriDigest(ctx context.Context, uriDigest
 	return svc.sourceRepo.DeleteSourceByUriDigest(ctx, source)
 }
 
-func (svc *sourceService) GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error) {
-	source, err := svc.sourceRepo.GetSourceByUriDigest(ctx, uriDigest)
-	if err != nil {
-		return nil, err
-	}
+func (svc *sourceService) GetSources(ctx context.Context) ([]api.Source, error) {
+	return svc.sourceRepo.GetSources(ctx)
+}
 
-	return source, nil
+func (svc *sourceService) GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error) {
+	return svc.sourceRepo.GetSourceByUriDigest(ctx, uriDigest)
 }
 
 func (svc *sourceService) PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error) {

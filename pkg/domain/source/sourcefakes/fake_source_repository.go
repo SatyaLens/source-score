@@ -35,6 +35,19 @@ type FakeSourceRepository struct {
 		result1 *api.Source
 		result2 error
 	}
+	GetSourcesStub        func(context.Context) ([]api.Source, error)
+	getSourcesMutex       sync.RWMutex
+	getSourcesArgsForCall []struct {
+		arg1 context.Context
+	}
+	getSourcesReturns struct {
+		result1 []api.Source
+		result2 error
+	}
+	getSourcesReturnsOnCall map[int]struct {
+		result1 []api.Source
+		result2 error
+	}
 	PatchSourceByUriDigestStub        func(context.Context, *api.SourceInput, string) error
 	patchSourceByUriDigestMutex       sync.RWMutex
 	patchSourceByUriDigestArgsForCall []struct {
@@ -189,6 +202,70 @@ func (fake *FakeSourceRepository) GetSourceByUriDigestReturnsOnCall(i int, resul
 	}
 	fake.getSourceByUriDigestReturnsOnCall[i] = struct {
 		result1 *api.Source
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSourceRepository) GetSources(arg1 context.Context) ([]api.Source, error) {
+	fake.getSourcesMutex.Lock()
+	ret, specificReturn := fake.getSourcesReturnsOnCall[len(fake.getSourcesArgsForCall)]
+	fake.getSourcesArgsForCall = append(fake.getSourcesArgsForCall, struct {
+		arg1 context.Context
+	}{arg1})
+	stub := fake.GetSourcesStub
+	fakeReturns := fake.getSourcesReturns
+	fake.recordInvocation("GetSources", []interface{}{arg1})
+	fake.getSourcesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeSourceRepository) GetSourcesCallCount() int {
+	fake.getSourcesMutex.RLock()
+	defer fake.getSourcesMutex.RUnlock()
+	return len(fake.getSourcesArgsForCall)
+}
+
+func (fake *FakeSourceRepository) GetSourcesCalls(stub func(context.Context) ([]api.Source, error)) {
+	fake.getSourcesMutex.Lock()
+	defer fake.getSourcesMutex.Unlock()
+	fake.GetSourcesStub = stub
+}
+
+func (fake *FakeSourceRepository) GetSourcesArgsForCall(i int) context.Context {
+	fake.getSourcesMutex.RLock()
+	defer fake.getSourcesMutex.RUnlock()
+	argsForCall := fake.getSourcesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeSourceRepository) GetSourcesReturns(result1 []api.Source, result2 error) {
+	fake.getSourcesMutex.Lock()
+	defer fake.getSourcesMutex.Unlock()
+	fake.GetSourcesStub = nil
+	fake.getSourcesReturns = struct {
+		result1 []api.Source
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSourceRepository) GetSourcesReturnsOnCall(i int, result1 []api.Source, result2 error) {
+	fake.getSourcesMutex.Lock()
+	defer fake.getSourcesMutex.Unlock()
+	fake.GetSourcesStub = nil
+	if fake.getSourcesReturnsOnCall == nil {
+		fake.getSourcesReturnsOnCall = make(map[int]struct {
+			result1 []api.Source
+			result2 error
+		})
+	}
+	fake.getSourcesReturnsOnCall[i] = struct {
+		result1 []api.Source
 		result2 error
 	}{result1, result2}
 }

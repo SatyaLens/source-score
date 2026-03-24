@@ -33,6 +33,10 @@ func (r *router) GetSource(ctx *gin.Context, uriDigest string) {
 	r.srcHandler.GetSourceByUriDigest(ctx)
 }
 
+func (r *router) GetSources(ctx *gin.Context) {
+	r.srcHandler.GetSources(ctx)
+}
+
 func (r *router) PatchSource(ctx *gin.Context, uriDigest string) {
 	r.srcHandler.PatchSourceByUriDigest(ctx)
 }
