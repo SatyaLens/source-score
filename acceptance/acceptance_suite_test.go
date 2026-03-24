@@ -20,18 +20,42 @@ type responseBody struct {
 
 const (
 	uriDigest1 = "8649a4126fb4fc9a750f432b729c8477398cf28ca241403b2cd36a6dc841f441"
+	uriDigest2 = "978d81ca657062910f60263c26ce7261e7530e53bfd28aa48748155eb5621868"
 )
 
 var (
 	baseUrl string
 
-	client     = &http.Client{Timeout: 10 * time.Second}
-	serverPort = os.Getenv("PORT")
+	client       = &http.Client{Timeout: 10 * time.Second}
+	serverPort   = os.Getenv("PORT")
 	sourceInput1 = api.SourceInput{
 		Name:    "Sample Source 1",
 		Summary: "Sample summary",
 		Tags:    "tag1",
 		Uri:     "https://sample-uri-1",
+	}
+	sourceInput2 = api.SourceInput{
+		Name:    "Sample Source 2",
+		Summary: "Sample summary 2",
+		Tags:    "tag2",
+		Uri:     "https://sample-uri-2",
+	}
+	sampleSource1 = api.Source{
+		Name:      "Sample Source 1",
+		Score:     0,
+		Summary:   "Sample summary",
+		Tags:      "tag1",
+		Uri:       "https://sample-uri-1",
+		UriDigest: uriDigest1,
+	}
+
+	sampleSource2 = api.Source{
+		Name:      "Sample Source 2",
+		Score:     0,
+		Summary:   "Sample summary 2",
+		Tags:      "tag2",
+		Uri:       "https://sample-uri-2",
+		UriDigest: uriDigest2,
 	}
 )
 

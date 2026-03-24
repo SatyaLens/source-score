@@ -14,6 +14,7 @@ import (
 //go:generate go tool counterfeiter . SourceRepository
 type SourceRepository interface {
 	DeleteSourceByUriDigest(ctx context.Context, source *api.Source) error
+	GetSources(ctx context.Context) ([]api.Source, error)
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error)
 	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
@@ -37,6 +38,17 @@ func (sr *sourceRepository) DeleteSourceByUriDigest(ctx context.Context, source 
 	)
 
 	return result.Error
+}
+
+func (sr *sourceRepository) GetSources(ctx context.Context) ([]api.Source, error) {
+	var sources []api.Source
+	result := sr.client.FindAll(ctx, &sources)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return sources, nil
 }
 
 func (sr *sourceRepository) GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error) {

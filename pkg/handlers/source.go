@@ -21,8 +21,7 @@ func NewSourceHandler(ctx context.Context, sourceSvc source.SourceService) *Sour
 	}
 }
 
-func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context) {
-	uriDigest := ctx.Param("uriDigest")
+func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context, uriDigest string) {
 	err := sh.sourceSvc.DeleteSourceByUriDigest(ctx, uriDigest)
 	// TODO: add proper error wrapping logic
 	if err != nil {
@@ -36,8 +35,23 @@ func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-func (sh *SourceHandler) GetSourceByUriDigest(ctx *gin.Context) {
-	uriDigest := ctx.Param("uriDigest")
+func (sh *SourceHandler) GetSources(ctx *gin.Context) {
+	sources, err := sh.sourceSvc.GetSources(ctx)
+	if err != nil {
+		ctx.JSON(
+			http.StatusInternalServerError,
+			gin.H{"error": err.Error()},
+		)
+		return
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		sources,
+	)
+}
+
+func (sh *SourceHandler) GetSourceByUriDigest(ctx *gin.Context, uriDigest string) {
 	source, err := sh.sourceSvc.GetSourceByUriDigest(ctx, uriDigest)
 	// TODO: add proper error wrapping logic
 	if err != nil {
@@ -88,8 +102,7 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 	)
 }
 
-func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context) {
-	uriDigest := ctx.Param("uriDigest")
+func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context, uriDigest string) {
 	sourceInput := &api.SourceInput{}
 	err := ctx.ShouldBindJSON(sourceInput)
 	if err != nil {

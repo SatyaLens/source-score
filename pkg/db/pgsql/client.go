@@ -24,25 +24,29 @@ func NewClient(ctx context.Context, dsn string, config *gorm.Config) *Client {
 	return client
 }
 
-func (client *Client) SetAutoMigration(ctx context.Context, allModels []interface{}) {
-	err := client.DB.AutoMigrate(allModels...)
+func (client *Client) SetAutoMigration(ctx context.Context, allModels []any) {
+	err := client.DB.WithContext(ctx).AutoMigrate(allModels...)
 	if err != nil {
 		log.Fatalf("failed enable auto migration for all models :: %s", err)
 	}
 }
 
-func (client *Client) Create(ctx context.Context, record interface{}) *gorm.DB {
-	return client.DB.Create(record)
+func (client *Client) Create(ctx context.Context, record any) *gorm.DB {
+	return client.DB.WithContext(ctx).Create(record)
 }
 
-func (client *Client) Delete(ctx context.Context, record interface{}) *gorm.DB {
-	return client.DB.Delete(record)
+func (client *Client) Delete(ctx context.Context, record any) *gorm.DB {
+	return client.DB.WithContext(ctx).Delete(record)
 }
 
-func (client *Client) FindFirst(ctx context.Context, record interface{}) *gorm.DB {
-	return client.DB.First(record)
+func (client *Client) FindFirst(ctx context.Context, record any) *gorm.DB {
+	return client.DB.WithContext(ctx).First(record)
 }
 
-func (client *Client) Update(ctx context.Context, record interface{}) *gorm.DB {
-	return client.DB.Save(record)
+func (client *Client) FindAll(ctx context.Context, records any) *gorm.DB {
+	return client.DB.WithContext(ctx).Find(records)
+}
+
+func (client *Client) Update(ctx context.Context, record any) *gorm.DB {
+	return client.DB.WithContext(ctx).Save(record)
 }

@@ -10,11 +10,28 @@ import (
 
 var _ = Describe("Source model repository layer unit tests", func() {
 	Context("Happy path", Ordered, func() {
-		When("Adding a new source to the DB with valid input", func() {
+		When("Adding new sources to the DB with valid input", func() {
 			It("Should create the source record in the DB", func() {
 				digest, err := sourceRepo.PostSource(context.TODO(), &sampleSourceInput1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(digest).To(Equal(uriDigest1))
+
+				digest, err = sourceRepo.PostSource(context.TODO(), &sampleSourceInput2)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(digest).To(Equal(uriDigest2))
+			})
+		})
+
+		When("Retrieving all sources from the DB", func() {
+			It("Should return all source records from the DB", func() {
+				sources, err := sourceRepo.GetSources(context.TODO())
+				Expect(err).ToNot(HaveOccurred())
+				Expect(len(sources)).To(Equal(2))
+
+				Expect(sources).To(ContainElements(
+					sampleSource1,
+					sampleSource2,
+				))
 			})
 		})
 

@@ -23,6 +23,18 @@ var _ = Describe("Source model service layer unit test", func() {
 			})
 		})
 
+		When("Retrieving all sources", func() {
+			It("Should pass the request to the repository layer", func() {
+				expectedSources := []api.Source{sampleSource1, sampleSource2}
+				fakeSourceRepo.GetSourcesReturnsOnCall(0, expectedSources, nil)
+				sources, err := sourceSvc.GetSources(context.TODO())
+				Expect(err).ToNot(HaveOccurred())
+				Expect(len(sources)).To(Equal(2))
+				Expect(sources).To(Equal(expectedSources))
+				Expect(fakeSourceRepo.GetSourcesCallCount()).To(Equal(1))
+			})
+		})
+
 		When("Retrieving a source by its uri digest", func() {
 			It("Should pass the digest to the repo layer", func() {
 				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(0, &sampleSource1, nil)
