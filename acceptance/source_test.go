@@ -196,7 +196,7 @@ var _ = Describe("Source model tests", func() {
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
 
-				var errResp map[string]interface{}
+				var errResp map[string]any
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
 				Expect(errResp["error"]).ToNot(BeNil())
@@ -211,7 +211,7 @@ var _ = Describe("Source model tests", func() {
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
 
-				var errResp map[string]interface{}
+				var errResp map[string]any
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
 				Expect(errResp["error"]).ToNot(BeNil())
@@ -341,6 +341,98 @@ var _ = Describe("Source model tests", func() {
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
 				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("uri validation failed"))
+			})
+		})
+
+		When("PATCH request with empty name is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidInput := api.SourcePatchInput{
+					Name: "",
+				}
+				body, _ := json.Marshal(invalidInput)
+				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
+				Expect(err).To(BeNil())
+				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).To(ContainSubstring("name validation failed"))
+			})
+		})
+
+		When("PATCH request with empty summary is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidInput := api.SourcePatchInput{
+					Summary: "",
+				}
+				body, _ := json.Marshal(invalidInput)
+				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
+				Expect(err).To(BeNil())
+				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).To(ContainSubstring("summary validation failed"))
+			})
+		})
+
+		When("PATCH request with empty tags is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidInput := api.SourcePatchInput{
+					Tags: "",
+				}
+				body, _ := json.Marshal(invalidInput)
+				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
+				Expect(err).To(BeNil())
+				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).To(ContainSubstring("tags validation failed"))
+			})
+		})
+
+		When("PATCH request with tags containing spaces is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidInput := api.SourcePatchInput{
+					Tags: "tag1, tag2",
+				}
+				body, _ := json.Marshal(invalidInput)
+				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
+				Expect(err).To(BeNil())
+				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).To(ContainSubstring("tags validation failed"))
 			})
 		})
 	})
