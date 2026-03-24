@@ -88,9 +88,9 @@ var _ = Describe("Source model tests", func() {
 			})
 		})
 
-		When("PATCH request is sent to update the created source", func() {
+		When("PATCH request is sent to update all the fields of the created source", func() {
 			It("should update the source record", func() {
-				updatedSrcInput := api.SourceInput{
+				updatedSrcInput := api.SourcePatchInput{
 					Name:    updatedName,
 					Summary: updatedSummary,
 					Tags:    updatedTags,
@@ -126,6 +126,43 @@ var _ = Describe("Source model tests", func() {
 			})
 		})
 
+		When("PATCH request is sent to update some fields of the created source", func() {
+			It("should update the source record", func() {
+				updatedSrcInput := api.SourcePatchInput{
+					Name: "twice updated name",
+					Tags: "twice-updated-tag",
+				}
+				reqBody, err := json.Marshal(updatedSrcInput)
+				Expect(err).To(BeNil())
+
+				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
+				Expect(err).To(BeNil())
+				req, err := http.NewRequest(
+					http.MethodPatch,
+					srcUrl,
+					bytes.NewBuffer(reqBody))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
+				resp.Body.Close()
+
+				By("verifying source got updated")
+				var src api.Source
+				resp, err = http.Get(srcUrl)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				err = json.NewDecoder(resp.Body).Decode(&src)
+				Expect(err).To(BeNil())
+				Expect(src.Name).To(Equal("twice updated name"))
+				Expect(src.Summary).To(Equal(updatedSummary))
+				Expect(src.Tags).To(Equal("twice-updated-tag"))
+			})
+		})
+
 		When("DELETE request is sent to delete the created source", func() {
 			It("should delete the created source", func() {
 				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
@@ -151,6 +188,36 @@ var _ = Describe("Source model tests", func() {
 	})
 
 	Context("Validation tests", func() {
+		When("POST request with missing required fields is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidBody := []byte(`{}`)
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(invalidBody))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]interface{}
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).ToNot(BeNil())
+			})
+		})
+
+		When("POST request with missing tags field is sent", func() {
+			It("should return 400 Bad Request with error message", func() {
+				invalidBody := []byte(`{"name":"valid name","summary":"valid summary","uri":"https://example.com"}`)
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(invalidBody))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]interface{}
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).ToNot(BeNil())
+			})
+		})
+
 		When("POST request with empty name is sent", func() {
 			It("should return 400 Bad Request with error message", func() {
 				invalidInput := api.SourceInput{
