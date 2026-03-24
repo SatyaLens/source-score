@@ -21,25 +21,39 @@ const (
 var _ = Describe("Source model tests", func() {
 	endpoint, err := url.JoinPath(baseUrl, "/api/v1/source")
 	Expect(err).To(BeNil())
-	body, err := json.Marshal(sourceInput1)
+	body1, err := json.Marshal(sourceInput1)
+	Expect(err).To(BeNil())
+	body2, err := json.Marshal(sourceInput2)
 	Expect(err).To(BeNil())
 
 	Context("Happy path tests", Ordered, func() {
-		When("valid POST request is sent with source model input", func() {
+		When("valid POST requests are sent with source model inputs", func() {
 			It("should return successful response", func() {
+				var respBody api.CreateSourceResponse
+
 				resp, err := http.Post(
 					endpoint,
 					"application/json",
-					bytes.NewBuffer(body),
+					bytes.NewBuffer(body1),
 				)
 				Expect(err).To(BeNil())
-				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
-
-				var respBody api.CreateSourceResponse
 				err = json.NewDecoder(resp.Body).Decode(&respBody)
 				Expect(err).To(BeNil())
 				Expect(respBody.UriDigest).To(Equal(uriDigest1))
+				resp.Body.Close()
+
+				resp, err = http.Post(
+					endpoint,
+					"application/json",
+					bytes.NewBuffer(body2),
+				)
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+				err = json.NewDecoder(resp.Body).Decode(&respBody)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(respBody.UriDigest).To(Equal(uriDigest2))
 			})
 		})
 
@@ -51,6 +65,26 @@ var _ = Describe("Source model tests", func() {
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+			})
+		})
+
+		When("GET request is sent to retrieve all sources", func() {
+			It("should return all sources", func() {
+				sourcesUrl, err := url.JoinPath(baseUrl, "/api/v1/sources")
+				Expect(err).To(BeNil())
+				resp, err := http.Get(sourcesUrl)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var sources []api.Source
+				err = json.NewDecoder(resp.Body).Decode(&sources)
+				Expect(err).To(BeNil())
+				Expect(len(sources)).To(Equal(2))
+				Expect(sources).To(ContainElements(
+					sampleSource1,
+					sampleSource2,
+				))
 			})
 		})
 
