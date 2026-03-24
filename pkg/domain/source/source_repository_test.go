@@ -28,17 +28,10 @@ var _ = Describe("Source model repository layer unit tests", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(len(sources)).To(Equal(2))
 
-				Expect(sources[0].Name).To(Equal(sampleSourceInput1.Name))
-				Expect(sources[0].Summary).To(Equal(sampleSourceInput1.Summary))
-				Expect(sources[0].Tags).To(Equal(sampleSourceInput1.Tags))
-				Expect(sources[0].Uri).To(Equal(sampleSourceInput1.Uri))
-				Expect(sources[0].UriDigest).To(Equal(uriDigest1))
-
-				Expect(sources[1].Name).To(Equal(sampleSourceInput2.Name))
-				Expect(sources[1].Summary).To(Equal(sampleSourceInput2.Summary))
-				Expect(sources[1].Tags).To(Equal(sampleSourceInput2.Tags))
-				Expect(sources[1].Uri).To(Equal(sampleSourceInput2.Uri))
-				Expect(sources[1].UriDigest).To(Equal(uriDigest2))
+				Expect(sources).To(ContainElements(
+					sampleSource1,
+					sampleSource2,
+				))
 			})
 		})
 

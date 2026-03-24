@@ -62,7 +62,7 @@ func TestSource(t *testing.T) {
 
 		sampleSource1 = api.Source{
 			Name:      "Sample Source 1",
-			Score:     0.5,
+			Score:     0,
 			Summary:   "Sample summary",
 			Tags:      "tag1",
 			Uri:       "https://sample-uri-1",
@@ -71,7 +71,7 @@ func TestSource(t *testing.T) {
 
 		sampleSource2 = api.Source{
 			Name:      "Sample Source 2",
-			Score:     0.7,
+			Score:     0,
 			Summary:   "Sample summary 2",
 			Tags:      "tag2",
 			Uri:       "https://sample-uri-2",
