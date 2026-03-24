@@ -49,7 +49,7 @@ var _ = Describe("Source model service layer unit test", func() {
 
 		When("Updating a source by its uri digest", func() {
 			It("Should update the correct source record in the DB", func() {
-				sourceInput := &api.SourceInput{
+				sourceInput := &api.SourcePatchInput{
 					Name:    "Updated Sample Source 1",
 					Summary: "Updated Sample summary",
 					Tags:    "updated-tag1",

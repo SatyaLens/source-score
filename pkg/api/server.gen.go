@@ -44,7 +44,6 @@ type SourcePatchInput struct {
 	Name    string `json:"name,omitempty" validate:"nonempty,omitnil"`
 	Summary string `json:"summary,omitempty" validate:"nonempty,omitnil"`
 	Tags    string `json:"tags,omitempty" validate:"nonempty,nospace,omitnil"`
-	Uri     string `json:"uri,omitempty" validate:"nonempty,httpsurl,omitnil"`
 }
 
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.

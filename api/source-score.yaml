@@ -155,10 +155,6 @@ components:
           type: string
           x-oapi-codegen-extra-tags:
             validate: nonempty,nospace,omitnil
-        uri:
-          type: string
-          x-oapi-codegen-extra-tags:
-            validate: nonempty,httpsurl,omitnil
 
     Source:
       type: object
