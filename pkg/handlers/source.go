@@ -103,7 +103,7 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 }
 
 func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context, uriDigest string) {
-	sourceInput := &api.SourceInput{}
+	sourceInput := &api.SourcePatchInput{}
 	err := ctx.ShouldBindJSON(sourceInput)
 	if err != nil {
 		ctx.JSON(
@@ -114,10 +114,12 @@ func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context, uriDigest stri
 	}
 
 	if err = sh.sourceSvc.PatchSourceByUriDigest(ctx, sourceInput, uriDigest); err != nil {
-		ctx.JSON(
-			http.StatusNotFound,
-			gin.H{"error": err.Error()},
-		)
+		switch {
+		case errors.Is(err, apperrors.ErrInvalidSource):
+			ctx.Status(http.StatusBadRequest)
+		default:
+			ctx.Status(http.StatusInternalServerError)
+		}
 		return
 	}
 

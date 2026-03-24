@@ -33,17 +33,25 @@ type Source struct {
 
 // SourceInput defines model for SourceInput.
 type SourceInput struct {
-	Name    string `json:"name,omitempty" validate:"nonempty"`
-	Summary string `json:"summary,omitempty" validate:"nonempty"`
-	Tags    string `json:"tags,omitempty" validate:"nonempty,nospace"`
-	Uri     string `json:"uri,omitempty" validate:"nonempty,httpsurl"`
+	Name    string `binding:"required" json:"name" validate:"nonempty"`
+	Summary string `binding:"required" json:"summary" validate:"nonempty"`
+	Tags    string `binding:"required" json:"tags" validate:"nonempty,nospace"`
+	Uri     string `binding:"required" json:"uri" validate:"nonempty,httpsurl"`
+}
+
+// SourcePatchInput defines model for SourcePatchInput.
+type SourcePatchInput struct {
+	Name    string `json:"name,omitempty" validate:"nonempty,omitnil"`
+	Summary string `json:"summary,omitempty" validate:"nonempty,omitnil"`
+	Tags    string `json:"tags,omitempty" validate:"nonempty,nospace,omitnil"`
+	Uri     string `json:"uri,omitempty" validate:"nonempty,httpsurl,omitnil"`
 }
 
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.
 type CreateSourceJSONRequestBody = SourceInput
 
 // PatchSourceJSONRequestBody defines body for PatchSource for application/json ContentType.
-type PatchSourceJSONRequestBody = SourceInput
+type PatchSourceJSONRequestBody = SourcePatchInput
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {

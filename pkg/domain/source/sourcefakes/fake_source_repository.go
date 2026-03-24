@@ -48,11 +48,11 @@ type FakeSourceRepository struct {
 		result1 []api.Source
 		result2 error
 	}
-	PatchSourceByUriDigestStub        func(context.Context, *api.SourceInput, string) error
+	PatchSourceByUriDigestStub        func(context.Context, *api.SourcePatchInput, string) error
 	patchSourceByUriDigestMutex       sync.RWMutex
 	patchSourceByUriDigestArgsForCall []struct {
 		arg1 context.Context
-		arg2 *api.SourceInput
+		arg2 *api.SourcePatchInput
 		arg3 string
 	}
 	patchSourceByUriDigestReturns struct {
@@ -270,12 +270,12 @@ func (fake *FakeSourceRepository) GetSourcesReturnsOnCall(i int, result1 []api.S
 	}{result1, result2}
 }
 
-func (fake *FakeSourceRepository) PatchSourceByUriDigest(arg1 context.Context, arg2 *api.SourceInput, arg3 string) error {
+func (fake *FakeSourceRepository) PatchSourceByUriDigest(arg1 context.Context, arg2 *api.SourcePatchInput, arg3 string) error {
 	fake.patchSourceByUriDigestMutex.Lock()
 	ret, specificReturn := fake.patchSourceByUriDigestReturnsOnCall[len(fake.patchSourceByUriDigestArgsForCall)]
 	fake.patchSourceByUriDigestArgsForCall = append(fake.patchSourceByUriDigestArgsForCall, struct {
 		arg1 context.Context
-		arg2 *api.SourceInput
+		arg2 *api.SourcePatchInput
 		arg3 string
 	}{arg1, arg2, arg3})
 	stub := fake.PatchSourceByUriDigestStub
@@ -297,13 +297,13 @@ func (fake *FakeSourceRepository) PatchSourceByUriDigestCallCount() int {
 	return len(fake.patchSourceByUriDigestArgsForCall)
 }
 
-func (fake *FakeSourceRepository) PatchSourceByUriDigestCalls(stub func(context.Context, *api.SourceInput, string) error) {
+func (fake *FakeSourceRepository) PatchSourceByUriDigestCalls(stub func(context.Context, *api.SourcePatchInput, string) error) {
 	fake.patchSourceByUriDigestMutex.Lock()
 	defer fake.patchSourceByUriDigestMutex.Unlock()
 	fake.PatchSourceByUriDigestStub = stub
 }
 
-func (fake *FakeSourceRepository) PatchSourceByUriDigestArgsForCall(i int) (context.Context, *api.SourceInput, string) {
+func (fake *FakeSourceRepository) PatchSourceByUriDigestArgsForCall(i int) (context.Context, *api.SourcePatchInput, string) {
 	fake.patchSourceByUriDigestMutex.RLock()
 	defer fake.patchSourceByUriDigestMutex.RUnlock()
 	argsForCall := fake.patchSourceByUriDigestArgsForCall[i]
