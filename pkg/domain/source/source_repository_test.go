@@ -49,10 +49,13 @@ var _ = Describe("Source model repository layer unit tests", func() {
 
 		When("Updating all the fields of source by its uri digest", func() {
 			It("Should update the correct source record in the DB", func() {
+				name := "Updated Sample Source 1"
+				summary := "Updated Sample summary"
+				tags := "updated-tag1"
 				sourceInput := &api.SourcePatchInput{
-					Name:    "Updated Sample Source 1",
-					Summary: "Updated Sample summary",
-					Tags:    "updated-tag1",
+					Name:    &name,
+					Summary: &summary,
+					Tags:    &tags,
 				}
 
 				err := sourceRepo.PatchSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
@@ -60,9 +63,9 @@ var _ = Describe("Source model repository layer unit tests", func() {
 
 				source, err := sourceRepo.GetSourceByUriDigest(context.TODO(), uriDigest1)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(source.Name).To(BeEquivalentTo(sourceInput.Name))
-				Expect(source.Summary).To(BeEquivalentTo(sourceInput.Summary))
-				Expect(source.Tags).To(BeEquivalentTo(sourceInput.Tags))
+				Expect(source.Name).To(BeEquivalentTo(*sourceInput.Name))
+				Expect(source.Summary).To(BeEquivalentTo(*sourceInput.Summary))
+				Expect(source.Tags).To(BeEquivalentTo(*sourceInput.Tags))
 				Expect(source.Uri).To(BeEquivalentTo(sampleSourceInput1.Uri))
 				Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))
 			})
@@ -70,9 +73,11 @@ var _ = Describe("Source model repository layer unit tests", func() {
 
 		When("Updating some fields of source by its uri digest", func() {
 			It("Should update the correct source record in the DB", func() {
+				name := "Twice Updated Sample Source 1"
+				tags := "twice-updated-tag1"
 				sourceInput := &api.SourcePatchInput{
-					Name:    "Twice Updated Sample Source 1",
-					Tags:    "twice-updated-tag1",
+					Name:    &name,
+					Tags:    &tags,
 				}
 
 				err := sourceRepo.PatchSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
@@ -80,9 +85,9 @@ var _ = Describe("Source model repository layer unit tests", func() {
 
 				source, err := sourceRepo.GetSourceByUriDigest(context.TODO(), uriDigest1)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(source.Name).To(BeEquivalentTo(sourceInput.Name))
+				Expect(source.Name).To(BeEquivalentTo(*sourceInput.Name))
 				Expect(source.Summary).To(BeEquivalentTo("Updated Sample summary"))
-				Expect(source.Tags).To(BeEquivalentTo(sourceInput.Tags))
+				Expect(source.Tags).To(BeEquivalentTo(*sourceInput.Tags))
 				Expect(source.Uri).To(BeEquivalentTo(sampleSourceInput1.Uri))
 				Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))
 			})

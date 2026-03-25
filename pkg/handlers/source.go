@@ -116,9 +116,15 @@ func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context, uriDigest stri
 	if err = sh.sourceSvc.PatchSourceByUriDigest(ctx, sourceInput, uriDigest); err != nil {
 		switch {
 		case errors.Is(err, apperrors.ErrInvalidSource):
-			ctx.Status(http.StatusBadRequest)
+			ctx.JSON(
+				http.StatusBadRequest,
+				gin.H{"error": err.Error()},
+			)
 		default:
-			ctx.Status(http.StatusInternalServerError)
+			ctx.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": err.Error()},
+			)
 		}
 		return
 	}

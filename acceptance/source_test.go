@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const (
+var (
 	updatedName    = "updated source"
 	updatedSummary = "updated summary"
 	updatedTags    = "tag1,tag2"
@@ -91,9 +91,9 @@ var _ = Describe("Source model tests", func() {
 		When("PATCH request is sent to update all the fields of the created source", func() {
 			It("should update the source record", func() {
 				updatedSrcInput := api.SourcePatchInput{
-					Name:    updatedName,
-					Summary: updatedSummary,
-					Tags:    updatedTags,
+					Name:    &updatedName,
+					Summary: &updatedSummary,
+					Tags:    &updatedTags,
 				}
 				reqBody, err := json.Marshal(updatedSrcInput)
 				Expect(err).To(BeNil())
@@ -128,9 +128,11 @@ var _ = Describe("Source model tests", func() {
 
 		When("PATCH request is sent to update some fields of the created source", func() {
 			It("should update the source record", func() {
+				name := "twice updated name"
+				tags := "twice-updated-tag"
 				updatedSrcInput := api.SourcePatchInput{
-					Name: "twice updated name",
-					Tags: "twice-updated-tag",
+					Name: &name,
+					Tags: &tags,
 				}
 				reqBody, err := json.Marshal(updatedSrcInput)
 				Expect(err).To(BeNil())
@@ -235,7 +237,8 @@ var _ = Describe("Source model tests", func() {
 				var errResp map[string]any
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
-				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("name validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).
+					To(ContainSubstring("field validation for 'name' failed on the 'required' tag"))
 			})
 		})
 
@@ -256,7 +259,8 @@ var _ = Describe("Source model tests", func() {
 				var errResp map[string]any
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
-				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("summary validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).
+					To(ContainSubstring("field validation for 'summary' failed on the 'required' tag"))
 			})
 		})
 
@@ -277,7 +281,8 @@ var _ = Describe("Source model tests", func() {
 				var errResp map[string]any
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
-				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("tags validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).
+					To(ContainSubstring("field validation for 'tags' failed on the 'required' tag"))
 			})
 		})
 
@@ -319,7 +324,8 @@ var _ = Describe("Source model tests", func() {
 				var errResp map[string]any
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
-				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("uri validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).
+					To(ContainSubstring("field validation for 'uri' failed on the 'required' tag"))
 			})
 		})
 
@@ -346,8 +352,9 @@ var _ = Describe("Source model tests", func() {
 
 		When("PATCH request with empty name is sent", func() {
 			It("should return 400 Bad Request with error message", func() {
+				name := ""
 				invalidInput := api.SourcePatchInput{
-					Name: "",
+					Name: &name,
 				}
 				body, _ := json.Marshal(invalidInput)
 				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
@@ -363,14 +370,19 @@ var _ = Describe("Source model tests", func() {
 				var errResp map[string]any
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
-				Expect(errResp["error"]).To(ContainSubstring("name validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("name validation failed"))
+
+				By("verifying validation is not running for nil fields")
+				Expect(strings.ToLower(errResp["error"].(string))).ToNot(ContainSubstring("tags validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).ToNot(ContainSubstring("summary validation failed"))
 			})
 		})
 
 		When("PATCH request with empty summary is sent", func() {
 			It("should return 400 Bad Request with error message", func() {
+				summary := ""
 				invalidInput := api.SourcePatchInput{
-					Summary: "",
+					Summary: &summary,
 				}
 				body, _ := json.Marshal(invalidInput)
 				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
@@ -386,14 +398,19 @@ var _ = Describe("Source model tests", func() {
 				var errResp map[string]any
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
-				Expect(errResp["error"]).To(ContainSubstring("summary validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("summary validation failed"))
+
+				By("verifying validation is not running for nil fields")
+				Expect(strings.ToLower(errResp["error"].(string))).ToNot(ContainSubstring("tags validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).ToNot(ContainSubstring("name validation failed"))
 			})
 		})
 
 		When("PATCH request with empty tags is sent", func() {
 			It("should return 400 Bad Request with error message", func() {
+				tags := ""
 				invalidInput := api.SourcePatchInput{
-					Tags: "",
+					Tags: &tags,
 				}
 				body, _ := json.Marshal(invalidInput)
 				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
@@ -409,14 +426,19 @@ var _ = Describe("Source model tests", func() {
 				var errResp map[string]any
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
-				Expect(errResp["error"]).To(ContainSubstring("tags validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("tags validation failed"))
+
+				By("verifying validation is not running for nil fields")
+				Expect(strings.ToLower(errResp["error"].(string))).ToNot(ContainSubstring("summary validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).ToNot(ContainSubstring("name validation failed"))
 			})
 		})
 
 		When("PATCH request with tags containing spaces is sent", func() {
 			It("should return 400 Bad Request with error message", func() {
+				tags := "tag1, tag2"
 				invalidInput := api.SourcePatchInput{
-					Tags: "tag1, tag2",
+					Tags: &tags,
 				}
 				body, _ := json.Marshal(invalidInput)
 				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
@@ -432,7 +454,11 @@ var _ = Describe("Source model tests", func() {
 				var errResp map[string]any
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
-				Expect(errResp["error"]).To(ContainSubstring("tags validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("tags validation failed"))
+
+				By("verifying validation is not running for nil fields")
+				Expect(strings.ToLower(errResp["error"].(string))).ToNot(ContainSubstring("summary validation failed"))
+				Expect(strings.ToLower(errResp["error"].(string))).ToNot(ContainSubstring("name validation failed"))
 			})
 		})
 	})

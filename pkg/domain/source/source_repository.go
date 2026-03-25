@@ -102,14 +102,14 @@ func (sr *sourceRepository) PatchSourceByUriDigest(ctx context.Context, sourceIn
 		return result.Error
 	}
 
-	if sourceInput.Name != "" {
-		source.Name = sourceInput.Name
+	if sourceInput.Name != nil {
+		source.Name = *sourceInput.Name
 	}
-	if sourceInput.Summary != "" {
-		source.Summary = sourceInput.Summary
+	if sourceInput.Summary != nil {
+		source.Summary = *sourceInput.Summary
 	}
-	if sourceInput.Tags != "" {
-		source.Tags = sourceInput.Tags
+	if sourceInput.Tags != nil {
+		source.Tags = *sourceInput.Tags
 	}
 
 	result = sr.client.Update(ctx, source)

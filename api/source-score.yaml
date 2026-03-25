@@ -122,22 +122,20 @@ components:
         name:
           type: string
           x-oapi-codegen-extra-tags:
-            validate: nonempty
             binding: required
         summary:
           type: string
           x-oapi-codegen-extra-tags:
-            validate: nonempty
             binding: required
         tags:
           type: string
           x-oapi-codegen-extra-tags:
-            validate: nonempty,nospace
+            validate: nospace
             binding: required
         uri:
           type: string
           x-oapi-codegen-extra-tags:
-            validate: nonempty,httpsurl
+            validate: httpsurl
             binding: required
 
     SourcePatchInput:
@@ -145,16 +143,19 @@ components:
       properties:
         name:
           type: string
+          nullable: true
           x-oapi-codegen-extra-tags:
-            validate: nonempty,omitnil
+            validate: omitnil,nonempty
         summary:
           type: string
+          nullable: true
           x-oapi-codegen-extra-tags:
-            validate: nonempty,omitnil
+            validate: omitnil,nonempty
         tags:
           type: string
+          nullable: true
           x-oapi-codegen-extra-tags:
-            validate: nonempty,nospace,omitnil
+            validate: omitnil,nospace,nonempty
 
     Source:
       type: object

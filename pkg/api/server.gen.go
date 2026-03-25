@@ -33,17 +33,17 @@ type Source struct {
 
 // SourceInput defines model for SourceInput.
 type SourceInput struct {
-	Name    string `binding:"required" json:"name" validate:"nonempty"`
-	Summary string `binding:"required" json:"summary" validate:"nonempty"`
-	Tags    string `binding:"required" json:"tags" validate:"nonempty,nospace"`
-	Uri     string `binding:"required" json:"uri" validate:"nonempty,httpsurl"`
+	Name    string `binding:"required" json:"name"`
+	Summary string `binding:"required" json:"summary"`
+	Tags    string `binding:"required" json:"tags" validate:"nospace"`
+	Uri     string `binding:"required" json:"uri" validate:"httpsurl"`
 }
 
 // SourcePatchInput defines model for SourcePatchInput.
 type SourcePatchInput struct {
-	Name    string `json:"name,omitempty" validate:"nonempty,omitnil"`
-	Summary string `json:"summary,omitempty" validate:"nonempty,omitnil"`
-	Tags    string `json:"tags,omitempty" validate:"nonempty,nospace,omitnil"`
+	Name    *string `json:"name" validate:"omitnil,nonempty"`
+	Summary *string `json:"summary" validate:"omitnil,nonempty"`
+	Tags    *string `json:"tags" validate:"omitnil,nospace,nonempty"`
 }
 
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.

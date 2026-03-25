@@ -49,10 +49,13 @@ var _ = Describe("Source model service layer unit test", func() {
 
 		When("Updating a source by its uri digest", func() {
 			It("Should update the correct source record in the DB", func() {
+				name := "Updated Sample Source 1"
+				summary := "Updated Sample summary"
+				tags := "updated-tag1"
 				sourceInput := &api.SourcePatchInput{
-					Name:    "Updated Sample Source 1",
-					Summary: "Updated Sample summary",
-					Tags:    "updated-tag1",
+					Name:    &name,
+					Summary: &summary,
+					Tags:    &tags,
 				}
 				updatedSource = sampleSource1
 				updatedSource.Name = "Updated Sample Source 1"
@@ -71,9 +74,9 @@ var _ = Describe("Source model service layer unit test", func() {
 				Expect(err).ToNot(HaveOccurred())
 				_, digest := fakeSourceRepo.GetSourceByUriDigestArgsForCall(1)
 				Expect(digest).To(Equal(uriDigest1))
-				Expect(source.Name).To(BeEquivalentTo(sourceInput.Name))
-				Expect(source.Summary).To(BeEquivalentTo(sourceInput.Summary))
-				Expect(source.Tags).To(BeEquivalentTo(sourceInput.Tags))
+				Expect(source.Name).To(BeEquivalentTo(*sourceInput.Name))
+				Expect(source.Summary).To(BeEquivalentTo(*sourceInput.Summary))
+				Expect(source.Tags).To(BeEquivalentTo(*sourceInput.Tags))
 				Expect(source.Uri).To(BeEquivalentTo(sampleSourceInput1.Uri))
 				Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))
 			})
