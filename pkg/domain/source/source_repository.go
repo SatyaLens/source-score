@@ -17,7 +17,7 @@ type SourceRepository interface {
 	GetSources(ctx context.Context) ([]api.Source, error)
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error)
-	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
+	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourcePatchInput, uriDigest string) error
 }
 
 type sourceRepository struct {
@@ -93,7 +93,7 @@ func (sr *sourceRepository) PostSource(ctx context.Context, sourceInput *api.Sou
 }
 
 // Updates source model fields except for `uri` and `uriDigest`
-func (sr *sourceRepository) PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
+func (sr *sourceRepository) PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourcePatchInput, uriDigest string) error {
 	source := &api.Source{}
 	source.UriDigest = uriDigest
 
@@ -102,14 +102,14 @@ func (sr *sourceRepository) PatchSourceByUriDigest(ctx context.Context, sourceIn
 		return result.Error
 	}
 
-	if sourceInput.Name != "" {
-		source.Name = sourceInput.Name
+	if sourceInput.Name != nil {
+		source.Name = *sourceInput.Name
 	}
-	if sourceInput.Summary != "" {
-		source.Summary = sourceInput.Summary
+	if sourceInput.Summary != nil {
+		source.Summary = *sourceInput.Summary
 	}
-	if sourceInput.Tags != "" {
-		source.Tags = sourceInput.Tags
+	if sourceInput.Tags != nil {
+		source.Tags = *sourceInput.Tags
 	}
 
 	result = sr.client.Update(ctx, source)

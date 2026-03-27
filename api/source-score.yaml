@@ -81,7 +81,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SourceInput'
+              $ref: '#/components/schemas/SourcePatchInput'
       responses:
         204:
           description: source updated
@@ -113,23 +113,49 @@ components:
 
     SourceInput:
       type: object
+      required:
+      - name
+      - summary
+      - tags
+      - uri
       properties:
         name:
           type: string
           x-oapi-codegen-extra-tags:
-            validate: nonempty
+            binding: required
         summary:
           type: string
           x-oapi-codegen-extra-tags:
-            validate: nonempty
+            binding: required
         tags:
           type: string
           x-oapi-codegen-extra-tags:
-            validate: nonempty,nospace
+            validate: nospace
+            binding: required
         uri:
           type: string
           x-oapi-codegen-extra-tags:
-            validate: nonempty,httpsurl
+            validate: httpsurl
+            binding: required
+
+    SourcePatchInput:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          x-oapi-codegen-extra-tags:
+            validate: omitnil,nonempty
+        summary:
+          type: string
+          nullable: true
+          x-oapi-codegen-extra-tags:
+            validate: omitnil,nonempty
+        tags:
+          type: string
+          nullable: true
+          x-oapi-codegen-extra-tags:
+            validate: omitnil,nospace,nonempty
 
     Source:
       type: object

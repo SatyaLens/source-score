@@ -21,7 +21,7 @@ type SourceService interface {
 	GetSources(ctx context.Context) ([]api.Source, error)
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error)
-	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error
+	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourcePatchInput, uriDigest string) error
 }
 
 type sourceService struct {
@@ -82,6 +82,21 @@ func (svc *sourceService) PostSource(ctx context.Context, sourceInput *api.Sourc
 	return svc.sourceRepo.PostSource(ctx, sourceInput)
 }
 
-func (svc *sourceService) PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourceInput, uriDigest string) error {
+func (svc *sourceService) PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourcePatchInput, uriDigest string) error {
+	err := validate.Struct(sourceInput)
+	if err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			return fmt.Errorf("%w: %s", apperrors.ErrValidationLogic, err.Error())
+		}
+		combinedErrs := ""
+		for _, e := range err.(validator.ValidationErrors) {
+			combinedErrs = fmt.Sprintf(
+				"%s\n%s validation failed for value %v with error %s",
+				combinedErrs, e.Field(), e.Value(), e.Tag(),
+			)
+		}
+		combinedErrs = strings.TrimSpace(combinedErrs)
+		return fmt.Errorf("%w: %s", apperrors.ErrInvalidSource, combinedErrs)
+	}
 	return svc.sourceRepo.PatchSourceByUriDigest(ctx, sourceInput, uriDigest)
 }
