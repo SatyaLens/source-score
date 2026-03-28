@@ -125,14 +125,16 @@ components:
           type: string
           x-oapi-codegen-extra-tags:
             binding: required
+            validate: nonempty
         summary:
           type: string
           x-oapi-codegen-extra-tags:
             binding: required
+            validate: nonempty
         tags:
           type: string
           x-oapi-codegen-extra-tags:
-            validate: nospace
+            validate: nonempty,nospace
             binding: required
         uri:
           type: string

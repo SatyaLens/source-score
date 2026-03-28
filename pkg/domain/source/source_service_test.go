@@ -5,6 +5,7 @@ import (
 	"errors"
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -99,7 +100,66 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 		})
 	})
 
-	Context("Validation tests", func() {
+	Context("Source POST validation tests", func() {
+		When("Creating a source with tags containing spaces", func() {
+			It("Should return invalid source error with nospace validation message", func() {
+				invalidInput := &api.SourceInput{
+					Name:    "Valid Name",
+					Summary: "Valid Summary",
+					Tags:    "tag1, tag2",
+					Uri:     "https://example.com",
+				}
+
+				_, err := sourceSvc.PostSource(context.TODO(), invalidInput)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidSource)).To(BeTrue())
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("tags validation failed"))
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("nospace"))
+			})
+		})
+
+		When("Creating a source with non-https uri", func() {
+			It("Should return invalid source error with httpsurl validation message", func() {
+				invalidInput := &api.SourceInput{
+					Name:    "Valid Name",
+					Summary: "Valid Summary",
+					Tags:    "tag1,tag2",
+					Uri:     "http://example.com",
+				}
+
+				_, err := sourceSvc.PostSource(context.TODO(), invalidInput)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidSource)).To(BeTrue())
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("uri validation failed"))
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("httpsurl"))
+			})
+		})
+
+		When("Creating a source with empty summary and name", func() {
+			It("Should return invalid source error with httpsurl validation message", func() {
+				invalidInput := &api.SourceInput{
+					Name:    "",
+					Summary: "",
+					Tags:    "tag1,tag2",
+					Uri:     "https://example.com",
+				}
+
+				_, err := sourceSvc.PostSource(context.TODO(), invalidInput)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidSource)).To(BeTrue())
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("name validation failed"))
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("summary validation failed"))
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("nonempty"))
+				Expect(strings.ToLower(err.Error())).ToNot(ContainSubstring("tags"))
+				Expect(strings.ToLower(err.Error())).ToNot(ContainSubstring("uri"))
+			})
+		})
+	})
+
+	Context("Source PACTH validation tests", func() {
 		When("Patching a source that does not exist", func() {
 			It("Should return source not found error", func() {
 				fakeSourceRepo.PatchSourceByUriDigestReturns(gorm.ErrRecordNotFound)
@@ -116,6 +176,38 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 
 				Expect(err).ToNot(BeNil())
 				Expect(errors.Is(err, apperrors.ErrSourceNotFound)).To(BeTrue())
+			})
+		})
+
+		When("Patching a source with empty name", func() {
+			It("Should return invalid source error with nonempty validation message", func() {
+				emptyName := ""
+				invalidInput := &api.SourcePatchInput{
+					Name: &emptyName,
+				}
+
+				err := sourceSvc.PatchSourceByUriDigest(context.TODO(), invalidInput, uriDigest1)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidSource)).To(BeTrue())
+				Expect(err.Error()).To(ContainSubstring("Name"))
+				Expect(err.Error()).To(ContainSubstring("nonempty"))
+			})
+		})
+
+		When("Patching a source with tags containing spaces", func() {
+			It("Should return invalid source error with nospace validation message", func() {
+				invalidTags := "tag1, tag2"
+				invalidInput := &api.SourcePatchInput{
+					Tags: &invalidTags,
+				}
+
+				err := sourceSvc.PatchSourceByUriDigest(context.TODO(), invalidInput, uriDigest1)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidSource)).To(BeTrue())
+				Expect(err.Error()).To(ContainSubstring("Tags"))
+				Expect(err.Error()).To(ContainSubstring("nospace"))
 			})
 		})
 	})

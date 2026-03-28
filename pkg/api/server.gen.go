@@ -33,9 +33,9 @@ type Source struct {
 
 // SourceInput defines model for SourceInput.
 type SourceInput struct {
-	Name    string `binding:"required" json:"name"`
-	Summary string `binding:"required" json:"summary"`
-	Tags    string `binding:"required" json:"tags" validate:"nospace"`
+	Name    string `binding:"required" json:"name" validate:"nonempty"`
+	Summary string `binding:"required" json:"summary" validate:"nonempty"`
+	Tags    string `binding:"required" json:"tags" validate:"nonempty,nospace"`
 	Uri     string `binding:"required" json:"uri" validate:"httpsurl"`
 }
 
