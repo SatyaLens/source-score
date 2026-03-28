@@ -2,13 +2,16 @@ package source_test
 
 import (
 	"context"
+	"errors"
 	"source-score/pkg/api"
+	"source-score/pkg/apperrors"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"gorm.io/gorm"
 )
 
-var _ = Describe("Source model service layer unit test", func() {
+var _ = Describe("Source model service layer unit test", Ordered, func() {
 	Context("Happy path", Ordered, func() {
 		When("Adding a new source with valid input", func() {
 			It("Should pass the data to the repository layer", func() {
@@ -92,6 +95,27 @@ var _ = Describe("Source model service layer unit test", func() {
 				Expect(digest).To(Equal(uriDigest1))
 				_, src := fakeSourceRepo.DeleteSourceByUriDigestArgsForCall(0)
 				Expect(*src).To(Equal(updatedSource))
+			})
+		})
+	})
+
+	Context("Validation tests", func() {
+		When("Patching a source that does not exist", func() {
+			It("Should return source not found error", func() {
+				fakeSourceRepo.PatchSourceByUriDigestReturns(gorm.ErrRecordNotFound)
+
+				name := "Updated Sample Source 1"
+				summary := "Updated Sample summary"
+				tags := "updated-tag1"
+				sourceInput := &api.SourcePatchInput{
+					Name:    &name,
+					Summary: &summary,
+					Tags:    &tags,
+				}
+				err := sourceSvc.PatchSourceByUriDigest(context.TODO(), sourceInput, "invalid-digest")
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrSourceNotFound)).To(BeTrue())
 			})
 		})
 	})

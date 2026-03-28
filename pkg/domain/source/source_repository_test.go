@@ -2,13 +2,15 @@ package source_test
 
 import (
 	"context"
+	"errors"
 	"source-score/pkg/api"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"gorm.io/gorm"
 )
 
-var _ = Describe("Source model repository layer unit tests", func() {
+var _ = Describe("Source model repository layer unit tests", Ordered, func() {
 	Context("Happy path", Ordered, func() {
 		When("Adding new sources to the DB with valid input", func() {
 			It("Should create the source record in the DB", func() {
@@ -76,8 +78,8 @@ var _ = Describe("Source model repository layer unit tests", func() {
 				name := "Twice Updated Sample Source 1"
 				tags := "twice-updated-tag1"
 				sourceInput := &api.SourcePatchInput{
-					Name:    &name,
-					Tags:    &tags,
+					Name: &name,
+					Tags: &tags,
 				}
 
 				err := sourceRepo.PatchSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
@@ -105,6 +107,23 @@ var _ = Describe("Source model repository layer unit tests", func() {
 				_, err = sourceRepo.GetSourceByUriDigest(context.TODO(), uriDigest1)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("record not found"))
+			})
+		})
+	})
+
+	Context("Validation tests", func() {
+		When("Patching a source that does not exist", func() {
+			It("Should return record not found error", func() {
+				name := "Twice Updated Sample Source 1"
+				tags := "twice-updated-tag1"
+				sourceInput := &api.SourcePatchInput{
+					Name: &name,
+					Tags: &tags,
+				}
+
+				err := sourceRepo.PatchSourceByUriDigest(context.TODO(), sourceInput, "invalid-digest")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
 			})
 		})
 	})
