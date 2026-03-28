@@ -112,7 +112,7 @@ var _ = Describe("Source model repository layer unit tests", Ordered, func() {
 	})
 
 	Context("Validation tests", func() {
-		When("Patching a record that does not exist", func() {
+		When("Patching a source that does not exist", func() {
 			It("Should return record not found error", func() {
 				name := "Twice Updated Sample Source 1"
 				tags := "twice-updated-tag1"

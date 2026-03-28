@@ -2,6 +2,7 @@ package source
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
@@ -10,6 +11,7 @@ import (
 	"source-score/pkg/helpers"
 
 	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
 )
 
 var (
@@ -98,5 +100,10 @@ func (svc *sourceService) PatchSourceByUriDigest(ctx context.Context, sourceInpu
 		combinedErrs = strings.TrimSpace(combinedErrs)
 		return fmt.Errorf("%w: %s", apperrors.ErrInvalidSource, combinedErrs)
 	}
-	return svc.sourceRepo.PatchSourceByUriDigest(ctx, sourceInput, uriDigest)
+
+	err = svc.sourceRepo.PatchSourceByUriDigest(ctx, sourceInput, uriDigest)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("%w: %s", apperrors.ErrSourceNotFound, err.Error())
+	}
+	return err
 }
