@@ -85,6 +85,8 @@ paths:
       responses:
         204:
           description: source updated
+        404:
+          description: source not found
 
     delete:
       tags:
