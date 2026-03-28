@@ -120,6 +120,11 @@ func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context, uriDigest stri
 				http.StatusBadRequest,
 				gin.H{"error": err.Error()},
 			)
+		case errors.Is(err, apperrors.ErrSourceNotFound):
+			ctx.JSON(
+				http.StatusNotFound,
+				gin.H{"error": err.Error()},
+			)
 		default:
 			ctx.JSON(
 				http.StatusInternalServerError,

@@ -461,5 +461,31 @@ var _ = Describe("Source model tests", func() {
 				Expect(strings.ToLower(errResp["error"].(string))).ToNot(ContainSubstring("name validation failed"))
 			})
 		})
+
+		When("PATCH request for a source that doesn't exist is sent", func() {
+			It("should return 404 Not Found with error message", func() {
+				srcName := "new name"
+				validInput := api.SourcePatchInput{
+					Name: &srcName,
+				}
+				body, _ := json.Marshal(validInput)
+				srcUrl, err := url.JoinPath(endpoint, "invalid-uri-digest")
+				Expect(err).To(BeNil())
+				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).ToNot(BeNil())
+				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("source not found"))
+			})
+		})
+
 	})
 })
