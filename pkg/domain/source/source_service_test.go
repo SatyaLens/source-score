@@ -190,8 +190,8 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 
 				Expect(err).ToNot(BeNil())
 				Expect(errors.Is(err, apperrors.ErrInvalidSource)).To(BeTrue())
-				Expect(err.Error()).To(ContainSubstring("Name"))
-				Expect(err.Error()).To(ContainSubstring("nonempty"))
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("name validation failed"))
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("nonempty"))
 			})
 		})
 
@@ -208,6 +208,26 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 				Expect(errors.Is(err, apperrors.ErrInvalidSource)).To(BeTrue())
 				Expect(err.Error()).To(ContainSubstring("Tags"))
 				Expect(err.Error()).To(ContainSubstring("nospace"))
+			})
+		})
+
+		When("Patching a source with empty tag and summary", func() {
+			It("Should return invalid source error with nospace validation message", func() {
+				validName := "valid-name"
+				invalidSummary := ""
+				invalidTags := ""
+				invalidInput := &api.SourcePatchInput{
+					Name:    &validName,
+					Summary: &invalidSummary,
+					Tags:    &invalidTags,
+				}
+
+				err := sourceSvc.PatchSourceByUriDigest(context.TODO(), invalidInput, uriDigest1)
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidSource)).To(BeTrue())
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("summary validation failed"))
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("tags validation failed"))
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("nonempty"))
 			})
 		})
 	})
