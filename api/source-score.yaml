@@ -211,3 +211,38 @@ components:
           type: string
           x-oapi-codegen-extra-tags:
             binding: required
+
+    # Claim models
+    Claim:
+      type: object
+      required:
+      - sourceUri
+      - score
+      - summary
+      - tags
+      - uri
+      - uriDigest
+      properties:
+        sourceUri:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        summary:
+          type: string
+        title:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        uri:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+            gorm: primaryKey
+        checked:
+          type: boolean
+          x-oapi-codegen-extra-tags:
+            binding: required
+        validity:
+          type: boolean
+          x-oapi-codegen-extra-tags:
+            binding: required
