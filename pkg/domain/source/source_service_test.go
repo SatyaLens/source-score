@@ -233,12 +233,24 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 	})
 
 	Context("Source GET validation tests", func() {
-		When("Getching a source that doesn't exist", func() {
+		When("Getting a source that doesn't exist", func() {
 			It("Should return source not found error", func() {
 				fakeSourceRepo.GetSourceByUriDigestReturns(nil, gorm.ErrRecordNotFound)
 
 				source, err := sourceSvc.GetSourceByUriDigest(context.TODO(), "invalid-digest")
 				Expect(source).To(BeNil())
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrSourceNotFound)).To(BeTrue())
+			})
+		})
+	})
+
+	Context("Source DELETE validation tests", func() {
+		When("Deleting a source that doesn't exist", func() {
+			It("Should return source not found error", func() {
+				fakeSourceRepo.DeleteSourceByUriDigestReturns(gorm.ErrRecordNotFound)
+
+				err := sourceSvc.DeleteSourceByUriDigest(context.TODO(), "invalid-digest")
 				Expect(err).ToNot(BeNil())
 				Expect(errors.Is(err, apperrors.ErrSourceNotFound)).To(BeTrue())
 			})

@@ -23,12 +23,19 @@ func NewSourceHandler(ctx context.Context, sourceSvc source.SourceService) *Sour
 
 func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context, uriDigest string) {
 	err := sh.sourceSvc.DeleteSourceByUriDigest(ctx, uriDigest)
-	// TODO: add proper error wrapping logic
 	if err != nil {
-		ctx.JSON(
-			http.StatusNotFound,
-			gin.H{"error": err.Error()},
-		)
+		switch {
+		case errors.Is(err, apperrors.ErrSourceNotFound):
+			ctx.JSON(
+				http.StatusNotFound,
+				gin.H{"error": err.Error()},
+			)
+		default:
+			ctx.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": err.Error()},
+			)
+		}
 		return
 	}
 
