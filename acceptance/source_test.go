@@ -190,6 +190,34 @@ var _ = Describe("Source model tests", func() {
 	})
 
 	Context("Validation tests", func() {
+		When("GET request is sent for an invalid source", func() {
+			It("should return 404 error", func() {
+				srcUrl, err := url.JoinPath(endpoint, "invalid-digest")
+				Expect(err).To(BeNil())
+				resp, err := http.Get(srcUrl)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+			})
+		})
+
+		When("DELETE request is sent for an invalid source", func() {
+			It("should return 404 error", func() {
+				srcUrl, err := url.JoinPath(endpoint, "invalid-digest")
+				Expect(err).To(BeNil())
+				req, err := http.NewRequest(
+					http.MethodDelete,
+					srcUrl,
+					nil,
+				)
+				Expect(err).To(BeNil())
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+			})
+		})
+
 		When("POST request with missing required fields is sent", func() {
 			It("should return 400 Bad Request with error message", func() {
 				invalidBody := []byte(`{}`)

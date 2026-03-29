@@ -62,7 +62,15 @@ func (svc *sourceService) GetSources(ctx context.Context) ([]api.Source, error) 
 }
 
 func (svc *sourceService) GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error) {
-	return svc.sourceRepo.GetSourceByUriDigest(ctx, uriDigest)
+	source, err := svc.sourceRepo.GetSourceByUriDigest(ctx, uriDigest)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("%w: %s", apperrors.ErrSourceNotFound, err.Error())
+		}
+		return nil, err
+	}
+	return source, nil
 }
 
 func (svc *sourceService) PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error) {

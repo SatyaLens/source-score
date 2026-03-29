@@ -66,6 +66,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Source'
+        404:
+          description: source not found
 
     patch:
       tags:
@@ -101,6 +103,8 @@ paths:
       responses:
         204:
           description: source deleted
+        404:
+          description: source not found
 
 components:
   schemas:

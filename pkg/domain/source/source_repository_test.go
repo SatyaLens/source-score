@@ -126,5 +126,13 @@ var _ = Describe("Source model repository layer unit tests", Ordered, func() {
 				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
 			})
 		})
+
+		When("Getting a source that does not exist", func() {
+			It("Should return record not found error", func() {
+				_, err := sourceRepo.GetSourceByUriDigest(context.TODO(), "invalid-digest")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
+			})
+		})
 	})
 })
