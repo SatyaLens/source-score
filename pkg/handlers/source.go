@@ -53,12 +53,19 @@ func (sh *SourceHandler) GetSources(ctx *gin.Context) {
 
 func (sh *SourceHandler) GetSourceByUriDigest(ctx *gin.Context, uriDigest string) {
 	source, err := sh.sourceSvc.GetSourceByUriDigest(ctx, uriDigest)
-	// TODO: add proper error wrapping logic
 	if err != nil {
-		ctx.JSON(
-			http.StatusNotFound,
-			gin.H{"error": err.Error()},
-		)
+		switch {
+		case errors.Is(err, apperrors.ErrSourceNotFound):
+			ctx.JSON(
+				http.StatusNotFound,
+				gin.H{"error": err.Error()},
+			)
+		default:
+			ctx.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": err.Error()},
+			)
+		}
 		return
 	}
 
