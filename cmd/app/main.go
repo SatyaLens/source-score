@@ -13,6 +13,7 @@ import (
 	"source-score/pkg/api"
 	"source-score/pkg/conf"
 	"source-score/pkg/db/pgsql"
+	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/source"
 	"source-score/pkg/helpers"
 	apiServer "source-score/pkg/http"
@@ -52,11 +53,19 @@ func main() {
 		conf.DbName,
 	)
 	dbClient := pgsql.NewClient(context.Background(), dsn, &gorm.Config{})
+
 	srcRepo := source.NewSourceRepository(context.Background(), dbClient)
 	srcSvc := source.NewSourceService(context.Background(), srcRepo)
 
+	claimRepo := claim.NewClaimRepository(context.Background(), dbClient)
+	claimSvc := claim.NewClaimService(context.Background(), claimRepo)
+
 	server := gin.Default()
-	api.RegisterHandlersWithOptions(server, apiServer.NewRouter(context.Background(), srcSvc), loggerOpts)
+	api.RegisterHandlersWithOptions(
+		server,
+		apiServer.NewRouter(context.Background(), srcSvc, claimSvc),
+		loggerOpts,
+	)
 
 	err := server.Run()
 	if err != nil {

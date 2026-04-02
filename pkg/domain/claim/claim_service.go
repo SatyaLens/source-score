@@ -3,12 +3,6 @@ package claim
 import (
 	"context"
 	"source-score/pkg/api"
-
-	"github.com/go-playground/validator/v10"
-)
-
-var (
-	validate = validator.New()
 )
 
 //go:generate go tool counterfeiter . ClaimService

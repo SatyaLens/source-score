@@ -45,7 +45,7 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(digest).To(Equal(claim2Digest))
 				Expect(fakeClaimRepo.PostClaimCallCount()).To(Equal(2))
-				_, arg = fakeClaimRepo.PostClaimArgsForCall(0)
+				_, arg = fakeClaimRepo.PostClaimArgsForCall(1)
 				Expect(arg).To(Equal(&input))
 			})
 		})
