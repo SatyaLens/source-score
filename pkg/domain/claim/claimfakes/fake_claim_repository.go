@@ -22,6 +22,20 @@ type FakeClaimRepository struct {
 		result1 []api.Claim
 		result2 error
 	}
+	PostClaimStub        func(context.Context, *api.ClaimInput) (string, error)
+	postClaimMutex       sync.RWMutex
+	postClaimArgsForCall []struct {
+		arg1 context.Context
+		arg2 *api.ClaimInput
+	}
+	postClaimReturns struct {
+		result1 string
+		result2 error
+	}
+	postClaimReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -86,6 +100,71 @@ func (fake *FakeClaimRepository) GetClaimsReturnsOnCall(i int, result1 []api.Cla
 	}
 	fake.getClaimsReturnsOnCall[i] = struct {
 		result1 []api.Claim
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClaimRepository) PostClaim(arg1 context.Context, arg2 *api.ClaimInput) (string, error) {
+	fake.postClaimMutex.Lock()
+	ret, specificReturn := fake.postClaimReturnsOnCall[len(fake.postClaimArgsForCall)]
+	fake.postClaimArgsForCall = append(fake.postClaimArgsForCall, struct {
+		arg1 context.Context
+		arg2 *api.ClaimInput
+	}{arg1, arg2})
+	stub := fake.PostClaimStub
+	fakeReturns := fake.postClaimReturns
+	fake.recordInvocation("PostClaim", []interface{}{arg1, arg2})
+	fake.postClaimMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeClaimRepository) PostClaimCallCount() int {
+	fake.postClaimMutex.RLock()
+	defer fake.postClaimMutex.RUnlock()
+	return len(fake.postClaimArgsForCall)
+}
+
+func (fake *FakeClaimRepository) PostClaimCalls(stub func(context.Context, *api.ClaimInput) (string, error)) {
+	fake.postClaimMutex.Lock()
+	defer fake.postClaimMutex.Unlock()
+	fake.PostClaimStub = stub
+}
+
+func (fake *FakeClaimRepository) PostClaimArgsForCall(i int) (context.Context, *api.ClaimInput) {
+	fake.postClaimMutex.RLock()
+	defer fake.postClaimMutex.RUnlock()
+	argsForCall := fake.postClaimArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeClaimRepository) PostClaimReturns(result1 string, result2 error) {
+	fake.postClaimMutex.Lock()
+	defer fake.postClaimMutex.Unlock()
+	fake.PostClaimStub = nil
+	fake.postClaimReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClaimRepository) PostClaimReturnsOnCall(i int, result1 string, result2 error) {
+	fake.postClaimMutex.Lock()
+	defer fake.postClaimMutex.Unlock()
+	fake.PostClaimStub = nil
+	if fake.postClaimReturnsOnCall == nil {
+		fake.postClaimReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.postClaimReturnsOnCall[i] = struct {
+		result1 string
 		result2 error
 	}{result1, result2}
 }
