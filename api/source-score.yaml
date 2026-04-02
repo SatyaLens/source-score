@@ -106,6 +106,33 @@ paths:
         404:
           description: source not found
 
+  # claim paths
+  /api/v1/claims:
+    get:
+      tags:
+      - claims
+      operationId: getClaims
+      responses:
+        200:
+          description: returns all claims
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Claim'
+
+  /api/v1/claim:
+    post:
+      tags:
+      - claim
+      operationId: postClaim
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimInput'
+
 components:
   schemas:
     Pong:
@@ -212,23 +239,20 @@ components:
           x-oapi-codegen-extra-tags:
             binding: required
 
-    # Claim models
-    Claim:
+    ClaimInput:
       type: object
       required:
-      - sourceUri
-      - score
-      - summary
-      - tags
+      - sourceUriDigest
+      - title
       - uri
-      - uriDigest
       properties:
-        sourceUri:
+        sourceUriDigest:
           type: string
           x-oapi-codegen-extra-tags:
             binding: required
         summary:
           type: string
+          x-oapi-codegen-extra-tags:
         title:
           type: string
           x-oapi-codegen-extra-tags:
@@ -237,12 +261,46 @@ components:
           type: string
           x-oapi-codegen-extra-tags:
             binding: required
+
+    Claim:
+      type: object
+      required:
+      - sourceUriDigest
+      - summary
+      - title
+      - uri
+      - uriDigest
+      - checked
+      - validity
+      properties:
+        sourceUriDigest:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        summary:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        title:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        uri:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        uriDigest:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
             gorm: primaryKey
         checked:
           type: boolean
+          default: false
           x-oapi-codegen-extra-tags:
             binding: required
         validity:
           type: boolean
+          default: false
           x-oapi-codegen-extra-tags:
             binding: required

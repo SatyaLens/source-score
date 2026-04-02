@@ -11,6 +11,25 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// Claim defines model for Claim.
+type Claim struct {
+	Checked         bool   `binding:"required" json:"checked"`
+	SourceUriDigest string `binding:"required" json:"sourceUriDigest"`
+	Summary         string `binding:"required" json:"summary"`
+	Title           string `binding:"required" json:"title"`
+	Uri             string `binding:"required" json:"uri"`
+	UriDigest       string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
+	Validity        bool   `binding:"required" json:"validity"`
+}
+
+// ClaimInput defines model for ClaimInput.
+type ClaimInput struct {
+	SourceUriDigest string  `binding:"required" json:"sourceUriDigest"`
+	Summary         *string `json:"summary,omitempty"`
+	Title           string  `binding:"required" json:"title"`
+	Uri             string  `binding:"required" json:"uri"`
+}
+
 // CreateSourceResponse defines model for CreateSourceResponse.
 type CreateSourceResponse struct {
 	UriDigest string `binding:"required" json:"uriDigest"`
@@ -46,6 +65,9 @@ type SourcePatchInput struct {
 	Tags    *string `json:"tags" validate:"omitnil,nospace,nonempty"`
 }
 
+// PostClaimJSONRequestBody defines body for PostClaim for application/json ContentType.
+type PostClaimJSONRequestBody = ClaimInput
+
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.
 type CreateSourceJSONRequestBody = SourceInput
 
@@ -54,6 +76,12 @@ type PatchSourceJSONRequestBody = SourcePatchInput
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+
+	// (POST /api/v1/claim)
+	PostClaim(c *gin.Context)
+
+	// (GET /api/v1/claims)
+	GetClaims(c *gin.Context)
 
 	// (POST /api/v1/source)
 	CreateSource(c *gin.Context)
@@ -82,6 +110,32 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
+
+// PostClaim operation middleware
+func (siw *ServerInterfaceWrapper) PostClaim(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostClaim(c)
+}
+
+// GetClaims operation middleware
+func (siw *ServerInterfaceWrapper) GetClaims(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetClaims(c)
+}
 
 // CreateSource operation middleware
 func (siw *ServerInterfaceWrapper) CreateSource(c *gin.Context) {
@@ -221,6 +275,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
+	router.POST(options.BaseURL+"/api/v1/claim", wrapper.PostClaim)
+	router.GET(options.BaseURL+"/api/v1/claims", wrapper.GetClaims)
 	router.POST(options.BaseURL+"/api/v1/source", wrapper.CreateSource)
 	router.DELETE(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.DeleteSource)
 	router.GET(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.GetSource)
