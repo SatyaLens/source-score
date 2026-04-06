@@ -2,11 +2,13 @@ package claim_test
 
 import (
 	"context"
+	"errors"
 
 	"source-score/pkg/api"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"gorm.io/gorm"
 )
 
 var _ = Describe("Claim repository layer unit tests", func() {
@@ -58,6 +60,21 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(claim).ToNot(BeNil())
 				Expect(*claim).To(Equal(sampleClaim1))
+			})
+		})
+
+		When("Deleting a claim by its uri digest", func() {
+			It("Should delete the correct claim record from the DB", func() {
+				claim := &api.Claim{
+					UriDigest: claim1Digest,
+				}
+
+				err := claimRepo.DeleteClaimByUriDigest(context.TODO(), claim)
+				Expect(err).ToNot(HaveOccurred())
+
+				_, err = claimRepo.GetClaimByUriDigest(context.TODO(), claim1Digest)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
 			})
 		})
 	})

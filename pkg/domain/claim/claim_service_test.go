@@ -77,5 +77,19 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(arg).To(Equal(claim1Digest))
 			})
 		})
+
+		When("Deleting a claim by its uri digest", func() {
+			It("Should delete the correct claim record via repository", func() {
+				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(1, &sampleClaim1, nil)
+				fakeClaimRepo.DeleteClaimByUriDigestReturns(nil)
+
+				err := claimSvc.DeleteClaimByUriDigest(context.TODO(), claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+				_, digest := fakeClaimRepo.GetClaimByUriDigestArgsForCall(1)
+				Expect(digest).To(Equal(claim1Digest))
+				_, c := fakeClaimRepo.DeleteClaimByUriDigestArgsForCall(0)
+				Expect(*c).To(Equal(sampleClaim1))
+			})
+		})
 	})
 })
