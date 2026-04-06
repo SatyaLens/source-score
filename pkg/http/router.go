@@ -56,8 +56,8 @@ func (r *router) PostClaim(ctx *gin.Context) {
 	r.claimHandler.PostClaim(ctx)
 }
 
-func (r *router) GetClaim(ctx *gin.Context, claimDigest string) {
-	r.claimHandler.GetClaimByUriDigest(ctx, claimDigest)
+func (r *router) GetClaim(ctx *gin.Context, uriDigest string) {
+	r.claimHandler.GetClaimByUriDigest(ctx, uriDigest)
 }
 
 func (r *router) GetPing(ctx *gin.Context) {
@@ -66,6 +66,10 @@ func (r *router) GetPing(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": message})
 }
 
-func (r *router) DeleteClaim(ctx *gin.Context, claimDigest string) {
-	r.claimHandler.DeleteClaimByUriDigest(ctx, claimDigest)
+func (r *router) DeleteClaim(ctx *gin.Context, uriDigest string) {
+	r.claimHandler.DeleteClaimByUriDigest(ctx, uriDigest)
+}
+
+func (r *router) PatchClaim(ctx *gin.Context, claimDigest string) {
+	r.claimHandler.PatchClaimByUriDigest(ctx, claimDigest)
 }

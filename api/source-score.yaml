@@ -136,14 +136,14 @@ paths:
         201:
           description: claim created
 
-  /api/v1/claim/{claimDigest}:
+  /api/v1/claim/{uriDigest}:
     get:
       tags:
       - claim
       operationId: getClaim
       parameters:
       - in: path
-        name: claimDigest
+        name: uriDigest
         required: true
         schema:
           type: string
@@ -170,6 +170,27 @@ paths:
       responses:
         204:
           description: claim deleted
+        404:
+          description: claim not found
+
+    patch:
+      tags:
+        - claim
+      operationId: patchClaim
+      parameters:
+      - in: path
+        name: uriDigest
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimPatchInput'
+      responses:
+        204:
+          description: claim updated
         404:
           description: claim not found
 

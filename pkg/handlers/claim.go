@@ -101,3 +101,37 @@ func (ch *ClaimHandler) DeleteClaimByUriDigest(ctx *gin.Context, uriDigest strin
 
 	ctx.Status(http.StatusNoContent)
 }
+
+func (ch *ClaimHandler) PatchClaimByUriDigest(ctx *gin.Context, uriDigest string) {
+	claimInput := &api.ClaimPatchInput{}
+	if err := ctx.ShouldBindJSON(claimInput); err != nil {
+		ctx.JSON(
+			http.StatusBadRequest,
+			gin.H{"error": err.Error()},
+		)
+		return
+	}
+
+	if err := ch.claimSvc.PatchClaimByUriDigest(ctx, claimInput, uriDigest); err != nil {
+		switch {
+		case errors.Is(err, apperrors.ErrInvalidClaim):
+			ctx.JSON(
+				http.StatusBadRequest,
+				gin.H{"error": err.Error()},
+			)
+		case errors.Is(err, apperrors.ErrClaimNotFound):
+			ctx.JSON(
+				http.StatusNotFound,
+				gin.H{"error": err.Error()},
+			)
+		default:
+			ctx.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": err.Error()},
+			)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
