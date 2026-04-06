@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"source-score/pkg/api"
+	"source-score/pkg/apperrors"
 	"source-score/pkg/domain/claim"
 
 	"github.com/gin-gonic/gin"
@@ -53,4 +55,28 @@ func (ch *ClaimHandler) PostClaim(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{"uriDigest": digest})
+}
+
+func (ch *ClaimHandler) GetClaimByUriDigest(ctx *gin.Context, uriDigest string) {
+	claim, err := ch.claimSvc.GetClaimByUriDigest(ctx, uriDigest)
+	if err != nil {
+		switch {
+		case errors.Is(err, apperrors.ErrClaimNotFound):
+			ctx.JSON(
+				http.StatusNotFound,
+				gin.H{"error": err.Error()},
+			)
+		default:
+			ctx.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": err.Error()},
+			)
+		}
+		return
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		claim,
+	)
 }

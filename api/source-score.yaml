@@ -136,6 +136,27 @@ paths:
         201:
           description: claim created
 
+  /api/v1/claim/{claimDigest}:
+    get:
+      tags:
+      - claim
+      operationId: getClaim
+      parameters:
+      - in: path
+        name: claimDigest
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: claim returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+        404:
+          description: source not found
+
 components:
   schemas:
     Pong:
@@ -307,3 +328,18 @@ components:
           default: false
           x-oapi-codegen-extra-tags:
             binding: required
+
+    ClaimPatchInput:
+      type: object
+      required:
+      properties:
+        summary:
+          type: string
+          nullable: true
+          x-oapi-codegen-extra-tags:
+            validate: omitnil,nonempty
+        title:
+          type: string
+          nullable: true
+          x-oapi-codegen-extra-tags:
+            validate: omitnil,nonempty

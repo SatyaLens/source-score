@@ -80,6 +80,9 @@ type ServerInterface interface {
 	// (POST /api/v1/claim)
 	PostClaim(c *gin.Context)
 
+	// (GET /api/v1/claim/{claimDigest})
+	GetClaim(c *gin.Context, claimDigest string)
+
 	// (GET /api/v1/claims)
 	GetClaims(c *gin.Context)
 
@@ -122,6 +125,30 @@ func (siw *ServerInterfaceWrapper) PostClaim(c *gin.Context) {
 	}
 
 	siw.Handler.PostClaim(c)
+}
+
+// GetClaim operation middleware
+func (siw *ServerInterfaceWrapper) GetClaim(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "claimDigest" -------------
+	var claimDigest string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "claimDigest", c.Param("claimDigest"), &claimDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter claimDigest: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetClaim(c, claimDigest)
 }
 
 // GetClaims operation middleware
@@ -276,6 +303,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.POST(options.BaseURL+"/api/v1/claim", wrapper.PostClaim)
+	router.GET(options.BaseURL+"/api/v1/claim/:claimDigest", wrapper.GetClaim)
 	router.GET(options.BaseURL+"/api/v1/claims", wrapper.GetClaims)
 	router.POST(options.BaseURL+"/api/v1/source", wrapper.CreateSource)
 	router.DELETE(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.DeleteSource)

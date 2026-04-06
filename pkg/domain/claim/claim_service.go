@@ -2,13 +2,19 @@ package claim
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"source-score/pkg/api"
+	"source-score/pkg/apperrors"
+
+	"gorm.io/gorm"
 )
 
 //go:generate go tool counterfeiter . ClaimService
 type ClaimService interface {
 	GetClaims(ctx context.Context) ([]api.Claim, error)
 	PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error)
+	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
 }
 
 type claimService struct {
@@ -21,6 +27,18 @@ func NewClaimService(ctx context.Context, claimRepo ClaimRepository) ClaimServic
 
 func (svc *claimService) GetClaims(ctx context.Context) ([]api.Claim, error) {
 	return svc.claimRepo.GetClaims(ctx)
+}
+
+func (svc *claimService) GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error) {
+	claim, err := svc.claimRepo.GetClaimByUriDigest(ctx, uriDigest)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("%w: %s", apperrors.ErrClaimNotFound, err.Error())
+		}
+		return nil, err
+	}
+	return claim, nil
 }
 
 func (svc *claimService) PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error) {

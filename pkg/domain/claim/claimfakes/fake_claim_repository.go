@@ -9,6 +9,20 @@ import (
 )
 
 type FakeClaimRepository struct {
+	GetClaimByUriDigestStub        func(context.Context, string) (*api.Claim, error)
+	getClaimByUriDigestMutex       sync.RWMutex
+	getClaimByUriDigestArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	getClaimByUriDigestReturns struct {
+		result1 *api.Claim
+		result2 error
+	}
+	getClaimByUriDigestReturnsOnCall map[int]struct {
+		result1 *api.Claim
+		result2 error
+	}
 	GetClaimsStub        func(context.Context) ([]api.Claim, error)
 	getClaimsMutex       sync.RWMutex
 	getClaimsArgsForCall []struct {
@@ -38,6 +52,71 @@ type FakeClaimRepository struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeClaimRepository) GetClaimByUriDigest(arg1 context.Context, arg2 string) (*api.Claim, error) {
+	fake.getClaimByUriDigestMutex.Lock()
+	ret, specificReturn := fake.getClaimByUriDigestReturnsOnCall[len(fake.getClaimByUriDigestArgsForCall)]
+	fake.getClaimByUriDigestArgsForCall = append(fake.getClaimByUriDigestArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.GetClaimByUriDigestStub
+	fakeReturns := fake.getClaimByUriDigestReturns
+	fake.recordInvocation("GetClaimByUriDigest", []interface{}{arg1, arg2})
+	fake.getClaimByUriDigestMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeClaimRepository) GetClaimByUriDigestCallCount() int {
+	fake.getClaimByUriDigestMutex.RLock()
+	defer fake.getClaimByUriDigestMutex.RUnlock()
+	return len(fake.getClaimByUriDigestArgsForCall)
+}
+
+func (fake *FakeClaimRepository) GetClaimByUriDigestCalls(stub func(context.Context, string) (*api.Claim, error)) {
+	fake.getClaimByUriDigestMutex.Lock()
+	defer fake.getClaimByUriDigestMutex.Unlock()
+	fake.GetClaimByUriDigestStub = stub
+}
+
+func (fake *FakeClaimRepository) GetClaimByUriDigestArgsForCall(i int) (context.Context, string) {
+	fake.getClaimByUriDigestMutex.RLock()
+	defer fake.getClaimByUriDigestMutex.RUnlock()
+	argsForCall := fake.getClaimByUriDigestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeClaimRepository) GetClaimByUriDigestReturns(result1 *api.Claim, result2 error) {
+	fake.getClaimByUriDigestMutex.Lock()
+	defer fake.getClaimByUriDigestMutex.Unlock()
+	fake.GetClaimByUriDigestStub = nil
+	fake.getClaimByUriDigestReturns = struct {
+		result1 *api.Claim
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClaimRepository) GetClaimByUriDigestReturnsOnCall(i int, result1 *api.Claim, result2 error) {
+	fake.getClaimByUriDigestMutex.Lock()
+	defer fake.getClaimByUriDigestMutex.Unlock()
+	fake.GetClaimByUriDigestStub = nil
+	if fake.getClaimByUriDigestReturnsOnCall == nil {
+		fake.getClaimByUriDigestReturnsOnCall = make(map[int]struct {
+			result1 *api.Claim
+			result2 error
+		})
+	}
+	fake.getClaimByUriDigestReturnsOnCall[i] = struct {
+		result1 *api.Claim
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeClaimRepository) GetClaims(arg1 context.Context) ([]api.Claim, error) {

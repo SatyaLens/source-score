@@ -56,6 +56,10 @@ func (r *router) PostClaim(ctx *gin.Context) {
 	r.claimHandler.PostClaim(ctx)
 }
 
+func (r *router) GetClaim(ctx *gin.Context, claimDigest string) {
+	r.claimHandler.GetClaimByUriDigest(ctx, claimDigest)
+}
+
 func (r *router) GetPing(ctx *gin.Context) {
 	message := r.pingHandler.GetPing(ctx)
 

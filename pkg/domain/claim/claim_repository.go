@@ -15,6 +15,7 @@ import (
 type ClaimRepository interface {
 	GetClaims(ctx context.Context) ([]api.Claim, error)
 	PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error)
+	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
 }
 
 type claimRepository struct {
@@ -70,4 +71,17 @@ func (cr *claimRepository) PostClaim(ctx context.Context, claimInput *api.ClaimI
 	}
 
 	return uriDigest, nil
+}
+
+// GetClaimByUriDigest returns a single claim by its uri digest
+func (cr *claimRepository) GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error) {
+	claim := &api.Claim{}
+	claim.UriDigest = uriDigest
+	result := cr.client.FindFirst(ctx, claim)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return claim, nil
 }
