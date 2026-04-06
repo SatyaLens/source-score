@@ -9,6 +9,18 @@ import (
 )
 
 type FakeClaimRepository struct {
+	DeleteClaimByUriDigestStub        func(context.Context, *api.Claim) error
+	deleteClaimByUriDigestMutex       sync.RWMutex
+	deleteClaimByUriDigestArgsForCall []struct {
+		arg1 context.Context
+		arg2 *api.Claim
+	}
+	deleteClaimByUriDigestReturns struct {
+		result1 error
+	}
+	deleteClaimByUriDigestReturnsOnCall map[int]struct {
+		result1 error
+	}
 	GetClaimByUriDigestStub        func(context.Context, string) (*api.Claim, error)
 	getClaimByUriDigestMutex       sync.RWMutex
 	getClaimByUriDigestArgsForCall []struct {
@@ -52,6 +64,68 @@ type FakeClaimRepository struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeClaimRepository) DeleteClaimByUriDigest(arg1 context.Context, arg2 *api.Claim) error {
+	fake.deleteClaimByUriDigestMutex.Lock()
+	ret, specificReturn := fake.deleteClaimByUriDigestReturnsOnCall[len(fake.deleteClaimByUriDigestArgsForCall)]
+	fake.deleteClaimByUriDigestArgsForCall = append(fake.deleteClaimByUriDigestArgsForCall, struct {
+		arg1 context.Context
+		arg2 *api.Claim
+	}{arg1, arg2})
+	stub := fake.DeleteClaimByUriDigestStub
+	fakeReturns := fake.deleteClaimByUriDigestReturns
+	fake.recordInvocation("DeleteClaimByUriDigest", []interface{}{arg1, arg2})
+	fake.deleteClaimByUriDigestMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeClaimRepository) DeleteClaimByUriDigestCallCount() int {
+	fake.deleteClaimByUriDigestMutex.RLock()
+	defer fake.deleteClaimByUriDigestMutex.RUnlock()
+	return len(fake.deleteClaimByUriDigestArgsForCall)
+}
+
+func (fake *FakeClaimRepository) DeleteClaimByUriDigestCalls(stub func(context.Context, *api.Claim) error) {
+	fake.deleteClaimByUriDigestMutex.Lock()
+	defer fake.deleteClaimByUriDigestMutex.Unlock()
+	fake.DeleteClaimByUriDigestStub = stub
+}
+
+func (fake *FakeClaimRepository) DeleteClaimByUriDigestArgsForCall(i int) (context.Context, *api.Claim) {
+	fake.deleteClaimByUriDigestMutex.RLock()
+	defer fake.deleteClaimByUriDigestMutex.RUnlock()
+	argsForCall := fake.deleteClaimByUriDigestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeClaimRepository) DeleteClaimByUriDigestReturns(result1 error) {
+	fake.deleteClaimByUriDigestMutex.Lock()
+	defer fake.deleteClaimByUriDigestMutex.Unlock()
+	fake.DeleteClaimByUriDigestStub = nil
+	fake.deleteClaimByUriDigestReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeClaimRepository) DeleteClaimByUriDigestReturnsOnCall(i int, result1 error) {
+	fake.deleteClaimByUriDigestMutex.Lock()
+	defer fake.deleteClaimByUriDigestMutex.Unlock()
+	fake.DeleteClaimByUriDigestStub = nil
+	if fake.deleteClaimByUriDigestReturnsOnCall == nil {
+		fake.deleteClaimByUriDigestReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.deleteClaimByUriDigestReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeClaimRepository) GetClaimByUriDigest(arg1 context.Context, arg2 string) (*api.Claim, error) {

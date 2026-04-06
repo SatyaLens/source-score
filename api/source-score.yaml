@@ -155,7 +155,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/Claim'
         404:
-          description: source not found
+          description: claim not found
+
+    delete:
+      tags:
+      - claim
+      operationId: deleteClaim
+      parameters:
+      - in: path
+        name: uriDigest
+        required: true
+        schema:
+          type: string
+      responses:
+        204:
+          description: claim deleted
+        404:
+          description: claim not found
 
 components:
   schemas:
@@ -331,7 +347,6 @@ components:
 
     ClaimPatchInput:
       type: object
-      required:
       properties:
         summary:
           type: string

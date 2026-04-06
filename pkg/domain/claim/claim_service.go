@@ -15,6 +15,7 @@ type ClaimService interface {
 	GetClaims(ctx context.Context) ([]api.Claim, error)
 	PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error)
 	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
+	DeleteClaimByUriDigest(ctx context.Context, uriDigest string) error
 }
 
 type claimService struct {
@@ -39,6 +40,15 @@ func (svc *claimService) GetClaimByUriDigest(ctx context.Context, uriDigest stri
 		return nil, err
 	}
 	return claim, nil
+}
+
+func (svc *claimService) DeleteClaimByUriDigest(ctx context.Context, uriDigest string) error {
+	claim, err := svc.GetClaimByUriDigest(ctx, uriDigest)
+	if err != nil {
+		return err
+	}
+
+	return svc.claimRepo.DeleteClaimByUriDigest(ctx, claim)
 }
 
 func (svc *claimService) PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error) {

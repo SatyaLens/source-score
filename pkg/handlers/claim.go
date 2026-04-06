@@ -80,3 +80,24 @@ func (ch *ClaimHandler) GetClaimByUriDigest(ctx *gin.Context, uriDigest string) 
 		claim,
 	)
 }
+
+func (ch *ClaimHandler) DeleteClaimByUriDigest(ctx *gin.Context, uriDigest string) {
+	err := ch.claimSvc.DeleteClaimByUriDigest(ctx, uriDigest)
+	if err != nil {
+		switch {
+		case errors.Is(err, apperrors.ErrClaimNotFound):
+			ctx.JSON(
+				http.StatusNotFound,
+				gin.H{"error": err.Error()},
+			)
+		default:
+			ctx.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": err.Error()},
+			)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}

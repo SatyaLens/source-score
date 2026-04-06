@@ -65,3 +65,7 @@ func (r *router) GetPing(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"data": message})
 }
+
+func (r *router) DeleteClaim(ctx *gin.Context, claimDigest string) {
+	r.claimHandler.DeleteClaimByUriDigest(ctx, claimDigest)
+}

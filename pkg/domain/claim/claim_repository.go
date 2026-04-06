@@ -16,6 +16,7 @@ type ClaimRepository interface {
 	GetClaims(ctx context.Context) ([]api.Claim, error)
 	PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error)
 	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
+	DeleteClaimByUriDigest(ctx context.Context, claim *api.Claim) error
 }
 
 type claimRepository struct {
@@ -84,4 +85,11 @@ func (cr *claimRepository) GetClaimByUriDigest(ctx context.Context, uriDigest st
 	}
 
 	return claim, nil
+}
+
+// DeleteClaimByUriDigest deletes the provided claim record
+func (cr *claimRepository) DeleteClaimByUriDigest(ctx context.Context, claim *api.Claim) error {
+	result := cr.client.Delete(ctx, claim)
+	slog.InfoContext(ctx, fmt.Sprintf("%d rows affected\n", result.RowsAffected))
+	return result.Error
 }
