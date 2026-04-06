@@ -24,7 +24,7 @@ func NewClient(ctx context.Context, dsn string, config *gorm.Config) *Client {
 	return client
 }
 
-func (client *Client) SetAutoMigration(ctx context.Context, allModels []any) {
+func (client *Client) SetAutoMigration(ctx context.Context, allModels... any) {
 	err := client.DB.WithContext(ctx).AutoMigrate(allModels...)
 	if err != nil {
 		log.Fatalf("failed enable auto migration for all models :: %s", err)

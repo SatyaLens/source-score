@@ -73,6 +73,9 @@ func TestClaim(t *testing.T) {
 	})
 
 	var _ = AfterSuite(func() {
+		db, err := testDB.DB()
+		Expect(err).ToNot(HaveOccurred())
+		db.Close()
 		err = helpers.DeleteFileIfExists(testDBFile)
 		Expect(err).ToNot(HaveOccurred())
 	})

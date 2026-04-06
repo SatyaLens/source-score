@@ -86,6 +86,9 @@ func TestSource(t *testing.T) {
 	})
 
 	var _ = AfterSuite(func() {
+		db, err := testDB.DB()
+		Expect(err).ToNot(HaveOccurred())
+		db.Close()
 		log.Println("deleting test files")
 		err = helpers.DeleteFileIfExists(testDBFile)
 		Expect(err).ToNot(HaveOccurred())

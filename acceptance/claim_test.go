@@ -26,7 +26,6 @@ var _ = Describe("Claim model tests", func() {
 	Context("Happy path tests", Ordered, func() {
 		When("valid POST requests are sent to create claims", func() {
 			It("should create the claims and return their uri digests", func() {
-				// ensure source exists
 				srcBody, err := json.Marshal(sourceInput3)
 				Expect(err).To(BeNil())
 
@@ -94,7 +93,7 @@ var _ = Describe("Claim model tests", func() {
 				Expect(len(claims)).To(BeNumerically(">=", 2))
 
 				// assert the created claims are present
-				Expect(claims).To(ContainElement(
+				Expect(claims).To(ContainElements(
 					sampleClaim1,
 					sampleClaim2,
 				))

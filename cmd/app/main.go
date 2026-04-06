@@ -53,6 +53,12 @@ func main() {
 		conf.DbName,
 	)
 	dbClient := pgsql.NewClient(context.Background(), dsn, &gorm.Config{})
+	// TODO: wrap this and call it securely
+	dbClient.SetAutoMigration(
+		context.Background(),
+		api.Source{},
+		api.Claim{},
+	)
 
 	srcRepo := source.NewSourceRepository(context.Background(), dbClient)
 	srcSvc := source.NewSourceService(context.Background(), srcRepo)

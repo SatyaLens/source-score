@@ -132,6 +132,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ClaimInput'
+      responses:
+        201:
+          description: claim created
 
 components:
   schemas:
