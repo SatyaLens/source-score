@@ -116,5 +116,26 @@ var _ = Describe("Claim model tests", func() {
 				Expect(c).To(Equal(sampleClaim1))
 			})
 		})
+
+		When("DELETE request is sent to delete the created claim", func() {
+			It("should delete the created claim and subsequent GET returns 404", func() {
+				claimUrl, err := url.JoinPath(endpoint, claim1Digest)
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodDelete, claimUrl, nil)
+				Expect(err).To(BeNil())
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
+
+				// verify deletion
+				resp, err = http.Get(claimUrl)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+			})
+		})
 	})
 })
