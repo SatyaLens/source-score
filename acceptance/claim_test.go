@@ -99,5 +99,22 @@ var _ = Describe("Claim model tests", func() {
 				))
 			})
 		})
+
+		When("GET request is sent to retrieve a single claim by digest", func() {
+			It("should return the created claim", func() {
+				claimUrl, err := url.JoinPath(endpoint, claim1Digest)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Get(claimUrl)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var c api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&c)
+				Expect(err).To(BeNil())
+				Expect(c).To(Equal(sampleClaim1))
+			})
+		})
 	})
 })
