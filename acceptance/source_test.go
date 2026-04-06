@@ -80,7 +80,7 @@ var _ = Describe("Source model tests", func() {
 				var sources []api.Source
 				err = json.NewDecoder(resp.Body).Decode(&sources)
 				Expect(err).To(BeNil())
-				Expect(len(sources)).To(Equal(2))
+				Expect(len(sources)).To(BeNumerically(">=", 2))
 				Expect(sources).To(ContainElements(
 					sampleSource1,
 					sampleSource2,

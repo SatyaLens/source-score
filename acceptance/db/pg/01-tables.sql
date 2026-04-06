@@ -11,15 +11,15 @@ CREATE TABLE
         uri TEXT
     );
 
-
 CREATE TABLE
     claims (
-        source_uri TEXT,
+        source_uri_digest TEXT,
         summary TEXT,
         title TEXT,
         uri TEXT PRIMARY KEY,
+        checked BOOLEAN DEFAULT FALSE,
         validity BOOLEAN DEFAULT FALSE,
-        CONSTRAINT fk_source FOREIGN KEY (source_uri) REFERENCES sources (uri_digest) ON DELETE CASCADE
+        CONSTRAINT fk_source FOREIGN KEY (source_uri_digest) REFERENCES sources (uri_digest) ON DELETE CASCADE
     );
 
 CREATE TABLE
