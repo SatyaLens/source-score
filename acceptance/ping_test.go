@@ -27,7 +27,7 @@ var _ = Describe("API Tests", func() {
 
 				var respBody responseBody
 				err = json.Unmarshal(body, &respBody)
-				Expect(err).To(BeNil())	
+				Expect(err).To(BeNil())
 				Expect(respBody.Data).To(BeEquivalentTo("Pong"))
 			})
 		})

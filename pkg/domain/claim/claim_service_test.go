@@ -62,5 +62,20 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(fakeClaimRepo.GetClaimsCallCount()).To(Equal(1))
 			})
 		})
+
+		When("Retrieving a single claim by uri digest", func() {
+			It("Should return the matching claim from repository", func() {
+				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(0, &sampleClaim1, nil)
+
+				claim, err := claimSvc.GetClaimByUriDigest(context.TODO(), claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claim).ToNot(BeNil())
+				Expect(*claim).To(Equal(sampleClaim1))
+				Expect(claim.UriDigest).To(Equal(claim1Digest))
+				Expect(fakeClaimRepo.GetClaimByUriDigestCallCount()).To(Equal(1))
+				_, arg := fakeClaimRepo.GetClaimByUriDigestArgsForCall(0)
+				Expect(arg).To(Equal(claim1Digest))
+			})
+		})
 	})
 })

@@ -51,5 +51,14 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				))
 			})
 		})
+
+		When("Retrieving a single claim by uri digest", func() {
+			It("Should return the matching claim record", func() {
+				claim, err := claimRepo.GetClaimByUriDigest(context.TODO(), claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claim).ToNot(BeNil())
+				Expect(*claim).To(Equal(sampleClaim1))
+			})
+		})
 	})
 })
