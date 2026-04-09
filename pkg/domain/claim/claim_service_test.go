@@ -103,15 +103,8 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 
 				fakeClaimRepo.PatchClaimByUriDigestReturns(nil)
 
-				updated := sampleClaim1
-				updated.Title = newTitle
-				updated.Summary = newSummary
-				// next GetClaimByUriDigest call should return the updated record
-				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(2, &updated, nil)
-
 				err := claimSvc.PatchClaimByUriDigest(context.TODO(), &patchInput, claim1Digest)
 				Expect(err).ToNot(HaveOccurred())
-
 				Expect(fakeClaimRepo.PatchClaimByUriDigestCallCount()).To(Equal(1))
 				_, argInput, argDigest := fakeClaimRepo.PatchClaimByUriDigestArgsForCall(0)
 				Expect(argDigest).To(Equal(claim1Digest))

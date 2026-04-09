@@ -117,6 +117,43 @@ var _ = Describe("Claim model tests", func() {
 			})
 		})
 
+		When("PATCH request is sent to update the created claim", func() {
+			It("should update the claim and subsequent GET returns updated record", func() {
+				claimUrl, err := url.JoinPath(endpoint, claim1Digest)
+				Expect(err).To(BeNil())
+
+				updatedTitle := "Patched Claim Title"
+				updatedSummary := "Patched claim summary"
+				patchBody := api.ClaimPatchInput{
+					Title:   &updatedTitle,
+					Summary: &updatedSummary,
+				}
+				body, err := json.Marshal(patchBody)
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodPatch, claimUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
+
+				// verify update
+				resp, err = http.Get(claimUrl)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var c api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&c)
+				Expect(err).To(BeNil())
+				Expect(c.Title).To(Equal(updatedTitle))
+				Expect(c.Summary).To(Equal(updatedSummary))
+			})
+		})
+
 		When("DELETE request is sent to delete the created claim", func() {
 			It("should delete the created claim and subsequent GET returns 404", func() {
 				claimUrl, err := url.JoinPath(endpoint, claim1Digest)
