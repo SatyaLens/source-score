@@ -98,4 +98,25 @@ var _ = Describe("Claim repository layer unit tests", func() {
 			})
 		})
 	})
+
+	Context("Validation tests", func() {
+		When("Retrieving a non-existent claim by uri digest", func() {
+			It("Should return gorm.ErrRecordNotFound", func() {
+				_, err := claimRepo.GetClaimByUriDigest(context.TODO(), "doesnotexist")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
+			})
+		})
+
+		When("Patching a non-existent claim by uri digest", func() {
+			It("Should return gorm.ErrRecordNotFound", func() {
+				newTitle := "New Title"
+				patchInput := &api.ClaimPatchInput{Title: &newTitle}
+
+				err := claimRepo.PatchClaimByUriDigest(context.TODO(), patchInput, "doesnotexist")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
+			})
+		})
+	})
 })
