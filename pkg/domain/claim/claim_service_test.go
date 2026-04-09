@@ -62,5 +62,55 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(fakeClaimRepo.GetClaimsCallCount()).To(Equal(1))
 			})
 		})
+
+		When("Retrieving a single claim by uri digest", func() {
+			It("Should return the matching claim from repository", func() {
+				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(0, &sampleClaim1, nil)
+
+				claim, err := claimSvc.GetClaimByUriDigest(context.TODO(), claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claim).ToNot(BeNil())
+				Expect(*claim).To(Equal(sampleClaim1))
+				Expect(claim.UriDigest).To(Equal(claim1Digest))
+				Expect(fakeClaimRepo.GetClaimByUriDigestCallCount()).To(Equal(1))
+				_, arg := fakeClaimRepo.GetClaimByUriDigestArgsForCall(0)
+				Expect(arg).To(Equal(claim1Digest))
+			})
+		})
+
+		When("Deleting a claim by its uri digest", func() {
+			It("Should delete the correct claim record via repository", func() {
+				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(1, &sampleClaim1, nil)
+				fakeClaimRepo.DeleteClaimByUriDigestReturns(nil)
+
+				err := claimSvc.DeleteClaimByUriDigest(context.TODO(), claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+				_, digest := fakeClaimRepo.GetClaimByUriDigestArgsForCall(1)
+				Expect(digest).To(Equal(claim1Digest))
+				_, c := fakeClaimRepo.DeleteClaimByUriDigestArgsForCall(0)
+				Expect(*c).To(Equal(sampleClaim1))
+			})
+		})
+
+		When("Patching a claim by its uri digest", func() {
+			It("Should update the claim via repository and return updated record", func() {
+				newTitle := "Updated Claim Title"
+				newSummary := "Updated claim summary"
+				patchInput := api.ClaimPatchInput{
+					Title:   &newTitle,
+					Summary: &newSummary,
+				}
+
+				fakeClaimRepo.PatchClaimByUriDigestReturns(nil)
+
+				err := claimSvc.PatchClaimByUriDigest(context.TODO(), &patchInput, claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeClaimRepo.PatchClaimByUriDigestCallCount()).To(Equal(1))
+				_, argInput, argDigest := fakeClaimRepo.PatchClaimByUriDigestArgsForCall(0)
+				Expect(argDigest).To(Equal(claim1Digest))
+				Expect(*argInput.Title).To(Equal(newTitle))
+				Expect(*argInput.Summary).To(Equal(newSummary))
+			})
+		})
 	})
 })

@@ -6,7 +6,7 @@ const (
 )
 
 var (
-	ApiReqLogFields = []string {
+	ApiReqLogFields = []string{
 		RequestIdHeader,
 	}
 )

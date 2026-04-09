@@ -15,6 +15,9 @@ import (
 type ClaimRepository interface {
 	GetClaims(ctx context.Context) ([]api.Claim, error)
 	PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error)
+	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
+	DeleteClaimByUriDigest(ctx context.Context, claim *api.Claim) error
+	PatchClaimByUriDigest(ctx context.Context, claimInput *api.ClaimPatchInput, uriDigest string) error
 }
 
 type claimRepository struct {
@@ -70,4 +73,47 @@ func (cr *claimRepository) PostClaim(ctx context.Context, claimInput *api.ClaimI
 	}
 
 	return uriDigest, nil
+}
+
+// GetClaimByUriDigest returns a single claim by its uri digest
+func (cr *claimRepository) GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error) {
+	claim := &api.Claim{}
+	claim.UriDigest = uriDigest
+	result := cr.client.FindFirst(ctx, claim)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return claim, nil
+}
+
+// DeleteClaimByUriDigest deletes the provided claim record
+func (cr *claimRepository) DeleteClaimByUriDigest(ctx context.Context, claim *api.Claim) error {
+	result := cr.client.Delete(ctx, claim)
+	slog.InfoContext(ctx, fmt.Sprintf("%d rows affected\n", result.RowsAffected))
+	return result.Error
+}
+
+// PatchClaimByUriDigest updates claim fields
+func (cr *claimRepository) PatchClaimByUriDigest(ctx context.Context, claimInput *api.ClaimPatchInput, uriDigest string) error {
+	claim := &api.Claim{}
+	claim.UriDigest = uriDigest
+
+	result := cr.client.FindFirst(ctx, claim)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if claimInput.Summary != nil {
+		claim.Summary = *claimInput.Summary
+	}
+	if claimInput.Title != nil {
+		claim.Title = *claimInput.Title
+	}
+
+	result = cr.client.Update(ctx, claim)
+	slog.InfoContext(ctx, fmt.Sprintf("%d rows affected\n", result.RowsAffected))
+
+	return result.Error
 }

@@ -30,6 +30,12 @@ type ClaimInput struct {
 	Uri             string  `binding:"required" json:"uri"`
 }
 
+// ClaimPatchInput defines model for ClaimPatchInput.
+type ClaimPatchInput struct {
+	Summary *string `json:"summary" validate:"omitnil,nonempty"`
+	Title   *string `json:"title" validate:"omitnil,nonempty"`
+}
+
 // CreateSourceResponse defines model for CreateSourceResponse.
 type CreateSourceResponse struct {
 	UriDigest string `binding:"required" json:"uriDigest"`
@@ -68,6 +74,9 @@ type SourcePatchInput struct {
 // PostClaimJSONRequestBody defines body for PostClaim for application/json ContentType.
 type PostClaimJSONRequestBody = ClaimInput
 
+// PatchClaimJSONRequestBody defines body for PatchClaim for application/json ContentType.
+type PatchClaimJSONRequestBody = ClaimPatchInput
+
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.
 type CreateSourceJSONRequestBody = SourceInput
 
@@ -79,6 +88,15 @@ type ServerInterface interface {
 
 	// (POST /api/v1/claim)
 	PostClaim(c *gin.Context)
+
+	// (DELETE /api/v1/claim/{uriDigest})
+	DeleteClaim(c *gin.Context, uriDigest string)
+
+	// (GET /api/v1/claim/{uriDigest})
+	GetClaim(c *gin.Context, uriDigest string)
+
+	// (PATCH /api/v1/claim/{uriDigest})
+	PatchClaim(c *gin.Context, uriDigest string)
 
 	// (GET /api/v1/claims)
 	GetClaims(c *gin.Context)
@@ -122,6 +140,78 @@ func (siw *ServerInterfaceWrapper) PostClaim(c *gin.Context) {
 	}
 
 	siw.Handler.PostClaim(c)
+}
+
+// DeleteClaim operation middleware
+func (siw *ServerInterfaceWrapper) DeleteClaim(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteClaim(c, uriDigest)
+}
+
+// GetClaim operation middleware
+func (siw *ServerInterfaceWrapper) GetClaim(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetClaim(c, uriDigest)
+}
+
+// PatchClaim operation middleware
+func (siw *ServerInterfaceWrapper) PatchClaim(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PatchClaim(c, uriDigest)
 }
 
 // GetClaims operation middleware
@@ -276,6 +366,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.POST(options.BaseURL+"/api/v1/claim", wrapper.PostClaim)
+	router.DELETE(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.DeleteClaim)
+	router.GET(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.GetClaim)
+	router.PATCH(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.PatchClaim)
 	router.GET(options.BaseURL+"/api/v1/claims", wrapper.GetClaims)
 	router.POST(options.BaseURL+"/api/v1/source", wrapper.CreateSource)
 	router.DELETE(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.DeleteSource)
