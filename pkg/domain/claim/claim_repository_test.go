@@ -63,6 +63,26 @@ var _ = Describe("Claim repository layer unit tests", func() {
 			})
 		})
 
+		When("Patching a claim by its uri digest", func() {
+			It("Should update the correct claim record in the DB", func() {
+				newSummary := "Updated claim summary"
+				newTitle := "Updated Claim Title"
+				patchInput := &api.ClaimPatchInput{
+					Summary: &newSummary,
+					Title:   &newTitle,
+				}
+
+				err := claimRepo.PatchClaimByUriDigest(context.TODO(), patchInput, claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+
+				updated, err := claimRepo.GetClaimByUriDigest(context.TODO(), claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(updated).ToNot(BeNil())
+				Expect(updated.Summary).To(Equal(newSummary))
+				Expect(updated.Title).To(Equal(newTitle))
+			})
+		})
+
 		When("Deleting a claim by its uri digest", func() {
 			It("Should delete the correct claim record from the DB", func() {
 				claim := &api.Claim{

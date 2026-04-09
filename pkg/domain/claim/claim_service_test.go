@@ -91,5 +91,33 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(*c).To(Equal(sampleClaim1))
 			})
 		})
+
+		When("Patching a claim by its uri digest", func() {
+			It("Should update the claim via repository and return updated record", func() {
+				newTitle := "Updated Claim Title"
+				newSummary := "Updated claim summary"
+				patchInput := api.ClaimPatchInput{
+					Title:   &newTitle,
+					Summary: &newSummary,
+				}
+
+				fakeClaimRepo.PatchClaimByUriDigestReturns(nil)
+
+				updated := sampleClaim1
+				updated.Title = newTitle
+				updated.Summary = newSummary
+				// next GetClaimByUriDigest call should return the updated record
+				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(2, &updated, nil)
+
+				err := claimSvc.PatchClaimByUriDigest(context.TODO(), &patchInput, claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeClaimRepo.PatchClaimByUriDigestCallCount()).To(Equal(1))
+				_, argInput, argDigest := fakeClaimRepo.PatchClaimByUriDigestArgsForCall(0)
+				Expect(argDigest).To(Equal(claim1Digest))
+				Expect(*argInput.Title).To(Equal(newTitle))
+				Expect(*argInput.Summary).To(Equal(newSummary))
+			})
+		})
 	})
 })
