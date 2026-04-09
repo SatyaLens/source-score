@@ -24,10 +24,10 @@ type Claim struct {
 
 // ClaimInput defines model for ClaimInput.
 type ClaimInput struct {
-	SourceUriDigest string  `binding:"required" json:"sourceUriDigest"`
-	Summary         *string `json:"summary,omitempty"`
-	Title           string  `binding:"required" json:"title"`
-	Uri             string  `binding:"required" json:"uri"`
+	SourceUriDigest string `binding:"required" json:"sourceUriDigest" validate:"nonempty"`
+	Summary         string `binding:"required" json:"summary" validate:"nonempty"`
+	Title           string `binding:"required" json:"title" validate:"nonempty"`
+	Uri             string `binding:"required" json:"uri" validate:"httpsurl"`
 }
 
 // ClaimPatchInput defines model for ClaimPatchInput.

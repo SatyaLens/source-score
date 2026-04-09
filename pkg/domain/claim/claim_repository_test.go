@@ -17,7 +17,7 @@ var _ = Describe("Claim repository layer unit tests", func() {
 			It("Should create the claims and return their uri digests", func() {
 				input := api.ClaimInput{
 					SourceUriDigest: sampleClaim1.SourceUriDigest,
-					Summary:         &sampleClaim1.Summary,
+					Summary:         sampleClaim1.Summary,
 					Title:           sampleClaim1.Title,
 					Uri:             sampleClaim1.Uri,
 				}
@@ -29,7 +29,7 @@ var _ = Describe("Claim repository layer unit tests", func() {
 
 				input = api.ClaimInput{
 					SourceUriDigest: sampleClaim2.SourceUriDigest,
-					Summary:         &sampleClaim2.Summary,
+					Summary:         sampleClaim2.Summary,
 					Title:           sampleClaim2.Title,
 					Uri:             sampleClaim2.Uri,
 				}

@@ -24,7 +24,7 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 
 				input := api.ClaimInput{
 					SourceUriDigest: sampleClaim1.SourceUriDigest,
-					Summary:         &sampleClaim1.Summary,
+					Summary:         sampleClaim1.Summary,
 					Title:           sampleClaim1.Title,
 					Uri:             sampleClaim1.Uri,
 				}
@@ -37,7 +37,7 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 
 				input = api.ClaimInput{
 					SourceUriDigest: sampleClaim2.SourceUriDigest,
-					Summary:         &sampleClaim2.Summary,
+					Summary:         sampleClaim2.Summary,
 					Title:           sampleClaim2.Title,
 					Uri:             sampleClaim2.Uri,
 				}
