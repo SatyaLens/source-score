@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"source-score/pkg/api"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -172,6 +173,81 @@ var _ = Describe("Claim model tests", func() {
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+			})
+		})
+	})
+
+	Context("Validation tests", func() {
+		When("POST request with empty sourceUriDigest is sent", func() {
+			It("should return 400 with validation error", func() {
+				claim := api.ClaimInput{
+					SourceUriDigest: "",
+					Summary:         "summary",
+					Title:           "title",
+					Uri:             "https://ok",
+				}
+				body, err := json.Marshal(claim)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("sourceuridigest"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("required"))
+			})
+		})
+
+		When("POST request with empty title and summary is sent", func() {
+			It("should return 400 with validation error mentioning Title and Summary", func() {
+				claim := api.ClaimInput{
+					SourceUriDigest: "somedigest",
+					Summary:         "",
+					Title:           "",
+					Uri:             "https://ok",
+				}
+				body, err := json.Marshal(claim)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("title"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("summary"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("required"))
+			})
+		})
+
+		When("POST request with non-https Uri is sent", func() {
+			It("should return 400 with validation error mentioning Uri and httpsurl", func() {
+				claim := api.ClaimInput{
+					SourceUriDigest: "somedigest",
+					Summary:         "summary",
+					Title:           "title",
+					Uri:             "http://not-https",
+				}
+				body, err := json.Marshal(claim)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("uri"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("httpsurl"))
 			})
 		})
 	})

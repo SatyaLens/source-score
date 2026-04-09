@@ -2,7 +2,11 @@ package claim_test
 
 import (
 	"context"
+	"errors"
+	"strings"
+
 	"source-score/pkg/api"
+	"source-score/pkg/apperrors"
 	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/claim/claimfakes"
 
@@ -110,6 +114,66 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(argDigest).To(Equal(claim1Digest))
 				Expect(*argInput.Title).To(Equal(newTitle))
 				Expect(*argInput.Summary).To(Equal(newSummary))
+			})
+		})
+	})
+
+	Context("Validation tests", func() {
+		When("Posting a claim with empty source uri digest", func() {
+			It("Should return ErrInvalidClaim", func() {
+				input := api.ClaimInput{
+					SourceUriDigest: "",
+					Summary:         "non-empty",
+					Title:           "title",
+					Uri:             "https://ok",
+				}
+
+				postClaimCalls := fakeClaimRepo.PostClaimCallCount()
+				_, err := claimSvc.PostClaim(context.TODO(), &input)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, apperrors.ErrInvalidClaim)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "sourceuridigest")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "nonempty")).To(BeTrue())
+				Expect(fakeClaimRepo.PostClaimCallCount()).To(Equal(postClaimCalls))
+			})
+		})
+
+		When("Posting a claim with empty title and summary", func() {
+			It("Should return ErrInvalidClaim and mention Title and Summary", func() {
+				input := api.ClaimInput{
+					SourceUriDigest: "srcdigest",
+					Summary:         "",
+					Title:           "",
+					Uri:             "https://ok",
+				}
+
+				postClaimCalls := fakeClaimRepo.PostClaimCallCount()
+				_, err := claimSvc.PostClaim(context.TODO(), &input)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, apperrors.ErrInvalidClaim)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "title")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "summary")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "nonempty")).To(BeTrue())
+				Expect(fakeClaimRepo.PostClaimCallCount()).To(Equal(postClaimCalls))
+			})
+		})
+
+		When("Posting a claim with a non-https Uri", func() {
+			It("Should return ErrInvalidClaim and mention Uri httpsurl", func() {
+				input := api.ClaimInput{
+					SourceUriDigest: "srcdigest",
+					Summary:         "summary",
+					Title:           "title",
+					Uri:             "http://not-https",
+				}
+
+				postClaimCalls := fakeClaimRepo.PostClaimCallCount()
+				_, err := claimSvc.PostClaim(context.TODO(), &input)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, apperrors.ErrInvalidClaim)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "uri")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "httpsurl")).To(BeTrue())
+				Expect(fakeClaimRepo.PostClaimCallCount()).To(Equal(postClaimCalls))
 			})
 		})
 	})
