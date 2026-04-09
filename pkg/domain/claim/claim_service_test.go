@@ -10,6 +10,8 @@ import (
 	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/claim/claimfakes"
 
+	"gorm.io/gorm"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -174,6 +176,18 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(strings.Contains(strings.ToLower(err.Error()), "uri")).To(BeTrue())
 				Expect(strings.Contains(strings.ToLower(err.Error()), "httpsurl")).To(BeTrue())
 				Expect(fakeClaimRepo.PostClaimCallCount()).To(Equal(postClaimCalls))
+			})
+		})
+
+		When("Deleting a non-existent claim by uri digest", func() {
+			It("Should return ErrClaimNotFound and not call Delete on repo", func() {
+				fakeClaimRepo.GetClaimByUriDigestReturns(nil, gorm.ErrRecordNotFound)
+				before := fakeClaimRepo.DeleteClaimByUriDigestCallCount()
+
+				err := claimSvc.DeleteClaimByUriDigest(context.TODO(), "doesnotexist")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, apperrors.ErrClaimNotFound)).To(BeTrue())
+				Expect(fakeClaimRepo.DeleteClaimByUriDigestCallCount()).To(Equal(before))
 			})
 		})
 	})

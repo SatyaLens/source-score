@@ -250,5 +250,25 @@ var _ = Describe("Claim model tests", func() {
 				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("httpsurl"))
 			})
 		})
+
+		When("DELETE request is sent for a non-existent claim", func() {
+			It("should return 404 with claim not found error", func() {
+				claimUrl, err := url.JoinPath(endpoint, "doesnotexistdigest")
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodDelete, claimUrl, nil)
+				Expect(err).To(BeNil())
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("claim not found"))
+			})
+		})
 	})
 })
