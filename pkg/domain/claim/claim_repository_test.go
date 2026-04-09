@@ -17,7 +17,7 @@ var _ = Describe("Claim repository layer unit tests", func() {
 			It("Should create the claims and return their uri digests", func() {
 				input := api.ClaimInput{
 					SourceUriDigest: sampleClaim1.SourceUriDigest,
-					Summary:         &sampleClaim1.Summary,
+					Summary:         sampleClaim1.Summary,
 					Title:           sampleClaim1.Title,
 					Uri:             sampleClaim1.Uri,
 				}
@@ -29,7 +29,7 @@ var _ = Describe("Claim repository layer unit tests", func() {
 
 				input = api.ClaimInput{
 					SourceUriDigest: sampleClaim2.SourceUriDigest,
-					Summary:         &sampleClaim2.Summary,
+					Summary:         sampleClaim2.Summary,
 					Title:           sampleClaim2.Title,
 					Uri:             sampleClaim2.Uri,
 				}
@@ -93,6 +93,27 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				_, err = claimRepo.GetClaimByUriDigest(context.TODO(), claim1Digest)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
+			})
+		})
+	})
+
+	Context("Validation tests", func() {
+		When("Retrieving a non-existent claim by uri digest", func() {
+			It("Should return gorm.ErrRecordNotFound", func() {
+				_, err := claimRepo.GetClaimByUriDigest(context.TODO(), "doesnotexist")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
+			})
+		})
+
+		When("Patching a non-existent claim by uri digest", func() {
+			It("Should return gorm.ErrRecordNotFound", func() {
+				newTitle := "New Title"
+				patchInput := &api.ClaimPatchInput{Title: &newTitle}
+
+				err := claimRepo.PatchClaimByUriDigest(context.TODO(), patchInput, "doesnotexist")
 				Expect(err).To(HaveOccurred())
 				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
 			})

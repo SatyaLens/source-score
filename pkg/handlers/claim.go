@@ -48,6 +48,11 @@ func (ch *ClaimHandler) PostClaim(ctx *gin.Context) {
 	digest, err := ch.claimSvc.PostClaim(ctx, claimInput)
 	if err != nil {
 		switch {
+		case errors.Is(err, apperrors.ErrInvalidClaim):
+			ctx.JSON(
+				http.StatusBadRequest,
+				gin.H{"error": err.Error()},
+			)
 		default:
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}

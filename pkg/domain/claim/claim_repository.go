@@ -50,14 +50,9 @@ func (cr *claimRepository) PostClaim(ctx context.Context, claimInput *api.ClaimI
 	}
 	uriDigest := hex.EncodeToString(hash.Sum(nil))
 
-	summary := ""
-	if claimInput.Summary != nil {
-		summary = *claimInput.Summary
-	}
-
 	claim := &api.Claim{
 		SourceUriDigest: claimInput.SourceUriDigest,
-		Summary:         summary,
+		Summary:         claimInput.Summary,
 		Title:           claimInput.Title,
 		Uri:             claimInput.Uri,
 		UriDigest:       uriDigest,

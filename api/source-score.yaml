@@ -304,6 +304,7 @@ components:
       type: object
       required:
       - sourceUriDigest
+      - summary
       - title
       - uri
       properties:
@@ -311,17 +312,22 @@ components:
           type: string
           x-oapi-codegen-extra-tags:
             binding: required
+            validate: nonempty
         summary:
           type: string
           x-oapi-codegen-extra-tags:
+            binding: required
+            validate: nonempty
         title:
           type: string
           x-oapi-codegen-extra-tags:
             binding: required
+            validate: nonempty
         uri:
           type: string
           x-oapi-codegen-extra-tags:
             binding: required
+            validate: httpsurl
 
     Claim:
       type: object

@@ -6,10 +6,13 @@ import (
 	"net/http"
 	"net/url"
 	"source-score/pkg/api"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
+
+func ptrString(s string) *string { return &s }
 
 var _ = Describe("Claim model tests", func() {
 	// claim endpoints
@@ -40,7 +43,7 @@ var _ = Describe("Claim model tests", func() {
 
 				claim1 := api.ClaimInput{
 					SourceUriDigest: srcResp.UriDigest,
-					Summary:         &sampleClaim1.Summary,
+					Summary:         sampleClaim1.Summary,
 					Title:           sampleClaim1.Title,
 					Uri:             sampleClaim1.Uri,
 				}
@@ -60,7 +63,7 @@ var _ = Describe("Claim model tests", func() {
 
 				claim2 := api.ClaimInput{
 					SourceUriDigest: srcResp.UriDigest,
-					Summary:         &sampleClaim2.Summary,
+					Summary:         sampleClaim2.Summary,
 					Title:           sampleClaim2.Title,
 					Uri:             sampleClaim2.Uri,
 				}
@@ -152,6 +155,74 @@ var _ = Describe("Claim model tests", func() {
 				Expect(c.Title).To(Equal(updatedTitle))
 				Expect(c.Summary).To(Equal(updatedSummary))
 			})
+
+			It("should update only the summary when only summary is provided", func() {
+				claimUrl, err := url.JoinPath(endpoint, claim1Digest)
+				Expect(err).To(BeNil())
+
+				updatedSummary2 := "Patched Claim Summary Only"
+				patchBody := api.ClaimPatchInput{
+					Summary: &updatedSummary2,
+				}
+				body, err := json.Marshal(patchBody)
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodPatch, claimUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
+
+				// verify update
+				resp, err = http.Get(claimUrl)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var c api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&c)
+				Expect(err).To(BeNil())
+				// title should remain as previously patched
+				Expect(c.Title).To(Equal("Patched Claim Title"))
+				Expect(c.Summary).To(Equal(updatedSummary2))
+			})
+
+			It("should update only the title when only title is provided", func() {
+				claimUrl, err := url.JoinPath(endpoint, claim1Digest)
+				Expect(err).To(BeNil())
+
+				updatedTitle2 := "Patched Claim Title Only"
+				patchBody := api.ClaimPatchInput{
+					Title: &updatedTitle2,
+				}
+				body, err := json.Marshal(patchBody)
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodPatch, claimUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
+
+				// verify update
+				resp, err = http.Get(claimUrl)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var c api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&c)
+				Expect(err).To(BeNil())
+				// summary should remain as previously patched in prior test
+				Expect(c.Summary).To(Equal("Patched Claim Summary Only"))
+				Expect(c.Title).To(Equal(updatedTitle2))
+			})
 		})
 
 		When("DELETE request is sent to delete the created claim", func() {
@@ -172,6 +243,176 @@ var _ = Describe("Claim model tests", func() {
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+			})
+		})
+	})
+
+	Context("Validation tests", func() {
+		When("POST request with empty sourceUriDigest is sent", func() {
+			It("should return 400 with validation error", func() {
+				claim := api.ClaimInput{
+					SourceUriDigest: "",
+					Summary:         "summary",
+					Title:           "title",
+					Uri:             "https://ok",
+				}
+				body, err := json.Marshal(claim)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("sourceuridigest"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("required"))
+			})
+		})
+
+		When("POST request with empty title and summary is sent", func() {
+			It("should return 400 with validation error mentioning Title and Summary", func() {
+				claim := api.ClaimInput{
+					SourceUriDigest: "somedigest",
+					Summary:         "",
+					Title:           "",
+					Uri:             "https://ok",
+				}
+				body, err := json.Marshal(claim)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("title"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("summary"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("required"))
+			})
+		})
+
+		When("POST request with non-https Uri is sent", func() {
+			It("should return 400 with validation error mentioning Uri and httpsurl", func() {
+				claim := api.ClaimInput{
+					SourceUriDigest: "somedigest",
+					Summary:         "summary",
+					Title:           "title",
+					Uri:             "http://not-https",
+				}
+				body, err := json.Marshal(claim)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("uri"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("httpsurl"))
+			})
+		})
+
+		When("GET request is sent for a non-existent claim", func() {
+			It("should return 404 with claim not found error", func() {
+				claimUrl, err := url.JoinPath(endpoint, "doesnotexist")
+				Expect(err).To(BeNil())
+
+				resp, err := http.Get(claimUrl)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("claim not found"))
+			})
+		})
+
+		When("DELETE request is sent for a non-existent claim", func() {
+			It("should return 404 with claim not found error", func() {
+				claimUrl, err := url.JoinPath(endpoint, "doesnotexistdigest")
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodDelete, claimUrl, nil)
+				Expect(err).To(BeNil())
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("claim not found"))
+			})
+		})
+
+		When("PATCH request is sent for a non-existent claim", func() {
+			It("should return 404 with claim not found error", func() {
+				claimUrl, err := url.JoinPath(endpoint, "doesnotexist")
+				Expect(err).To(BeNil())
+
+				patchBody := api.ClaimPatchInput{
+					Title:   ptrString("irrelevant"),
+					Summary: ptrString("irrelevant summary"),
+				}
+				body, err := json.Marshal(patchBody)
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodPatch, claimUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("claim not found"))
+			})
+		})
+
+		When("PATCH request with empty title and summary is sent", func() {
+			It("should return 400 with validation error mentioning Title and Summary", func() {
+				claimUrl, err := url.JoinPath(endpoint, claim1Digest)
+				Expect(err).To(BeNil())
+
+				patchBody := api.ClaimPatchInput{
+					Title:   ptrString(""),
+					Summary: ptrString(""),
+				}
+				body, err := json.Marshal(patchBody)
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodPatch, claimUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("title"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("summary"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("nonempty"))
 			})
 		})
 	})

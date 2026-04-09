@@ -35,6 +35,9 @@ func init() {
 	if err := claimValidate.RegisterValidation("nonempty", helpers.ValidateNonEmpty); err != nil {
 		panic(fmt.Sprintf("failed to register nonempty validator with error: %v", err))
 	}
+	if err := claimValidate.RegisterValidation("httpsurl", helpers.ValidateHttpsURL); err != nil {
+		panic(fmt.Sprintf("failed to register httpsurl validator with error: %v", err))
+	}
 }
 
 func NewClaimService(ctx context.Context, claimRepo ClaimRepository) ClaimService {
@@ -90,5 +93,20 @@ func (svc *claimService) PatchClaimByUriDigest(ctx context.Context, claimInput *
 }
 
 func (svc *claimService) PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error) {
+	err := claimValidate.Struct(claimInput)
+	if err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			return "", fmt.Errorf("%w: %s", apperrors.ErrValidationLogic, err.Error())
+		}
+		combinedErrs := ""
+		for _, e := range err.(validator.ValidationErrors) {
+			combinedErrs = fmt.Sprintf(
+				"%s\n%s validation failed for value %v with error %s", combinedErrs, e.Field(), e.Value(), e.Tag(),
+			)
+		}
+		combinedErrs = strings.TrimSpace(combinedErrs)
+		return "", fmt.Errorf("%w: %s", apperrors.ErrInvalidClaim, combinedErrs)
+	}
+
 	return svc.claimRepo.PostClaim(ctx, claimInput)
 }
