@@ -117,6 +117,43 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(*argInput.Title).To(Equal(newTitle))
 				Expect(*argInput.Summary).To(Equal(newSummary))
 			})
+
+			It("Should patch only the summary when title is nil", func() {
+				newSummary := "Summary only update"
+				patchInput := api.ClaimPatchInput{
+					Summary: &newSummary,
+					Title:   nil,
+				}
+
+				before := fakeClaimRepo.PatchClaimByUriDigestCallCount()
+				fakeClaimRepo.PatchClaimByUriDigestReturns(nil)
+				err := claimSvc.PatchClaimByUriDigest(context.TODO(), &patchInput, claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeClaimRepo.PatchClaimByUriDigestCallCount()).To(Equal(before + 1))
+				_, argInput, argDigest := fakeClaimRepo.PatchClaimByUriDigestArgsForCall(before)
+				Expect(argDigest).To(Equal(claim1Digest))
+				Expect(argInput.Title).To(BeNil())
+				Expect(*argInput.Summary).To(Equal(newSummary))
+			})
+
+			It("Should patch only the title when summary is nil", func() {
+				newTitle := "Title only update"
+				patchInput := api.ClaimPatchInput{
+					Summary: nil,
+					Title:   &newTitle,
+				}
+
+				before := fakeClaimRepo.PatchClaimByUriDigestCallCount()
+				fakeClaimRepo.PatchClaimByUriDigestReturns(nil)
+				err := claimSvc.PatchClaimByUriDigest(context.TODO(), &patchInput, claim1Digest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeClaimRepo.PatchClaimByUriDigestCallCount()).To(Equal(before + 1))
+				_, argInput, argDigest := fakeClaimRepo.PatchClaimByUriDigestArgsForCall(before)
+				Expect(argDigest).To(Equal(claim1Digest))
+				Expect(*argInput.Title).To(Equal(newTitle))
+				Expect(argInput.Summary).To(BeNil())
+			})
+
 		})
 	})
 
@@ -190,5 +227,44 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(fakeClaimRepo.DeleteClaimByUriDigestCallCount()).To(Equal(before))
 			})
 		})
+
+		When("Getting a non-existent claim by uri digest", func() {
+			It("Should return ErrClaimNotFound and nil claim", func() {
+				fakeClaimRepo.GetClaimByUriDigestReturns(nil, gorm.ErrRecordNotFound)
+
+				c, err := claimSvc.GetClaimByUriDigest(context.TODO(), "doesnotexist")
+				Expect(err).To(HaveOccurred())
+				Expect(c).To(BeNil())
+				Expect(errors.Is(err, apperrors.ErrClaimNotFound)).To(BeTrue())
+			})
+		})
+
+		When("Patching a non-existent claim by uri digest", func() {
+			It("Should return ErrClaimNotFound", func() {
+				fakeClaimRepo.PatchClaimByUriDigestReturns(gorm.ErrRecordNotFound)
+
+				patchInput := api.ClaimPatchInput{Title: nil, Summary: nil}
+				err := claimSvc.PatchClaimByUriDigest(context.TODO(), &patchInput, "doesnotexist")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, apperrors.ErrClaimNotFound)).To(BeTrue())
+			})
+		})
+
+		When("Patching a claim with empty title and summary", func() {
+			It("Should return ErrInvalidClaim and not call repo", func() {
+				empty := ""
+				patchInput := api.ClaimPatchInput{Title: &empty, Summary: &empty}
+				before := fakeClaimRepo.PatchClaimByUriDigestCallCount()
+
+				err := claimSvc.PatchClaimByUriDigest(context.TODO(), &patchInput, claim1Digest)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, apperrors.ErrInvalidClaim)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower((err.Error())), "title")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "summary")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "nonempty")).To(BeTrue())
+				Expect(fakeClaimRepo.PatchClaimByUriDigestCallCount()).To(Equal(before))
+			})
+		})
+
 	})
 })
