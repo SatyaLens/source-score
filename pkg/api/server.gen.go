@@ -105,8 +105,8 @@ type PostProofJSONRequestBody = ProofInput
 // PatchProofJSONRequestBody defines body for PatchProof for application/json ContentType.
 type PatchProofJSONRequestBody = ProofPatchInput
 
-// CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.
-type CreateSourceJSONRequestBody = SourceInput
+// PostSourceJSONRequestBody defines body for PostSource for application/json ContentType.
+type PostSourceJSONRequestBody = SourceInput
 
 // PatchSourceJSONRequestBody defines body for PatchSource for application/json ContentType.
 type PatchSourceJSONRequestBody = SourcePatchInput
@@ -145,7 +145,7 @@ type ServerInterface interface {
 	GetProofs(c *gin.Context)
 
 	// (POST /api/v1/source)
-	CreateSource(c *gin.Context)
+	PostSource(c *gin.Context)
 
 	// (DELETE /api/v1/source/{uriDigest})
 	DeleteSource(c *gin.Context, uriDigest string)
@@ -368,8 +368,8 @@ func (siw *ServerInterfaceWrapper) GetProofs(c *gin.Context) {
 	siw.Handler.GetProofs(c)
 }
 
-// CreateSource operation middleware
-func (siw *ServerInterfaceWrapper) CreateSource(c *gin.Context) {
+// PostSource operation middleware
+func (siw *ServerInterfaceWrapper) PostSource(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -378,7 +378,7 @@ func (siw *ServerInterfaceWrapper) CreateSource(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.CreateSource(c)
+	siw.Handler.PostSource(c)
 }
 
 // DeleteSource operation middleware
@@ -516,7 +516,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.GetProof)
 	router.PATCH(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.PatchProof)
 	router.GET(options.BaseURL+"/api/v1/proofs", wrapper.GetProofs)
-	router.POST(options.BaseURL+"/api/v1/source", wrapper.CreateSource)
+	router.POST(options.BaseURL+"/api/v1/source", wrapper.PostSource)
 	router.DELETE(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.DeleteSource)
 	router.GET(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.GetSource)
 	router.PATCH(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.PatchSource)
