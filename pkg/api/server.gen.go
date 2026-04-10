@@ -46,6 +46,28 @@ type Pong struct {
 	Pong string `json:"pong"`
 }
 
+// Proof defines model for Proof.
+type Proof struct {
+	ClaimUriDigest string `binding:"required" json:"claimUriDigest"`
+	ReviewedBy     string `binding:"required" json:"reviewedBy"`
+	SupportsClaim  bool   `binding:"required" json:"supportsClaim"`
+	Uri            string `binding:"required" json:"uri"`
+	UriDigest      string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
+}
+
+// ProofInput defines model for ProofInput.
+type ProofInput struct {
+	ClaimUriDigest string `binding:"required" json:"claimUriDigest" validate:"nonempty,nospace"`
+	ReviewedBy     string `binding:"required" json:"reviewedBy" validate:"nonempty,nospace"`
+	SupportsClaim  bool   `binding:"required" json:"supportsClaim" validate:"nonempty"`
+	Uri            string `binding:"required" json:"uri" validate:"httpsurl"`
+}
+
+// ProofPatchInput defines model for ProofPatchInput.
+type ProofPatchInput struct {
+	ReviewedBy string `binding:"required" json:"reviewedBy" validate:"nonempty,nospace"`
+}
+
 // Source defines model for Source.
 type Source struct {
 	Name      string  `binding:"required" json:"name"`
@@ -77,6 +99,12 @@ type PostClaimJSONRequestBody = ClaimInput
 // PatchClaimJSONRequestBody defines body for PatchClaim for application/json ContentType.
 type PatchClaimJSONRequestBody = ClaimPatchInput
 
+// PostProofJSONRequestBody defines body for PostProof for application/json ContentType.
+type PostProofJSONRequestBody = ProofInput
+
+// PatchProofJSONRequestBody defines body for PatchProof for application/json ContentType.
+type PatchProofJSONRequestBody = ProofPatchInput
+
 // CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.
 type CreateSourceJSONRequestBody = SourceInput
 
@@ -100,6 +128,21 @@ type ServerInterface interface {
 
 	// (GET /api/v1/claims)
 	GetClaims(c *gin.Context)
+
+	// (POST /api/v1/proof)
+	PostProof(c *gin.Context)
+
+	// (DELETE /api/v1/proof/{uriDigest})
+	DeleteProof(c *gin.Context, uriDigest string)
+
+	// (GET /api/v1/proof/{uriDigest})
+	GetProof(c *gin.Context, uriDigest string)
+
+	// (PATCH /api/v1/proof/{uriDigest})
+	PatchProof(c *gin.Context, uriDigest string)
+
+	// (GET /api/v1/proofs)
+	GetProofs(c *gin.Context)
 
 	// (POST /api/v1/source)
 	CreateSource(c *gin.Context)
@@ -225,6 +268,104 @@ func (siw *ServerInterfaceWrapper) GetClaims(c *gin.Context) {
 	}
 
 	siw.Handler.GetClaims(c)
+}
+
+// PostProof operation middleware
+func (siw *ServerInterfaceWrapper) PostProof(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProof(c)
+}
+
+// DeleteProof operation middleware
+func (siw *ServerInterfaceWrapper) DeleteProof(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteProof(c, uriDigest)
+}
+
+// GetProof operation middleware
+func (siw *ServerInterfaceWrapper) GetProof(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProof(c, uriDigest)
+}
+
+// PatchProof operation middleware
+func (siw *ServerInterfaceWrapper) PatchProof(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PatchProof(c, uriDigest)
+}
+
+// GetProofs operation middleware
+func (siw *ServerInterfaceWrapper) GetProofs(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProofs(c)
 }
 
 // CreateSource operation middleware
@@ -370,6 +511,11 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.GetClaim)
 	router.PATCH(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.PatchClaim)
 	router.GET(options.BaseURL+"/api/v1/claims", wrapper.GetClaims)
+	router.POST(options.BaseURL+"/api/v1/proof", wrapper.PostProof)
+	router.DELETE(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.DeleteProof)
+	router.GET(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.GetProof)
+	router.PATCH(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.PatchProof)
+	router.GET(options.BaseURL+"/api/v1/proofs", wrapper.GetProofs)
 	router.POST(options.BaseURL+"/api/v1/source", wrapper.CreateSource)
 	router.DELETE(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.DeleteSource)
 	router.GET(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.GetSource)

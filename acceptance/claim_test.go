@@ -83,7 +83,7 @@ var _ = Describe("Claim model tests", func() {
 			})
 		})
 
-		When("GET requests are sent to create claims", func() {
+		When("GET requests are sent to fetch claims", func() {
 			It("should return all the created claims", func() {
 				resp, err := http.Get(claimsEndpoint)
 				Expect(err).To(BeNil())

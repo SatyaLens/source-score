@@ -16,7 +16,8 @@ CREATE TABLE
         source_uri_digest TEXT,
         summary TEXT,
         title TEXT,
-        uri TEXT PRIMARY KEY,
+        uri TEXT,
+        uri_digest TEXT PRIMARY KEY,
         checked BOOLEAN DEFAULT FALSE,
         validity BOOLEAN DEFAULT FALSE,
         CONSTRAINT fk_source FOREIGN KEY (source_uri_digest) REFERENCES sources (uri_digest) ON DELETE CASCADE
@@ -24,8 +25,10 @@ CREATE TABLE
 
 CREATE TABLE
     proofs (
-        claim_uri TEXT,
+        claim_uri_digest TEXT,
+        supports_claim BOOLEAN,
         reviewed_by TEXT,
-        uri TEXT PRIMARY KEY,
-        CONSTRAINT fk_claim FOREIGN KEY (claim_uri) REFERENCES claims (uri) ON DELETE CASCADE
+        uri TEXT,
+        uri_digest TEXT PRIMARY KEY,
+        CONSTRAINT fk_claim FOREIGN KEY (claim_uri_digest) REFERENCES claims (uri_digest) ON DELETE CASCADE
     );
