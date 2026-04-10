@@ -14,7 +14,7 @@ var _ = Describe("Proof repository layer unit tests", Ordered, func() {
 			It("Should create the proofs and return their uri digests", func() {
 				input := api.ProofInput{
 					ClaimUriDigest: sampleProof1.ClaimUriDigest,
-					ReviewedBy:     sampleProof1.ReviewedBy,
+					ReviewedBy:     "ReviewerA",
 					SupportsClaim:  sampleProof1.SupportsClaim,
 					Uri:            sampleProof1.Uri,
 				}
@@ -26,7 +26,7 @@ var _ = Describe("Proof repository layer unit tests", Ordered, func() {
 
 				input = api.ProofInput{
 					ClaimUriDigest: sampleProof2.ClaimUriDigest,
-					ReviewedBy:     sampleProof2.ReviewedBy,
+					ReviewedBy:     "ReviewerB",
 					SupportsClaim:  sampleProof2.SupportsClaim,
 					Uri:            sampleProof2.Uri,
 				}
@@ -63,7 +63,7 @@ var _ = Describe("Proof repository layer unit tests", Ordered, func() {
 		When("Patching a proof by its uri digest", func() {
 			It("Should update the correct proof record in the DB", func() {
 				patchInput := &api.ProofPatchInput{
-					ReviewedBy: "Updated Reviewer",
+					ReviewedBy: "UpdatedReviewer",
 				}
 
 				err := proofRepo.PatchProofByUriDigest(context.TODO(), patchInput, proof1Digest)

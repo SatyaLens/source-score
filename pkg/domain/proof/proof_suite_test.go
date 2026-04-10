@@ -38,7 +38,7 @@ var (
 
 	sampleProof1 = api.Proof{
 		ClaimUriDigest: sampleClaim.UriDigest,
-		ReviewedBy:     "Reviewer A",
+		ReviewedBy:     "ReviewerA",
 		SupportsClaim:  true,
 		Uri:            "https://sample-proof-1",
 		UriDigest:      proof1Digest,
@@ -46,7 +46,7 @@ var (
 
 	sampleProof2 = api.Proof{
 		ClaimUriDigest: sampleClaim.UriDigest,
-		ReviewedBy:     "Reviewer B",
+		ReviewedBy:     "ReviewerB",
 		SupportsClaim:  false,
 		Uri:            "https://sample-proof-2",
 		UriDigest:      proof2Digest,
