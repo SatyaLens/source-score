@@ -11,11 +11,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const (
-	proof1Digest = "6f2479b5249b1c27c4935da5594bc72bb0b9e59e704aea9af50780bc6178c357"
-	proof2Digest = "8df5229f310ae8322062834f3ba45a38ecef8ded549665d1170e15c8249b7cd0"
-)
-
 var _ = Describe("Proof model tests", func() {
 	endpoint, err := url.JoinPath(baseUrl, "/api/v1/proof")
 	Expect(err).To(BeNil())
@@ -48,10 +43,10 @@ var _ = Describe("Proof model tests", func() {
 
 				// create claim attached to that source
 				claimInput := api.ClaimInput{
-					SourceUriDigest: srcResp.UriDigest,
-					Summary:         sampleClaim1.Summary,
-					Title:           sampleClaim1.Title,
-					Uri:             sampleClaim1.Uri,
+					SourceUriDigest: sampleClaim3.SourceUriDigest,
+					Summary:         sampleClaim3.Summary,
+					Title:           sampleClaim3.Title,
+					Uri:             sampleClaim3.Uri,
 				}
 				claimBody, err := json.Marshal(claimInput)
 				Expect(err).To(BeNil())
@@ -65,13 +60,14 @@ var _ = Describe("Proof model tests", func() {
 				Expect(err).To(BeNil())
 				resp.Body.Close()
 				claimDigest := claimResp["uriDigest"]
+				Expect(claimDigest).To(Equal(claim3Digest))
 
 				// create proof 1
 				proof1 := api.ProofInput{
-					ClaimUriDigest: claimDigest,
-					ReviewedBy:     "ReviewerA",
-					SupportsClaim:  true,
-					Uri:            "https://sample-proof-1",
+					ClaimUriDigest: claim3Digest,
+					ReviewedBy:     sampleProof1.ReviewedBy,
+					SupportsClaim:  sampleProof1.SupportsClaim,
+					Uri:            sampleProof1.Uri,
 				}
 				body1, err := json.Marshal(proof1)
 				Expect(err).To(BeNil())
@@ -89,10 +85,10 @@ var _ = Describe("Proof model tests", func() {
 
 				// create proof 2
 				proof2 := api.ProofInput{
-					ClaimUriDigest: claimDigest,
-					ReviewedBy:     "ReviewerB",
-					SupportsClaim:  false,
-					Uri:            "https://sample-proof-2",
+					ClaimUriDigest: sampleProof2.ClaimUriDigest,
+					ReviewedBy:     sampleProof2.ReviewedBy,
+					SupportsClaim:  sampleProof2.SupportsClaim,
+					Uri:            sampleProof2.Uri,
 				}
 				body2, err := json.Marshal(proof2)
 				Expect(err).To(BeNil())
@@ -120,14 +116,7 @@ var _ = Describe("Proof model tests", func() {
 				err = json.NewDecoder(resp.Body).Decode(&proofs)
 				Expect(err).To(BeNil())
 				Expect(len(proofs)).To(BeNumerically(">=", 2))
-
-				// GET single proof
-				proofUrl, err := url.JoinPath(endpoint, proof1Digest)
-				Expect(err).To(BeNil())
-				resp, err = http.Get(proofUrl)
-				Expect(err).To(BeNil())
-				defer resp.Body.Close()
-				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+				Expect(proofs).To(ContainElements(sampleProof1, sampleProof2))
 			})
 
 			It("should return the correct proof when requested by uri digest", func() {
@@ -143,6 +132,9 @@ var _ = Describe("Proof model tests", func() {
 				err = json.NewDecoder(resp.Body).Decode(&p)
 				Expect(err).To(BeNil())
 				Expect(p.UriDigest).To(Equal(proof1Digest))
+				err = json.NewDecoder(resp.Body).Decode(&p)
+				Expect(err).To(BeNil())
+				Expect(p).To(Equal(sampleProof1))
 			})
 		})
 

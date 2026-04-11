@@ -24,6 +24,9 @@ const (
 	uriDigest3   = "f70fe06de54dcaa05e3fcda03ae724ad9d8603c04f6cdbd838c0ad4f2e789ba1"
 	claim1Digest = "369d9f3047c66c2e9b5e39693d9de3664b61a36a2d77cd0484fade042350d4a1"
 	claim2Digest = "a96fe15d3040685b06d0c195d54a13692a9002db148498f185babfb6a083f801"
+	claim3Digest = "99fbb18fa07b94788a61d373f463a903cbf4cc846c23ec6116d0d861891ec209"
+	proof1Digest = "6f2479b5249b1c27c4935da5594bc72bb0b9e59e704aea9af50780bc6178c357"
+	proof2Digest = "8df5229f310ae8322062834f3ba45a38ecef8ded549665d1170e15c8249b7cd0"
 )
 
 var (
@@ -82,6 +85,29 @@ var (
 		UriDigest:       claim2Digest,
 		Checked:         false,
 		Validity:        false,
+	}
+	sampleClaim3 = api.Claim{
+		SourceUriDigest: uriDigest3,
+		Summary:         "Sample claim summary 3",
+		Title:           "Sample Claim 3",
+		Uri:             "https://sample-claim-3",
+		UriDigest:       claim3Digest,
+		Checked:         false,
+		Validity:        false,
+	}
+	sampleProof1 = api.Proof{
+		ClaimUriDigest: claim3Digest,
+		ReviewedBy:     "ReviewerA",
+		SupportsClaim:  true,
+		Uri:            "https://sample-proof-1",
+		UriDigest:      proof1Digest,
+	}
+	sampleProof2 = api.Proof{
+		ClaimUriDigest: claim3Digest,
+		ReviewedBy:     "ReviewerB",
+		SupportsClaim:  false,
+		Uri:            "https://sample-proof-2",
+		UriDigest:      proof2Digest,
 	}
 )
 
