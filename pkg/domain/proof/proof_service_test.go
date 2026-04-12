@@ -2,13 +2,17 @@ package proof_test
 
 import (
 	"context"
+	"errors"
+	"strings"
 
 	"source-score/pkg/api"
+	"source-score/pkg/apperrors"
 	"source-score/pkg/domain/proof"
 	"source-score/pkg/domain/proof/prooffakes"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"gorm.io/gorm"
 )
 
 var (
@@ -79,7 +83,7 @@ var _ = Describe("Proof model service layer unit tests", Ordered, func() {
 				_, arg := fakeProofRepo.GetProofByUriDigestArgsForCall(0)
 				Expect(arg).To(Equal(proof1Digest))
 			})
-		})		
+		})
 
 		When("Patching a proof by its uri digest", func() {
 			It("Should update the proof via repository", func() {
@@ -106,6 +110,189 @@ var _ = Describe("Proof model service layer unit tests", Ordered, func() {
 				Expect(digest).To(Equal(proof1Digest))
 				_, c := fakeProofRepo.DeleteProofByUriDigestArgsForCall(0)
 				Expect(*c).To(Equal(sampleProof1))
+			})
+		})
+	})
+
+	Context("Proof POST validation tests", func() {
+		When("Posting a proof with space in ClaimUriDigest", func() {
+			It("Should return invalid proof error with nospace validation message", func() {
+				supports := true
+				invalidInput := &api.ProofInput{
+					ClaimUriDigest: "claim digest",
+					ReviewedBy:     "ValidReviewer",
+					SupportsClaim:  &supports,
+					Uri:            "https://example.com",
+				}
+
+				postCalls := fakeProofRepo.PostProofCallCount()
+				_, err := proofSvc.PostProof(context.TODO(), invalidInput)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidProof)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "claimuridigest")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "nospace")).To(BeTrue())
+				Expect(fakeProofRepo.PostProofCallCount()).To(Equal(postCalls))
+			})
+		})
+
+		When("Posting a proof with space in ReviewedBy", func() {
+			It("Should return invalid proof error with nospace validation message", func() {
+				supports := true
+				invalidInput := &api.ProofInput{
+					ClaimUriDigest: "validclaimdigest",
+					ReviewedBy:     "Reviewer Name",
+					SupportsClaim:  &supports,
+					Uri:            "https://example.com",
+				}
+
+				postCalls := fakeProofRepo.PostProofCallCount()
+				_, err := proofSvc.PostProof(context.TODO(), invalidInput)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidProof)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "reviewedby")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "nospace")).To(BeTrue())
+				Expect(fakeProofRepo.PostProofCallCount()).To(Equal(postCalls))
+			})
+		})
+
+		When("Posting a proof with empty ReviewedBy and ClaimUriDigest", func() {
+			It("Should return invalid proof error with nonempty validation message", func() {
+				supports := true
+				invalidInput := &api.ProofInput{
+					ClaimUriDigest: "",
+					ReviewedBy:     "",
+					SupportsClaim:  &supports,
+					Uri:            "https://example.com",
+				}
+
+				postCalls := fakeProofRepo.PostProofCallCount()
+				_, err := proofSvc.PostProof(context.TODO(), invalidInput)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidProof)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "claimuridigest")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "reviewedby")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "nonempty")).To(BeTrue())
+				Expect(fakeProofRepo.PostProofCallCount()).To(Equal(postCalls))
+			})
+		})
+
+		When("Posting a proof without SupportsClaim", func() {
+			It("Should return invalid proof error with nonempty validation message", func() {
+				invalidInput := &api.ProofInput{
+					ClaimUriDigest: "validclaimdigest",
+					ReviewedBy:     "ValidReviewer",
+					Uri:            "https://example.com",
+				}
+
+				postCalls := fakeProofRepo.PostProofCallCount()
+				_, err := proofSvc.PostProof(context.TODO(), invalidInput)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidProof)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "supportsclaim")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "nonempty")).To(BeTrue())
+				Expect(fakeProofRepo.PostProofCallCount()).To(Equal(postCalls))
+			})
+		})
+
+		When("Posting a proof with invalid url in Uri", func() {
+			It("Should return invalid proof error with httpsurl validation message", func() {
+				supports := true
+				invalidInput := &api.ProofInput{
+					ClaimUriDigest: "validclaimdigest",
+					ReviewedBy:     "ValidReviewer",
+					SupportsClaim:  &supports,
+					Uri:            "http://not-https.com",
+				}
+
+				postCalls := fakeProofRepo.PostProofCallCount()
+				_, err := proofSvc.PostProof(context.TODO(), invalidInput)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidProof)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "uri")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "httpsurl")).To(BeTrue())
+				Expect(fakeProofRepo.PostProofCallCount()).To(Equal(postCalls))
+			})
+		})
+	})
+
+	Context("Proof PATCH validation tests", func() {
+		When("Patching a proof with empty ReviewedBy", func() {
+			It("Should return invalid proof error with nonempty validation message", func() {
+				invalidInput := &api.ProofPatchInput{ReviewedBy: ""}
+				before := fakeProofRepo.PatchProofByUriDigestCallCount()
+
+				err := proofSvc.PatchProofByUriDigest(context.TODO(), invalidInput, proof1Digest)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidProof)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "reviewedby")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "nonempty")).To(BeTrue())
+				Expect(fakeProofRepo.PatchProofByUriDigestCallCount()).To(Equal(before))
+			})
+		})
+
+		When("Patching a proof with space in ReviewedBy value", func() {
+			It("Should return invalid proof error with nospace validation message", func() {
+				invalidInput := &api.ProofPatchInput{ReviewedBy: "Reviewer Name"}
+				before := fakeProofRepo.PatchProofByUriDigestCallCount()
+
+				err := proofSvc.PatchProofByUriDigest(context.TODO(), invalidInput, proof1Digest)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidProof)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "reviewedby")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "nospace")).To(BeTrue())
+				Expect(fakeProofRepo.PatchProofByUriDigestCallCount()).To(Equal(before))
+			})
+		})
+
+		When("Patching a proof that does not exist", func() {
+			It("Should return proof not found error", func() {
+				fakeProofRepo.PatchProofByUriDigestReturns(gorm.ErrRecordNotFound)
+
+				patchInput := &api.ProofPatchInput{ReviewedBy: "ValidReviewer"}
+				err := proofSvc.PatchProofByUriDigest(context.TODO(), patchInput, "invalid-digest")
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrProofNotFound)).To(BeTrue())
+			})
+		})
+	})
+
+	Context("Proof DELETE validation tests", func() {
+		When("Deleting a proof that doesn't exist", func() {
+			It("Should return proof not found error", func() {
+				fakeProofRepo.GetProofByUriDigestReturns(nil, gorm.ErrRecordNotFound)
+				before := fakeProofRepo.DeleteProofByUriDigestCallCount()
+				getProofCalls := fakeProofRepo.GetProofByUriDigestCallCount()
+
+				err := proofSvc.DeleteProofByUriDigest(context.TODO(), "invalid-digest")
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrProofNotFound)).To(BeTrue())
+				Expect(fakeProofRepo.DeleteProofByUriDigestCallCount()).To(Equal(before))
+				Expect(fakeProofRepo.GetProofByUriDigestCallCount()).To(Equal(getProofCalls + 1))
+			})
+		})
+	})
+
+	Context("Proof GET validation tests", func() {
+		When("Getting a proof that doesn't exist", func() {
+			It("Should return proof not found error", func() {
+				fakeProofRepo.GetProofByUriDigestReturns(nil, gorm.ErrRecordNotFound)
+				getProofCalls := fakeProofRepo.GetProofByUriDigestCallCount()
+
+				p, err := proofSvc.GetProofByUriDigest(context.TODO(), "invalid-digest")
+
+				Expect(p).To(BeNil())
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrProofNotFound)).To(BeTrue())
+				Expect(fakeProofRepo.GetProofByUriDigestCallCount()).To(Equal(getProofCalls + 1))
 			})
 		})
 	})

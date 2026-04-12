@@ -2,10 +2,12 @@ package proof_test
 
 import (
 	"context"
+	"errors"
 	"source-score/pkg/api"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"gorm.io/gorm"
 )
 
 var _ = Describe("Proof repository layer unit tests", Ordered, func() {
@@ -87,6 +89,25 @@ var _ = Describe("Proof repository layer unit tests", Ordered, func() {
 
 				_, err = proofRepo.GetProofByUriDigest(context.TODO(), proof1Digest)
 				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
+
+	Context("Validation tests", Ordered, func() {
+		When("Retrieving a non-existent proof by uri digest", func() {
+			It("Should return gorm.ErrRecordNotFound", func() {
+				_, err := proofRepo.GetProofByUriDigest(context.TODO(), "doesnotexist")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
+			})
+		})
+
+		When("Patching a proof by uri digest that does not exist", func() {
+			It("Should return gorm.ErrRecordNotFound", func() {
+				patchInput := &api.ProofPatchInput{ReviewedBy: "irrelevant"}
+				err := proofRepo.PatchProofByUriDigest(context.TODO(), patchInput, "doesnotexist")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
 			})
 		})
 	})
