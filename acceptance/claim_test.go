@@ -225,6 +225,38 @@ var _ = Describe("Claim model tests", func() {
 			})
 		})
 
+		When("POST request is sent to verify a claim", func() {
+			It("should verify the claim and subsequent GET returns updated checked and validity fields", func() {
+				claimUrl, err := url.JoinPath(endpoint, claim2Digest)
+				Expect(err).To(BeNil())
+
+				// verify claim with validity true
+				validity := true
+				verifyBody := api.ClaimVerification{
+					Validity: &validity,
+				}
+				body, err := json.Marshal(verifyBody)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(claimUrl, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
+
+				// verify the claim was updated
+				resp, err = http.Get(claimUrl)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var c api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&c)
+				Expect(err).To(BeNil())
+				Expect(c.Checked).To(BeTrue())
+				Expect(c.Validity).To(BeTrue())
+			})
+		})
+
 		When("DELETE request is sent to delete the created claim", func() {
 			It("should delete the created claim and subsequent GET returns 404", func() {
 				claimUrl, err := url.JoinPath(endpoint, claim1Digest)
@@ -415,5 +447,54 @@ var _ = Describe("Claim model tests", func() {
 				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("nonempty"))
 			})
 		})
+
+		When("POST request to verify claim without Validity field is sent", func() {
+			It("should return 400 with validation error mentioning validity", func() {
+				claimUrl, err := url.JoinPath(endpoint, claim2Digest)
+				Expect(err).To(BeNil())
+
+				verifyBody := api.ClaimVerification{
+				}
+				body, err := json.Marshal(verifyBody)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(claimUrl, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("validity"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("required"))
+			})
+		})
+
+		When("POST request to verify a non-existent claim is sent", func() {
+			It("should return 404 with claim not found error", func() {
+				claimUrl, err := url.JoinPath(endpoint, "doesnotexist")
+				Expect(err).To(BeNil())
+
+				validity := true
+				verifyBody := api.ClaimVerification{
+					Validity: &validity,
+				}
+				body, err := json.Marshal(verifyBody)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(claimUrl, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("claim not found"))
+			})
+		})
+
+		
 	})
 })

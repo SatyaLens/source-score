@@ -36,6 +36,7 @@ paths:
       - source
       operationId: postSource
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -80,6 +81,7 @@ paths:
         schema:
           type: string
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -128,6 +130,7 @@ paths:
       - claim
       operationId: postClaim
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -184,6 +187,7 @@ paths:
         schema:
           type: string
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -205,13 +209,16 @@ paths:
         schema:
           type: string
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ClaimVerification'
       responses:
-        200:
+        204:
           description: claim verified
+        404:
+          description: claim not found
 
   # proof paths
   /api/v1/proofs:
@@ -235,6 +242,7 @@ paths:
       - proof
       operationId: postProof
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -291,6 +299,7 @@ paths:
         schema:
           type: string
       requestBody:
+        required: true
         content:
           application/json:
             schema:
