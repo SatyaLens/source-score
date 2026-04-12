@@ -15,7 +15,7 @@ var _ = Describe("Proof repository layer unit tests", Ordered, func() {
 				input := api.ProofInput{
 					ClaimUriDigest: sampleProof1.ClaimUriDigest,
 					ReviewedBy:     "ReviewerA",
-					SupportsClaim:  sampleProof1.SupportsClaim,
+					SupportsClaim:  &sampleProof1.SupportsClaim,
 					Uri:            sampleProof1.Uri,
 				}
 
@@ -27,7 +27,7 @@ var _ = Describe("Proof repository layer unit tests", Ordered, func() {
 				input = api.ProofInput{
 					ClaimUriDigest: sampleProof2.ClaimUriDigest,
 					ReviewedBy:     "ReviewerB",
-					SupportsClaim:  sampleProof2.SupportsClaim,
+					SupportsClaim:  &sampleProof2.SupportsClaim,
 					Uri:            sampleProof2.Uri,
 				}
 

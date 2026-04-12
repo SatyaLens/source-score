@@ -26,7 +26,7 @@ var _ = Describe("Proof model service layer unit tests", Ordered, func() {
 				input := api.ProofInput{
 					ClaimUriDigest: sampleProof1.ClaimUriDigest,
 					ReviewedBy:     sampleProof1.ReviewedBy,
-					SupportsClaim:  sampleProof1.SupportsClaim,
+					SupportsClaim:  &sampleProof1.SupportsClaim,
 					Uri:            sampleProof1.Uri,
 				}
 
@@ -40,7 +40,7 @@ var _ = Describe("Proof model service layer unit tests", Ordered, func() {
 				input = api.ProofInput{
 					ClaimUriDigest: sampleProof2.ClaimUriDigest,
 					ReviewedBy:     sampleProof2.ReviewedBy,
-					SupportsClaim:  sampleProof2.SupportsClaim,
+					SupportsClaim:  &sampleProof2.SupportsClaim,
 					Uri:            sampleProof2.Uri,
 				}
 

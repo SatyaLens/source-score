@@ -13,7 +13,7 @@ CREATE TABLE
 
 CREATE TABLE
     claims (
-        source_uri_digest TEXT,
+        source_uri_digest TEXT NOT NULL,
         summary TEXT,
         title TEXT,
         uri TEXT,
@@ -25,7 +25,7 @@ CREATE TABLE
 
 CREATE TABLE
     proofs (
-        claim_uri_digest TEXT,
+        claim_uri_digest TEXT NOT NULL,
         supports_claim BOOLEAN,
         reviewed_by TEXT,
         uri TEXT,

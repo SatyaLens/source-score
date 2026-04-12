@@ -22,6 +22,7 @@ const (
 	uriDigest1   = "8649a4126fb4fc9a750f432b729c8477398cf28ca241403b2cd36a6dc841f441"
 	uriDigest2   = "978d81ca657062910f60263c26ce7261e7530e53bfd28aa48748155eb5621868"
 	uriDigest3   = "f70fe06de54dcaa05e3fcda03ae724ad9d8603c04f6cdbd838c0ad4f2e789ba1"
+	uriDigest4   = "678d242117b7fa600f84108acb14a92d571d11a9f37625320a014a3d4a8fa878"
 	claim1Digest = "369d9f3047c66c2e9b5e39693d9de3664b61a36a2d77cd0484fade042350d4a1"
 	claim2Digest = "a96fe15d3040685b06d0c195d54a13692a9002db148498f185babfb6a083f801"
 	claim3Digest = "99fbb18fa07b94788a61d373f463a903cbf4cc846c23ec6116d0d861891ec209"
@@ -51,6 +52,12 @@ var (
 		Summary: "Sample summary 3",
 		Tags:    "tag2",
 		Uri:     "https://sample-uri-3",
+	}
+	sourceInput4 = api.SourceInput{
+		Name:    "Sample Source 4",
+		Summary: "Sample summary 4",
+		Tags:    "tag4",
+		Uri:     "https://sample-uri-4",
 	}
 	sampleSource1 = api.Source{
 		Name:      "Sample Source 1",
@@ -87,7 +94,7 @@ var (
 		Validity:        false,
 	}
 	sampleClaim3 = api.Claim{
-		SourceUriDigest: uriDigest3,
+		SourceUriDigest: uriDigest4,
 		Summary:         "Sample claim summary 3",
 		Title:           "Sample Claim 3",
 		Uri:             "https://sample-claim-3",

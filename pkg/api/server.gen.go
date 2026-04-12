@@ -59,7 +59,7 @@ type Proof struct {
 type ProofInput struct {
 	ClaimUriDigest string `binding:"required" json:"claimUriDigest" validate:"nonempty,nospace"`
 	ReviewedBy     string `binding:"required" json:"reviewedBy" validate:"nonempty,nospace"`
-	SupportsClaim  bool   `binding:"required" json:"supportsClaim" validate:"nonempty"`
+	SupportsClaim  *bool  `binding:"required" json:"supportsClaim,omitempty" validate:"nonempty"`
 	Uri            string `binding:"required" json:"uri" validate:"httpsurl"`
 }
 

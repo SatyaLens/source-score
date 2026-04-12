@@ -29,7 +29,7 @@ var _ = Describe("Proof model tests", func() {
 		When("valid POST requests are sent to create proofs", func() {
 			It("should create the proofs and return their uri digests", func() {
 				// create source
-				srcBody, err := json.Marshal(sourceInput3)
+				srcBody, err := json.Marshal(sourceInput4)
 				Expect(err).To(BeNil())
 
 				resp, err := http.Post(srcEndpoint, "application/json", bytes.NewBuffer(srcBody))
@@ -39,7 +39,8 @@ var _ = Describe("Proof model tests", func() {
 				var srcResp api.CreateSourceResponse
 				err = json.NewDecoder(resp.Body).Decode(&srcResp)
 				Expect(err).To(BeNil())
-				resp.Body.Close()
+				defer resp.Body.Close()
+				Expect(srcResp.UriDigest).To(Equal(uriDigest4))
 
 				// create claim attached to that source
 				claimInput := api.ClaimInput{
@@ -64,9 +65,9 @@ var _ = Describe("Proof model tests", func() {
 
 				// create proof 1
 				proof1 := api.ProofInput{
-					ClaimUriDigest: claim3Digest,
+					ClaimUriDigest: sampleProof1.ClaimUriDigest,
 					ReviewedBy:     sampleProof1.ReviewedBy,
-					SupportsClaim:  sampleProof1.SupportsClaim,
+					SupportsClaim:  &sampleProof1.SupportsClaim,
 					Uri:            sampleProof1.Uri,
 				}
 				body1, err := json.Marshal(proof1)
@@ -87,7 +88,7 @@ var _ = Describe("Proof model tests", func() {
 				proof2 := api.ProofInput{
 					ClaimUriDigest: sampleProof2.ClaimUriDigest,
 					ReviewedBy:     sampleProof2.ReviewedBy,
-					SupportsClaim:  sampleProof2.SupportsClaim,
+					SupportsClaim:  &sampleProof2.SupportsClaim,
 					Uri:            sampleProof2.Uri,
 				}
 				body2, err := json.Marshal(proof2)
@@ -131,9 +132,8 @@ var _ = Describe("Proof model tests", func() {
 				var p api.Proof
 				err = json.NewDecoder(resp.Body).Decode(&p)
 				Expect(err).To(BeNil())
+				defer resp.Body.Close()
 				Expect(p.UriDigest).To(Equal(proof1Digest))
-				err = json.NewDecoder(resp.Body).Decode(&p)
-				Expect(err).To(BeNil())
 				Expect(p).To(Equal(sampleProof1))
 			})
 		})
