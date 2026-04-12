@@ -34,7 +34,7 @@ paths:
     post:
       tags:
       - source
-      operationId: createSource
+      operationId: postSource
       requestBody:
         content:
           application/json:
@@ -193,6 +193,94 @@ paths:
           description: claim updated
         404:
           description: claim not found
+
+  # proof paths
+  /api/v1/proofs:
+    get:
+      tags:
+      - proofs
+      operationId: getProofs
+      responses:
+        200:
+          description: returns all proofs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proof'
+
+  /api/v1/proof:
+    post:
+      tags:
+      - proof
+      operationId: postProof
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProofInput'
+      responses:
+        201:
+          description: proof created
+
+  /api/v1/proof/{uriDigest}:
+    get:
+      tags:
+      - proof
+      operationId: getProof
+      parameters:
+      - in: path
+        name: uriDigest
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: proof returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proof'
+        404:
+          description: proof not found
+
+    delete:
+      tags:
+      - proof
+      operationId: deleteProof
+      parameters:
+      - in: path
+        name: uriDigest
+        required: true
+        schema:
+          type: string
+      responses:
+        204:
+          description: proof deleted
+        404:
+          description: proof not found
+
+    patch:
+      tags:
+        - proof
+      operationId: patchProof
+      parameters:
+      - in: path
+        name: uriDigest
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProofPatchInput'
+      responses:
+        204:
+          description: proof updated
+        404:
+          description: proof not found
 
 components:
   schemas:
@@ -385,3 +473,73 @@ components:
           nullable: true
           x-oapi-codegen-extra-tags:
             validate: omitnil,nonempty
+
+    ProofInput:
+      type: object
+      required:
+      - claimUriDigest
+      - reviewedBy
+      - uri
+      properties:
+        claimUriDigest:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+            validate: nonempty,nospace
+        supportsClaim:
+          type: boolean
+          x-oapi-codegen-extra-tags:
+            binding: required
+            validate: nonempty
+        reviewedBy:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+            validate: nonempty,nospace
+        uri:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+            validate: httpsurl
+
+    Proof:
+      type: object
+      required:
+      - claimUriDigest
+      - supportsClaim
+      - reviewedBy
+      - uri
+      - uriDigest
+      properties:
+        claimUriDigest:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        supportsClaim:
+          type: boolean
+          x-oapi-codegen-extra-tags:
+            binding: required
+        reviewedBy:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        uri:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        uriDigest:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+            gorm: primaryKey
+
+    ProofPatchInput:
+      type: object
+      required:
+      - reviewedBy
+      properties:
+        reviewedBy:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+            validate: nonempty,nospace

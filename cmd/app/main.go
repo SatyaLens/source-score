@@ -14,6 +14,7 @@ import (
 	"source-score/pkg/conf"
 	"source-score/pkg/db/pgsql"
 	"source-score/pkg/domain/claim"
+	"source-score/pkg/domain/proof"
 	"source-score/pkg/domain/source"
 	"source-score/pkg/helpers"
 	apiServer "source-score/pkg/http"
@@ -66,10 +67,13 @@ func main() {
 	claimRepo := claim.NewClaimRepository(context.Background(), dbClient)
 	claimSvc := claim.NewClaimService(context.Background(), claimRepo)
 
+	proofRepo := proof.NewProofRepository(context.Background(), dbClient)
+	proofSvc := proof.NewProofService(context.Background(), proofRepo)
+
 	server := gin.Default()
 	api.RegisterHandlersWithOptions(
 		server,
-		apiServer.NewRouter(context.Background(), srcSvc, claimSvc),
+		apiServer.NewRouter(context.Background(), srcSvc, claimSvc, proofSvc),
 		loggerOpts,
 	)
 
