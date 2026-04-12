@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"source-score/pkg/api"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -187,6 +188,204 @@ var _ = Describe("Proof model tests", func() {
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+			})
+		})
+	})
+
+	Context("Validation tests", func() {
+		When("POST request with space in ClaimUriDigest is sent", func() {
+			It("should return 400 with validation error mentioning nospace", func() {
+				supports := true
+				proof := api.ProofInput{
+					ClaimUriDigest: "claim digest",
+					ReviewedBy:     "ValidReviewer",
+					SupportsClaim:  &supports,
+					Uri:            "https://example.com",
+				}
+				body, err := json.Marshal(proof)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("claimuridigest"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("nospace"))
+			})
+		})
+
+		When("POST request with space in ReviewedBy is sent", func() {
+			It("should return 400 with validation error mentioning nospace", func() {
+				supports := true
+				proof := api.ProofInput{
+					ClaimUriDigest: "validclaimdigest",
+					ReviewedBy:     "Reviewer Name",
+					SupportsClaim:  &supports,
+					Uri:            "https://example.com",
+				}
+				body, err := json.Marshal(proof)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("reviewedby"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("nospace"))
+			})
+		})
+
+		When("POST request with empty ReviewedBy and ClaimUriDigest is sent", func() {
+			It("should return 400 with validation error mentioning nonempty", func() {
+				supports := true
+				proof := api.ProofInput{
+					ClaimUriDigest: "",
+					ReviewedBy:     "",
+					SupportsClaim:  &supports,
+					Uri:            "https://example.com",
+				}
+				body, err := json.Marshal(proof)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("claimuridigest"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("reviewedby"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("required"))
+			})
+		})
+
+		When("POST request without SupportsClaim is sent", func() {
+			It("should return 400 with validation error mentioning supportsClaim", func() {
+				proof := api.ProofInput{
+					ClaimUriDigest: "validclaimdigest",
+					ReviewedBy:     "ValidReviewer",
+					Uri:            "https://example.com",
+				}
+				body, err := json.Marshal(proof)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("supportsclaim"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("required"))
+			})
+		})
+
+		When("POST request with invalid url in Uri is sent", func() {
+			It("should return 400 with validation error mentioning httpsurl", func() {
+				supports := true
+				proof := api.ProofInput{
+					ClaimUriDigest: "validclaimdigest",
+					ReviewedBy:     "ValidReviewer",
+					SupportsClaim:  &supports,
+					Uri:            "http://not-https.com",
+				}
+				body, err := json.Marshal(proof)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("uri"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("httpsurl"))
+			})
+		})
+
+		When("DELETE request is sent for a non-existent proof", func() {
+			It("should return 404 with proof not found error", func() {
+				proofUrl, err := url.JoinPath(endpoint, "doesnotexist")
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodDelete, proofUrl, nil)
+				Expect(err).To(BeNil())
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("proof not found"))
+			})
+		})
+
+		When("PATCH request with empty ReviewedBy is sent", func() {
+			It("should return 400 with validation error mentioning nonempty", func() {
+				proofUrl, err := url.JoinPath(endpoint, proof1Digest)
+				Expect(err).To(BeNil())
+
+				patchBody := api.ProofPatchInput{ReviewedBy: ""}
+				body, err := json.Marshal(patchBody)
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodPatch, proofUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("reviewedby"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("required"))
+			})
+		})
+
+		When("PATCH request with space in ReviewedBy value is sent", func() {
+			It("should return 400 with validation error mentioning nospace", func() {
+				proofUrl, err := url.JoinPath(endpoint, proof1Digest)
+				Expect(err).To(BeNil())
+
+				patchBody := api.ProofPatchInput{ReviewedBy: "Reviewer Name"}
+				body, err := json.Marshal(patchBody)
+				Expect(err).To(BeNil())
+
+				req, err := http.NewRequest(http.MethodPatch, proofUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				req.Header.Set("Content-Type", "application/json")
+
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("reviewedby"))
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("nospace"))
 			})
 		})
 	})
