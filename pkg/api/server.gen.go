@@ -36,6 +36,11 @@ type ClaimPatchInput struct {
 	Title   *string `json:"title" validate:"omitnil,nonempty"`
 }
 
+// ClaimVerification defines model for ClaimVerification.
+type ClaimVerification struct {
+	Validity *bool `binding:"required" json:"validity,omitempty" validate:"nonempty"`
+}
+
 // CreateSourceResponse defines model for CreateSourceResponse.
 type CreateSourceResponse struct {
 	UriDigest string `binding:"required" json:"uriDigest"`
@@ -99,6 +104,9 @@ type PostClaimJSONRequestBody = ClaimInput
 // PatchClaimJSONRequestBody defines body for PatchClaim for application/json ContentType.
 type PatchClaimJSONRequestBody = ClaimPatchInput
 
+// VerifyClaimJSONRequestBody defines body for VerifyClaim for application/json ContentType.
+type VerifyClaimJSONRequestBody = ClaimVerification
+
 // PostProofJSONRequestBody defines body for PostProof for application/json ContentType.
 type PostProofJSONRequestBody = ProofInput
 
@@ -125,6 +133,9 @@ type ServerInterface interface {
 
 	// (PATCH /api/v1/claim/{uriDigest})
 	PatchClaim(c *gin.Context, uriDigest string)
+
+	// (POST /api/v1/claim/{uriDigest})
+	VerifyClaim(c *gin.Context, uriDigest string)
 
 	// (GET /api/v1/claims)
 	GetClaims(c *gin.Context)
@@ -255,6 +266,30 @@ func (siw *ServerInterfaceWrapper) PatchClaim(c *gin.Context) {
 	}
 
 	siw.Handler.PatchClaim(c, uriDigest)
+}
+
+// VerifyClaim operation middleware
+func (siw *ServerInterfaceWrapper) VerifyClaim(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.VerifyClaim(c, uriDigest)
 }
 
 // GetClaims operation middleware
@@ -510,6 +545,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.DeleteClaim)
 	router.GET(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.GetClaim)
 	router.PATCH(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.PatchClaim)
+	router.POST(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.VerifyClaim)
 	router.GET(options.BaseURL+"/api/v1/claims", wrapper.GetClaims)
 	router.POST(options.BaseURL+"/api/v1/proof", wrapper.PostProof)
 	router.DELETE(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.DeleteProof)

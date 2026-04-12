@@ -97,6 +97,24 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
 			})
 		})
+
+		When("Validating a claim by its uri digest", func() {
+			It("Should update the claim's checked and validity fields", func() {
+				validity := true
+				verification := &api.ClaimVerification{
+					Validity: &validity,
+				}
+
+				err := claimRepo.VerifyClaimByUriDigest(context.TODO(), verification, claim2Digest)
+				Expect(err).ToNot(HaveOccurred())
+
+				validated, err := claimRepo.GetClaimByUriDigest(context.TODO(), claim2Digest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(validated).ToNot(BeNil())
+				Expect(validated.Checked).To(BeTrue())
+				Expect(validated.Validity).To(BeTrue())
+			})
+		})
 	})
 
 	Context("Validation tests", func() {
@@ -114,6 +132,17 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				patchInput := &api.ClaimPatchInput{Title: &newTitle}
 
 				err := claimRepo.PatchClaimByUriDigest(context.TODO(), patchInput, "doesnotexist")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
+			})
+		})
+
+		When("Validating a non-existent claim by uri digest", func() {
+			It("Should return gorm.ErrRecordNotFound", func() {
+				validity := true
+				verification := &api.ClaimVerification{Validity: &validity}
+
+				err := claimRepo.VerifyClaimByUriDigest(context.TODO(), verification, "doesnotexist")
 				Expect(err).To(HaveOccurred())
 				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
 			})

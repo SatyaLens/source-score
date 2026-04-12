@@ -21,6 +21,7 @@ type ClaimService interface {
 	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
 	DeleteClaimByUriDigest(ctx context.Context, uriDigest string) error
 	PatchClaimByUriDigest(ctx context.Context, claimInput *api.ClaimPatchInput, uriDigest string) error
+	VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
 }
 
 type claimService struct {
@@ -109,4 +110,27 @@ func (svc *claimService) PostClaim(ctx context.Context, claimInput *api.ClaimInp
 	}
 
 	return svc.claimRepo.PostClaim(ctx, claimInput)
+}
+
+func (svc *claimService) VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error {
+	err := claimValidate.Struct(claimVerification)
+	if err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			return fmt.Errorf("%w: %s", apperrors.ErrValidationLogic, err.Error())
+		}
+		combinedErrs := ""
+		for _, e := range err.(validator.ValidationErrors) {
+			combinedErrs = fmt.Sprintf(
+				"%s\n%s validation failed for value %v with error %s", combinedErrs, e.Field(), e.Value(), e.Tag(),
+			)
+		}
+		combinedErrs = strings.TrimSpace(combinedErrs)
+		return fmt.Errorf("%w: %s", apperrors.ErrInvalidClaimVerification, combinedErrs)
+	}
+
+	err = svc.claimRepo.VerifyClaimByUriDigest(ctx, claimVerification, uriDigest)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("%w: %s", apperrors.ErrClaimNotFound, err.Error())
+	}
+	return err
 }
