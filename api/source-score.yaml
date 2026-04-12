@@ -194,6 +194,25 @@ paths:
         404:
           description: claim not found
 
+    post:
+      tags:
+      - claim
+      operationId: verifyClaim
+      parameters:
+      - in: path
+        name: uriDigest
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimVerification'
+      responses:
+        200:
+          description: claim verified
+
   # proof paths
   /api/v1/proofs:
     get:
@@ -543,3 +562,12 @@ components:
           x-oapi-codegen-extra-tags:
             binding: required
             validate: nonempty,nospace
+
+    ClaimVerification:
+      type: object
+      properties:
+        validity:
+          type: boolean
+          x-oapi-codegen-extra-tags:
+            binding: required
+            validate: nonempty

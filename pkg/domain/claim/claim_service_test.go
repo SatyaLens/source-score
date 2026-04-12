@@ -155,6 +155,26 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 			})
 
 		})
+
+		When("Validating a claim by its uri digest", func() {
+			It("Should validate the claim via repository with validity false", func() {
+				validity := false
+				verification := &api.ClaimVerification{
+					Validity: &validity,
+				}
+
+				before := fakeClaimRepo.ValidateClaimByUriDigestCallCount()
+				fakeClaimRepo.ValidateClaimByUriDigestReturns(nil)
+
+				err := claimSvc.ValidateClaimByUriDigest(context.TODO(), verification, claim2Digest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeClaimRepo.ValidateClaimByUriDigestCallCount()).To(Equal(before + 1))
+				_, argVerification, argDigest := fakeClaimRepo.ValidateClaimByUriDigestArgsForCall(before)
+				Expect(argDigest).To(Equal(claim2Digest))
+				Expect(argVerification.Validity).ToNot(BeNil())
+				Expect(*argVerification.Validity).To(BeFalse())
+			})
+		})
 	})
 
 	Context("Validation tests", func() {
@@ -266,5 +286,34 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 			})
 		})
 
+		When("Validating a claim without Validity field", func() {
+			It("Should return ErrInvalidClaimVerification and not call repo", func() {
+				verification := &api.ClaimVerification{
+					Validity: nil,
+				}
+				before := fakeClaimRepo.ValidateClaimByUriDigestCallCount()
+
+				err := claimSvc.ValidateClaimByUriDigest(context.TODO(), verification, claim1Digest)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, apperrors.ErrInvalidClaimVerification)).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "validity")).To(BeTrue())
+				Expect(strings.Contains(strings.ToLower(err.Error()), "nonempty")).To(BeTrue())
+				Expect(fakeClaimRepo.ValidateClaimByUriDigestCallCount()).To(Equal(before))
+			})
+		})
+
+		When("Validating a non-existent claim by uri digest", func() {
+			It("Should return ErrClaimNotFound", func() {
+				validity := true
+				verification := &api.ClaimVerification{Validity: &validity}
+				before := fakeClaimRepo.ValidateClaimByUriDigestCallCount()
+				fakeClaimRepo.ValidateClaimByUriDigestReturns(gorm.ErrRecordNotFound)
+
+				err := claimSvc.ValidateClaimByUriDigest(context.TODO(), verification, "doesnotexist")
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, apperrors.ErrClaimNotFound)).To(BeTrue())
+				Expect(fakeClaimRepo.ValidateClaimByUriDigestCallCount()).To(Equal(before + 1))
+			})
+		})
 	})
 })

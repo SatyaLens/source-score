@@ -18,6 +18,7 @@ type ClaimRepository interface {
 	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
 	DeleteClaimByUriDigest(ctx context.Context, claim *api.Claim) error
 	PatchClaimByUriDigest(ctx context.Context, claimInput *api.ClaimPatchInput, uriDigest string) error
+	ValidateClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
 }
 
 type claimRepository struct {
@@ -106,6 +107,24 @@ func (cr *claimRepository) PatchClaimByUriDigest(ctx context.Context, claimInput
 	if claimInput.Title != nil {
 		claim.Title = *claimInput.Title
 	}
+
+	result = cr.client.Update(ctx, claim)
+	slog.InfoContext(ctx, fmt.Sprintf("%d rows affected\n", result.RowsAffected))
+
+	return result.Error
+}
+
+func (cr *claimRepository) ValidateClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error {
+	claim := &api.Claim{}
+	claim.UriDigest = uriDigest
+
+	result := cr.client.FindFirst(ctx, claim)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	claim.Checked = true
+	claim.Validity = *claimVerification.Validity
 
 	result = cr.client.Update(ctx, claim)
 	slog.InfoContext(ctx, fmt.Sprintf("%d rows affected\n", result.RowsAffected))
