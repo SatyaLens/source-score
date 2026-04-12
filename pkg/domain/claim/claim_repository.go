@@ -18,7 +18,7 @@ type ClaimRepository interface {
 	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
 	DeleteClaimByUriDigest(ctx context.Context, claim *api.Claim) error
 	PatchClaimByUriDigest(ctx context.Context, claimInput *api.ClaimPatchInput, uriDigest string) error
-	ValidateClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
+	VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
 }
 
 type claimRepository struct {
@@ -114,7 +114,7 @@ func (cr *claimRepository) PatchClaimByUriDigest(ctx context.Context, claimInput
 	return result.Error
 }
 
-func (cr *claimRepository) ValidateClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error {
+func (cr *claimRepository) VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error {
 	claim := &api.Claim{}
 	claim.UriDigest = uriDigest
 

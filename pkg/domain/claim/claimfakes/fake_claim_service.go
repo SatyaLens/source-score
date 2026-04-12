@@ -75,17 +75,17 @@ type FakeClaimService struct {
 		result1 string
 		result2 error
 	}
-	ValidateClaimByUriDigestStub        func(context.Context, *api.ClaimVerification, string) error
-	validateClaimByUriDigestMutex       sync.RWMutex
-	validateClaimByUriDigestArgsForCall []struct {
+	VerifyClaimByUriDigestStub        func(context.Context, *api.ClaimVerification, string) error
+	verifyClaimByUriDigestMutex       sync.RWMutex
+	verifyClaimByUriDigestArgsForCall []struct {
 		arg1 context.Context
 		arg2 *api.ClaimVerification
 		arg3 string
 	}
-	validateClaimByUriDigestReturns struct {
+	verifyClaimByUriDigestReturns struct {
 		result1 error
 	}
-	validateClaimByUriDigestReturnsOnCall map[int]struct {
+	verifyClaimByUriDigestReturnsOnCall map[int]struct {
 		result1 error
 	}
 	invocations      map[string][][]interface{}
@@ -411,18 +411,18 @@ func (fake *FakeClaimService) PostClaimReturnsOnCall(i int, result1 string, resu
 	}{result1, result2}
 }
 
-func (fake *FakeClaimService) ValidateClaimByUriDigest(arg1 context.Context, arg2 *api.ClaimVerification, arg3 string) error {
-	fake.validateClaimByUriDigestMutex.Lock()
-	ret, specificReturn := fake.validateClaimByUriDigestReturnsOnCall[len(fake.validateClaimByUriDigestArgsForCall)]
-	fake.validateClaimByUriDigestArgsForCall = append(fake.validateClaimByUriDigestArgsForCall, struct {
+func (fake *FakeClaimService) VerifyClaimByUriDigest(arg1 context.Context, arg2 *api.ClaimVerification, arg3 string) error {
+	fake.verifyClaimByUriDigestMutex.Lock()
+	ret, specificReturn := fake.verifyClaimByUriDigestReturnsOnCall[len(fake.verifyClaimByUriDigestArgsForCall)]
+	fake.verifyClaimByUriDigestArgsForCall = append(fake.verifyClaimByUriDigestArgsForCall, struct {
 		arg1 context.Context
 		arg2 *api.ClaimVerification
 		arg3 string
 	}{arg1, arg2, arg3})
-	stub := fake.ValidateClaimByUriDigestStub
-	fakeReturns := fake.validateClaimByUriDigestReturns
-	fake.recordInvocation("ValidateClaimByUriDigest", []interface{}{arg1, arg2, arg3})
-	fake.validateClaimByUriDigestMutex.Unlock()
+	stub := fake.VerifyClaimByUriDigestStub
+	fakeReturns := fake.verifyClaimByUriDigestReturns
+	fake.recordInvocation("VerifyClaimByUriDigest", []interface{}{arg1, arg2, arg3})
+	fake.verifyClaimByUriDigestMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2, arg3)
 	}
@@ -432,44 +432,44 @@ func (fake *FakeClaimService) ValidateClaimByUriDigest(arg1 context.Context, arg
 	return fakeReturns.result1
 }
 
-func (fake *FakeClaimService) ValidateClaimByUriDigestCallCount() int {
-	fake.validateClaimByUriDigestMutex.RLock()
-	defer fake.validateClaimByUriDigestMutex.RUnlock()
-	return len(fake.validateClaimByUriDigestArgsForCall)
+func (fake *FakeClaimService) VerifyClaimByUriDigestCallCount() int {
+	fake.verifyClaimByUriDigestMutex.RLock()
+	defer fake.verifyClaimByUriDigestMutex.RUnlock()
+	return len(fake.verifyClaimByUriDigestArgsForCall)
 }
 
-func (fake *FakeClaimService) ValidateClaimByUriDigestCalls(stub func(context.Context, *api.ClaimVerification, string) error) {
-	fake.validateClaimByUriDigestMutex.Lock()
-	defer fake.validateClaimByUriDigestMutex.Unlock()
-	fake.ValidateClaimByUriDigestStub = stub
+func (fake *FakeClaimService) VerifyClaimByUriDigestCalls(stub func(context.Context, *api.ClaimVerification, string) error) {
+	fake.verifyClaimByUriDigestMutex.Lock()
+	defer fake.verifyClaimByUriDigestMutex.Unlock()
+	fake.VerifyClaimByUriDigestStub = stub
 }
 
-func (fake *FakeClaimService) ValidateClaimByUriDigestArgsForCall(i int) (context.Context, *api.ClaimVerification, string) {
-	fake.validateClaimByUriDigestMutex.RLock()
-	defer fake.validateClaimByUriDigestMutex.RUnlock()
-	argsForCall := fake.validateClaimByUriDigestArgsForCall[i]
+func (fake *FakeClaimService) VerifyClaimByUriDigestArgsForCall(i int) (context.Context, *api.ClaimVerification, string) {
+	fake.verifyClaimByUriDigestMutex.RLock()
+	defer fake.verifyClaimByUriDigestMutex.RUnlock()
+	argsForCall := fake.verifyClaimByUriDigestArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeClaimService) ValidateClaimByUriDigestReturns(result1 error) {
-	fake.validateClaimByUriDigestMutex.Lock()
-	defer fake.validateClaimByUriDigestMutex.Unlock()
-	fake.ValidateClaimByUriDigestStub = nil
-	fake.validateClaimByUriDigestReturns = struct {
+func (fake *FakeClaimService) VerifyClaimByUriDigestReturns(result1 error) {
+	fake.verifyClaimByUriDigestMutex.Lock()
+	defer fake.verifyClaimByUriDigestMutex.Unlock()
+	fake.VerifyClaimByUriDigestStub = nil
+	fake.verifyClaimByUriDigestReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeClaimService) ValidateClaimByUriDigestReturnsOnCall(i int, result1 error) {
-	fake.validateClaimByUriDigestMutex.Lock()
-	defer fake.validateClaimByUriDigestMutex.Unlock()
-	fake.ValidateClaimByUriDigestStub = nil
-	if fake.validateClaimByUriDigestReturnsOnCall == nil {
-		fake.validateClaimByUriDigestReturnsOnCall = make(map[int]struct {
+func (fake *FakeClaimService) VerifyClaimByUriDigestReturnsOnCall(i int, result1 error) {
+	fake.verifyClaimByUriDigestMutex.Lock()
+	defer fake.verifyClaimByUriDigestMutex.Unlock()
+	fake.VerifyClaimByUriDigestStub = nil
+	if fake.verifyClaimByUriDigestReturnsOnCall == nil {
+		fake.verifyClaimByUriDigestReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.validateClaimByUriDigestReturnsOnCall[i] = struct {
+	fake.verifyClaimByUriDigestReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }

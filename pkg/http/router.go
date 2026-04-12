@@ -78,6 +78,10 @@ func (r *router) PatchClaim(ctx *gin.Context, claimDigest string) {
 	r.claimHandler.PatchClaimByUriDigest(ctx, claimDigest)
 }
 
+func (r *router) VerifyClaim(ctx *gin.Context, claimDigest string) {
+	r.claimHandler.ValidateClaimByUriDigest(ctx, claimDigest)
+}
+
 func (r *router) PostProof(ctx *gin.Context) {
 	r.proofHandler.PostProof(ctx)
 }

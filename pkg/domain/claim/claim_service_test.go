@@ -163,13 +163,13 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 					Validity: &validity,
 				}
 
-				before := fakeClaimRepo.ValidateClaimByUriDigestCallCount()
-				fakeClaimRepo.ValidateClaimByUriDigestReturns(nil)
+				before := fakeClaimRepo.VerifyClaimByUriDigestCallCount()
+				fakeClaimRepo.VerifyClaimByUriDigestReturns(nil)
 
-				err := claimSvc.ValidateClaimByUriDigest(context.TODO(), verification, claim2Digest)
+				err := claimSvc.VerifyClaimByUriDigest(context.TODO(), verification, claim2Digest)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(fakeClaimRepo.ValidateClaimByUriDigestCallCount()).To(Equal(before + 1))
-				_, argVerification, argDigest := fakeClaimRepo.ValidateClaimByUriDigestArgsForCall(before)
+				Expect(fakeClaimRepo.VerifyClaimByUriDigestCallCount()).To(Equal(before + 1))
+				_, argVerification, argDigest := fakeClaimRepo.VerifyClaimByUriDigestArgsForCall(before)
 				Expect(argDigest).To(Equal(claim2Digest))
 				Expect(argVerification.Validity).ToNot(BeNil())
 				Expect(*argVerification.Validity).To(BeFalse())
@@ -291,14 +291,14 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				verification := &api.ClaimVerification{
 					Validity: nil,
 				}
-				before := fakeClaimRepo.ValidateClaimByUriDigestCallCount()
+				before := fakeClaimRepo.VerifyClaimByUriDigestCallCount()
 
-				err := claimSvc.ValidateClaimByUriDigest(context.TODO(), verification, claim1Digest)
+				err := claimSvc.VerifyClaimByUriDigest(context.TODO(), verification, claim1Digest)
 				Expect(err).To(HaveOccurred())
 				Expect(errors.Is(err, apperrors.ErrInvalidClaimVerification)).To(BeTrue())
 				Expect(strings.Contains(strings.ToLower(err.Error()), "validity")).To(BeTrue())
 				Expect(strings.Contains(strings.ToLower(err.Error()), "nonempty")).To(BeTrue())
-				Expect(fakeClaimRepo.ValidateClaimByUriDigestCallCount()).To(Equal(before))
+				Expect(fakeClaimRepo.VerifyClaimByUriDigestCallCount()).To(Equal(before))
 			})
 		})
 
@@ -306,13 +306,13 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 			It("Should return ErrClaimNotFound", func() {
 				validity := true
 				verification := &api.ClaimVerification{Validity: &validity}
-				before := fakeClaimRepo.ValidateClaimByUriDigestCallCount()
-				fakeClaimRepo.ValidateClaimByUriDigestReturns(gorm.ErrRecordNotFound)
+				before := fakeClaimRepo.VerifyClaimByUriDigestCallCount()
+				fakeClaimRepo.VerifyClaimByUriDigestReturns(gorm.ErrRecordNotFound)
 
-				err := claimSvc.ValidateClaimByUriDigest(context.TODO(), verification, "doesnotexist")
+				err := claimSvc.VerifyClaimByUriDigest(context.TODO(), verification, "doesnotexist")
 				Expect(err).To(HaveOccurred())
 				Expect(errors.Is(err, apperrors.ErrClaimNotFound)).To(BeTrue())
-				Expect(fakeClaimRepo.ValidateClaimByUriDigestCallCount()).To(Equal(before + 1))
+				Expect(fakeClaimRepo.VerifyClaimByUriDigestCallCount()).To(Equal(before + 1))
 			})
 		})
 	})

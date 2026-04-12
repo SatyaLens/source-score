@@ -105,7 +105,7 @@ var _ = Describe("Claim repository layer unit tests", func() {
 					Validity: &validity,
 				}
 
-				err := claimRepo.ValidateClaimByUriDigest(context.TODO(), verification, claim2Digest)
+				err := claimRepo.VerifyClaimByUriDigest(context.TODO(), verification, claim2Digest)
 				Expect(err).ToNot(HaveOccurred())
 
 				validated, err := claimRepo.GetClaimByUriDigest(context.TODO(), claim2Digest)
@@ -142,7 +142,7 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				validity := true
 				verification := &api.ClaimVerification{Validity: &validity}
 
-				err := claimRepo.ValidateClaimByUriDigest(context.TODO(), verification, "doesnotexist")
+				err := claimRepo.VerifyClaimByUriDigest(context.TODO(), verification, "doesnotexist")
 				Expect(err).To(HaveOccurred())
 				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
 			})
