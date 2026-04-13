@@ -173,6 +173,9 @@ type ServerInterface interface {
 	// (GET /api/v1/sources)
 	GetSources(c *gin.Context)
 
+	// (POST /api/v1/sources/scores)
+	UpdateScores(c *gin.Context)
+
 	// (GET /ping)
 	GetPing(c *gin.Context)
 }
@@ -517,6 +520,19 @@ func (siw *ServerInterfaceWrapper) GetSources(c *gin.Context) {
 	siw.Handler.GetSources(c)
 }
 
+// UpdateScores operation middleware
+func (siw *ServerInterfaceWrapper) UpdateScores(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UpdateScores(c)
+}
+
 // GetPing operation middleware
 func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
 
@@ -574,5 +590,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.GetSource)
 	router.PATCH(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.PatchSource)
 	router.GET(options.BaseURL+"/api/v1/sources", wrapper.GetSources)
+	router.POST(options.BaseURL+"/api/v1/sources/scores", wrapper.UpdateScores)
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 }

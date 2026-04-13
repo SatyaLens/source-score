@@ -30,6 +30,17 @@ paths:
                 items:
                   $ref: '#/components/schemas/Source'
 
+  /api/v1/sources/scores:
+    post:
+      tags:
+      - sources
+      operationId: updateScores
+      responses:
+        202:
+          description: score update triggered
+        409:
+          description: score calculation in progress
+
   /api/v1/source:
     post:
       tags:
