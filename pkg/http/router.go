@@ -78,6 +78,10 @@ func (r *router) PatchClaim(ctx *gin.Context, claimDigest string) {
 	r.claimHandler.PatchClaimByUriDigest(ctx, claimDigest)
 }
 
+func (r *router) VerifyAllClaims(ctx *gin.Context) {
+	r.claimHandler.VerifyAllClaims(ctx)
+}
+
 func (r *router) VerifyClaim(ctx *gin.Context, claimDigest string) {
 	// TODO: remove if individual claim verification is not required
 	// r.claimHandler.ValidateClaimByUriDigest(ctx, claimDigest)

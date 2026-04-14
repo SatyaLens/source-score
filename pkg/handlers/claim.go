@@ -174,3 +174,19 @@ func (ch *ClaimHandler) ValidateClaimByUriDigest(ctx *gin.Context, uriDigest str
 
 	ctx.Status(http.StatusNoContent)
 }
+
+func (ch *ClaimHandler) VerifyAllClaims(ctx *gin.Context) {
+	if err := ch.claimSvc.VerifyAllClaims(ctx); err != nil {
+		switch {
+		// TODO: handle error when verification is already running
+		default:
+			ctx.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": err.Error()},
+			)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusAccepted)
+}

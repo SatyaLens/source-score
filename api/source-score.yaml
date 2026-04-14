@@ -127,7 +127,7 @@ paths:
     post:
       tags:
       - claims
-      operationId: verifyClaims
+      operationId: verifyAllClaims
       responses:
         202:
           description: claims verification triggered
