@@ -23,6 +23,7 @@ type ClaimService interface {
 	DeleteClaimByUriDigest(ctx context.Context, uriDigest string) error
 	PatchClaimByUriDigest(ctx context.Context, claimInput *api.ClaimPatchInput, uriDigest string) error
 	VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
+	VerifyAllClaims(ctx context.Context) error
 }
 
 type claimService struct {
@@ -178,7 +179,10 @@ func (svc *claimService) VerifyAllClaims(ctx context.Context) error {
 	}
 
 	if len(updatedClaims) > 0 {
-		
+		err = svc.claimRepo.VerifyClaims(ctx, updatedClaims)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
