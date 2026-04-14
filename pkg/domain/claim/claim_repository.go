@@ -21,6 +21,7 @@ type ClaimRepository interface {
 	PatchClaimByUriDigest(ctx context.Context, claimInput *api.ClaimPatchInput, uriDigest string) error
 	VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
 	VerifyClaims(ctx context.Context, updatedClaims []api.Claim) error
+	GetClaimsBySources(ctx context.Context) (map[string][]api.Claim, error)
 }
 
 type claimRepository struct {
@@ -156,4 +157,23 @@ func (cr *claimRepository) VerifyClaims(ctx context.Context, updatedClaims []api
 
 	fmt.Printf("rows updated: %d\n", result.RowsAffected)
 	return nil
+}
+
+func (cr *claimRepository) GetClaimsBySources(ctx context.Context) (map[string][]api.Claim, error) {
+	srcClaims := make(map[string][]api.Claim)
+	allClaims, err := cr.GetClaims(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, claim := range allClaims {
+		if claims, ok := srcClaims[claim.SourceUriDigest]; ok {
+			srcClaims[claim.SourceUriDigest] = append(claims, claim)
+		} else {
+			srcClaims[claim.SourceUriDigest] = []api.Claim{claim}
+		}
+	}
+
+	return srcClaims, nil
 }

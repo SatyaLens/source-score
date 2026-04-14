@@ -54,6 +54,20 @@ var _ = Describe("Claim repository layer unit tests", func() {
 			})
 		})
 
+		When("Getting claims grouped by sources", func() {
+			It("Should return a map of source uri digests to their claims", func() {
+				srcClaims, err := claimRepo.GetClaimsBySources(context.TODO())
+				Expect(err).ToNot(HaveOccurred())
+				Expect(srcClaims).ToNot(BeNil())
+
+				// verify the map contains the source digest
+				claims, exists := srcClaims[srcDigest]
+				Expect(exists).To(BeTrue())
+				Expect(len(claims)).To(Equal(2))
+				Expect(claims).To(ContainElements(sampleClaim1, sampleClaim2))
+			})
+		})
+
 		When("Retrieving a single claim by uri digest", func() {
 			It("Should return the matching claim record", func() {
 				claim, err := claimRepo.GetClaimByUriDigest(context.TODO(), claim1Digest)
@@ -80,21 +94,6 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				Expect(updated).ToNot(BeNil())
 				Expect(updated.Summary).To(Equal(newSummary))
 				Expect(updated.Title).To(Equal(newTitle))
-			})
-		})
-
-		When("Deleting a claim by its uri digest", func() {
-			It("Should delete the correct claim record from the DB", func() {
-				claim := &api.Claim{
-					UriDigest: claim1Digest,
-				}
-
-				err := claimRepo.DeleteClaimByUriDigest(context.TODO(), claim)
-				Expect(err).ToNot(HaveOccurred())
-
-				_, err = claimRepo.GetClaimByUriDigest(context.TODO(), claim1Digest)
-				Expect(err).To(HaveOccurred())
-				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
 			})
 		})
 
@@ -191,6 +190,21 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				Expect(claim5.Validity).To(BeFalse())
 				Expect(claim5.Title).To(Equal(claim5Input.Title))
 				Expect(claim5.Summary).To(Equal(claim5Input.Summary))
+			})
+		})
+
+		When("Deleting a claim by its uri digest", func() {
+			It("Should delete the correct claim record from the DB", func() {
+				claim := &api.Claim{
+					UriDigest: claim1Digest,
+				}
+
+				err := claimRepo.DeleteClaimByUriDigest(context.TODO(), claim)
+				Expect(err).ToNot(HaveOccurred())
+
+				_, err = claimRepo.GetClaimByUriDigest(context.TODO(), claim1Digest)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrRecordNotFound)).To(BeTrue())
 			})
 		})
 	})

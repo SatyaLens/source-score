@@ -1,9 +1,9 @@
 CREATE TABLE
     sources (
         name TEXT,
-        score SMALLINT DEFAULT 0 CHECK (
+        score FLOAT DEFAULT 0 CHECK (
             score >= 0
-            AND score <= 100
+            AND score <= 1
         ),
         uri_digest TEXT PRIMARY KEY,
         summary TEXT,

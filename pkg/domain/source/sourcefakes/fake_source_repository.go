@@ -75,6 +75,18 @@ type FakeSourceRepository struct {
 		result1 string
 		result2 error
 	}
+	UpdateSourceScoresStub        func(context.Context, *[]api.Source) error
+	updateSourceScoresMutex       sync.RWMutex
+	updateSourceScoresArgsForCall []struct {
+		arg1 context.Context
+		arg2 *[]api.Source
+	}
+	updateSourceScoresReturns struct {
+		result1 error
+	}
+	updateSourceScoresReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -396,6 +408,68 @@ func (fake *FakeSourceRepository) PostSourceReturnsOnCall(i int, result1 string,
 		result1 string
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeSourceRepository) UpdateSourceScores(arg1 context.Context, arg2 *[]api.Source) error {
+	fake.updateSourceScoresMutex.Lock()
+	ret, specificReturn := fake.updateSourceScoresReturnsOnCall[len(fake.updateSourceScoresArgsForCall)]
+	fake.updateSourceScoresArgsForCall = append(fake.updateSourceScoresArgsForCall, struct {
+		arg1 context.Context
+		arg2 *[]api.Source
+	}{arg1, arg2})
+	stub := fake.UpdateSourceScoresStub
+	fakeReturns := fake.updateSourceScoresReturns
+	fake.recordInvocation("UpdateSourceScores", []interface{}{arg1, arg2})
+	fake.updateSourceScoresMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeSourceRepository) UpdateSourceScoresCallCount() int {
+	fake.updateSourceScoresMutex.RLock()
+	defer fake.updateSourceScoresMutex.RUnlock()
+	return len(fake.updateSourceScoresArgsForCall)
+}
+
+func (fake *FakeSourceRepository) UpdateSourceScoresCalls(stub func(context.Context, *[]api.Source) error) {
+	fake.updateSourceScoresMutex.Lock()
+	defer fake.updateSourceScoresMutex.Unlock()
+	fake.UpdateSourceScoresStub = stub
+}
+
+func (fake *FakeSourceRepository) UpdateSourceScoresArgsForCall(i int) (context.Context, *[]api.Source) {
+	fake.updateSourceScoresMutex.RLock()
+	defer fake.updateSourceScoresMutex.RUnlock()
+	argsForCall := fake.updateSourceScoresArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeSourceRepository) UpdateSourceScoresReturns(result1 error) {
+	fake.updateSourceScoresMutex.Lock()
+	defer fake.updateSourceScoresMutex.Unlock()
+	fake.UpdateSourceScoresStub = nil
+	fake.updateSourceScoresReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeSourceRepository) UpdateSourceScoresReturnsOnCall(i int, result1 error) {
+	fake.updateSourceScoresMutex.Lock()
+	defer fake.updateSourceScoresMutex.Unlock()
+	fake.UpdateSourceScoresStub = nil
+	if fake.updateSourceScoresReturnsOnCall == nil {
+		fake.updateSourceScoresReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.updateSourceScoresReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeSourceRepository) Invocations() map[string][][]interface{} {

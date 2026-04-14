@@ -109,6 +109,69 @@ var _ = Describe("Source model repository layer unit tests", Ordered, func() {
 				Expect(err.Error()).To(ContainSubstring("record not found"))
 			})
 		})
+
+		When("Updating scores for multiple sources", func() {
+			It("Should update only the score field for all provided sources", func() {
+				// Create 3 new sources
+				source5Input := api.SourceInput{
+					Name:    "Sample Source 5",
+					Summary: "Sample summary 5",
+					Tags:    "tag3",
+					Uri:     "https://sample-uri-5",
+				}
+				digest5, err := sourceRepo.PostSource(context.TODO(), &source5Input)
+				Expect(err).ToNot(HaveOccurred())
+
+				source6Input := api.SourceInput{
+					Name:    "Sample Source 6",
+					Summary: "Sample summary 6",
+					Tags:    "tag4",
+					Uri:     "https://sample-uri-6",
+				}
+				digest6, err := sourceRepo.PostSource(context.TODO(), &source6Input)
+				Expect(err).ToNot(HaveOccurred())
+
+				source7Input := api.SourceInput{
+					Name:    "Sample Source 7",
+					Summary: "Sample summary 7",
+					Tags:    "tag5",
+					Uri:     "https://sample-uri-7",
+				}
+				digest7, err := sourceRepo.PostSource(context.TODO(), &source7Input)
+				Expect(err).ToNot(HaveOccurred())
+
+				// Prepare updated sources with new scores
+				updatedSources := []api.Source{
+					{UriDigest: digest5, Score: 0.4},
+					{UriDigest: digest6, Score: 1},
+					{UriDigest: digest7, Score: 0},
+				}
+
+				// Update scores
+				err = sourceRepo.UpdateSourceScores(context.TODO(), &updatedSources)
+				Expect(err).ToNot(HaveOccurred())
+
+				// Verify scores were updated
+				src5, err := sourceRepo.GetSourceByUriDigest(context.TODO(), digest5)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(src5.Score).To(Equal(updatedSources[0].Score))
+				Expect(src5.Name).To(Equal(source5Input.Name))
+				Expect(src5.Summary).To(Equal(source5Input.Summary))
+
+				src6, err := sourceRepo.GetSourceByUriDigest(context.TODO(), digest6)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(src6.Score).To(Equal(updatedSources[1].Score))
+				Expect(src6.Name).To(Equal(source6Input.Name))
+				Expect(src6.Summary).To(Equal(source6Input.Summary))
+
+				src7, err := sourceRepo.GetSourceByUriDigest(context.TODO(), digest7)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(src7.Score).To(Equal(updatedSources[2].Score))
+				Expect(src7.Name).To(Equal(source7Input.Name))
+				Expect(src7.Summary).To(Equal(source7Input.Summary))
+			})
+		})
+
 	})
 
 	Context("Validation tests", func() {
