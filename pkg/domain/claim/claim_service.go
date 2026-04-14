@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
+	"source-score/pkg/domain/proof"
 
 	"source-score/pkg/helpers"
 	"strings"
@@ -26,6 +27,7 @@ type ClaimService interface {
 
 type claimService struct {
 	claimRepo ClaimRepository
+	proofSvc  proof.ProofService
 }
 
 var (
@@ -41,8 +43,11 @@ func init() {
 	}
 }
 
-func NewClaimService(ctx context.Context, claimRepo ClaimRepository) ClaimService {
-	return &claimService{claimRepo: claimRepo}
+func NewClaimService(ctx context.Context, claimRepo ClaimRepository, proofSvc proof.ProofService) ClaimService {
+	return &claimService{
+		claimRepo: claimRepo,
+		proofSvc:  proofSvc,
+	}
 }
 
 func (svc *claimService) GetClaims(ctx context.Context) ([]api.Claim, error) {
@@ -133,4 +138,48 @@ func (svc *claimService) VerifyClaimByUriDigest(ctx context.Context, claimVerifi
 		return fmt.Errorf("%w: %s", apperrors.ErrClaimNotFound, err.Error())
 	}
 	return err
+}
+
+func (svc *claimService) VerifyAllClaims(ctx context.Context) error {
+	claimsProofs, err := svc.proofSvc.GetProofsByClaims(ctx)
+	if err != nil {
+		return err
+	}
+
+	var updatedClaims []api.Claim
+	for claim, proofs := range claimsProofs {
+		trueCtr := 0
+		falseCtr := 0
+
+		for _, proof := range proofs {
+			if proof.SupportsClaim {
+				trueCtr += 1
+			} else {
+				falseCtr += 1
+			}
+		}
+		if trueCtr == falseCtr {
+			continue
+		}
+
+		updatedClaim, err := svc.GetClaimByUriDigest(ctx, claim)
+		if err != nil {
+			return err
+		}
+
+		updatedClaim.Checked = true
+		if trueCtr > falseCtr {
+			updatedClaim.Validity = true
+		} else {
+			updatedClaim.Validity = false
+		}
+
+		updatedClaims = append(updatedClaims, *updatedClaim)
+	}
+
+	if len(updatedClaims) > 0 {
+		
+	}
+
+	return nil
 }

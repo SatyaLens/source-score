@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"source-score/pkg/api"
 	"source-score/pkg/db/pgsql"
@@ -19,6 +20,7 @@ type ClaimRepository interface {
 	DeleteClaimByUriDigest(ctx context.Context, claim *api.Claim) error
 	PatchClaimByUriDigest(ctx context.Context, claimInput *api.ClaimPatchInput, uriDigest string) error
 	VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
+	VerifyClaims(ctx context.Context, updatedClaims []api.Claim) error
 }
 
 type claimRepository struct {
@@ -130,4 +132,28 @@ func (cr *claimRepository) VerifyClaimByUriDigest(ctx context.Context, claimVeri
 	slog.InfoContext(ctx, fmt.Sprintf("%d rows affected\n", result.RowsAffected))
 
 	return result.Error
+}
+
+func (cr *claimRepository) VerifyClaims(ctx context.Context, updatedClaims []api.Claim) error {
+	var args []any
+	var query strings.Builder
+	claimDigests := []string{}
+	query.WriteString("UPDATE claims SET checked = true, validity = CASE uri_digest")
+
+	for _, claim := range updatedClaims {
+		query.WriteString(" WHEN ? THEN ?")
+		args = append(args, claim.UriDigest, claim.Validity)
+		claimDigests = append(claimDigests, claim.UriDigest)
+	}
+
+	query.WriteString(" END WHERE uri_digest IN ?")
+	args = append(args, claimDigests)
+
+	result := cr.client.DB.Exec(query.String(), args...)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	fmt.Printf("rows updated: %d\n", result.RowsAffected)
+	return nil
 }

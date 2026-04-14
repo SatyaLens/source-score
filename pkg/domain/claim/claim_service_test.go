@@ -9,6 +9,7 @@ import (
 	"source-score/pkg/apperrors"
 	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/claim/claimfakes"
+	"source-score/pkg/domain/proof/prooffakes"
 
 	"gorm.io/gorm"
 
@@ -18,7 +19,8 @@ import (
 
 var (
 	fakeClaimRepo = claimfakes.FakeClaimRepository{}
-	claimSvc      = claim.NewClaimService(context.TODO(), &fakeClaimRepo)
+	fakeProofSvc  = prooffakes.FakeProofService{}
+	claimSvc      = claim.NewClaimService(context.TODO(), &fakeClaimRepo, &fakeProofSvc)
 )
 
 var _ = Describe("Claim model service layer unit tests", Ordered, func() {
