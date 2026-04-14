@@ -124,6 +124,16 @@ paths:
                 items:
                   $ref: '#/components/schemas/Claim'
 
+    post:
+      tags:
+      - claims
+      operationId: verifyClaims
+      responses:
+        202:
+          description: claims verification triggered
+        409:
+          description: claims verification in progress
+
   /api/v1/claim:
     post:
       tags:
