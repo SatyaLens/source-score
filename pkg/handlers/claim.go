@@ -3,10 +3,13 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log/slog"
 	"net/http"
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
 	"source-score/pkg/domain/claim"
+	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +17,10 @@ import (
 type ClaimHandler struct {
 	claimSvc claim.ClaimService
 }
+
+var (
+	verificationJobRunning atomic.Bool
+)
 
 func NewClaimHandler(ctx context.Context, claimSvc claim.ClaimService) *ClaimHandler {
 	return &ClaimHandler{claimSvc: claimSvc}
@@ -176,17 +183,17 @@ func (ch *ClaimHandler) ValidateClaimByUriDigest(ctx *gin.Context, uriDigest str
 }
 
 func (ch *ClaimHandler) VerifyAllClaims(ctx *gin.Context) {
-	if err := ch.claimSvc.VerifyAllClaims(ctx); err != nil {
-		switch {
-		// TODO: handle error when verification is already running
-		default:
-			ctx.JSON(
-				http.StatusInternalServerError,
-				gin.H{"error": err.Error()},
-			)
-		}
+	if verificationJobRunning.CompareAndSwap(false, true) {
+		go func() {
+			defer verificationJobRunning.Store(false)
+			if err := ch.claimSvc.VerifyAllClaims(ctx); err != nil {
+				slog.Error(fmt.Sprintf("claim verification job failed with error: %v", err))
+			}
+		}()
+
+		ctx.Status(http.StatusAccepted)
 		return
 	}
 
-	ctx.Status(http.StatusAccepted)
+	ctx.Status(http.StatusConflict)
 }

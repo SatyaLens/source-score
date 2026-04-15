@@ -3,6 +3,7 @@ package acceptance_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"source-score/pkg/api"
@@ -277,6 +278,162 @@ var _ = Describe("Claim model tests", func() {
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
 			})
 		})
+
+		When("Verifying all claims based on their proofs", func() {
+			It("Should verify claims with validity based on proof counts", func() {
+				// Create a new source
+				srcBody, err := json.Marshal(sourceInput3)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(srcEndpoint, "application/json", bytes.NewBuffer(srcBody))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				var srcResp api.CreateSourceResponse
+				err = json.NewDecoder(resp.Body).Decode(&srcResp)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+
+				// Create claim 1
+				claim1Input := api.ClaimInput{
+					SourceUriDigest: srcResp.UriDigest,
+					Summary:         "Test claim 1 for verify all",
+					Title:           "Test Claim 1",
+					Uri:             "https://test-claim-verify-1",
+				}
+				body1, err := json.Marshal(claim1Input)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(endpoint, "application/json", bytes.NewBuffer(body1))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				var respBody map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&respBody)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+				testClaim1Digest := respBody["uriDigest"]
+
+				// Create claim 2
+				claim2Input := api.ClaimInput{
+					SourceUriDigest: srcResp.UriDigest,
+					Summary:         "Test claim 2 for verify all",
+					Title:           "Test Claim 2",
+					Uri:             "https://test-claim-verify-2",
+				}
+				body2, err := json.Marshal(claim2Input)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(endpoint, "application/json", bytes.NewBuffer(body2))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				err = json.NewDecoder(resp.Body).Decode(&respBody)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+				testClaim2Digest := respBody["uriDigest"]
+
+				// Create proofs for claim 1 (3 supporting, 1 refuting) -> validity = true
+				proofEndpoint, err := url.JoinPath(baseUrl, "/api/v1/proof")
+				Expect(err).To(BeNil())
+
+				for i := range 3 {
+					supports := true
+					proofInput := api.ProofInput{
+						ClaimUriDigest: testClaim1Digest,
+						ReviewedBy:     "ReviewerA",
+						SupportsClaim:  &supports,
+						Uri:            fmt.Sprintf("https://proof-claim1-support-%d", i),
+					}
+					proofBody, _ := json.Marshal(proofInput)
+					resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+					Expect(err).To(BeNil())
+					Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+					resp.Body.Close()
+				}
+
+				supports := false
+				proofInput := api.ProofInput{
+					ClaimUriDigest: testClaim1Digest,
+					ReviewedBy:     "ReviewerB",
+					SupportsClaim:  &supports,
+					Uri:            "https://proof-claim1-refute",
+				}
+				proofBody, _ := json.Marshal(proofInput)
+				resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+				resp.Body.Close()
+
+				// Create proofs for claim 2 (1 supporting, 2 refuting) -> validity = false
+				supports = true
+				proofInput = api.ProofInput{
+					ClaimUriDigest: testClaim2Digest,
+					ReviewedBy:     "ReviewerC",
+					SupportsClaim:  &supports,
+					Uri:            "https://proof-claim2-support",
+				}
+				proofBody, _ = json.Marshal(proofInput)
+				resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+				resp.Body.Close()
+
+				for i := range 2 {
+					supports := false
+					proofInput := api.ProofInput{
+						ClaimUriDigest: testClaim2Digest,
+						ReviewedBy:     "ReviewerD",
+						SupportsClaim:  &supports,
+						Uri:            fmt.Sprintf("https://proof-claim2-refute-%d", i),
+					}
+					proofBody, _ := json.Marshal(proofInput)
+					resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+					Expect(err).To(BeNil())
+					Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+					resp.Body.Close()
+				}
+
+				// Hit the verify all claims endpoint
+				verifyAllUrl, err := url.JoinPath(baseUrl, "/api/v1/claims")
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(verifyAllUrl, "application/json", nil)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusAccepted))
+
+				// Assert claim 1 has validity=true (3 supporting > 1 refuting)
+				claim1Url, err := url.JoinPath(endpoint, testClaim1Digest)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Get(claim1Url)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var c1 api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&c1)
+				Expect(err).To(BeNil())
+				Expect(c1.Checked).To(BeTrue())
+				Expect(c1.Validity).To(BeTrue())
+
+				// Assert claim 2 has validity=false (1 supporting < 2 refuting)
+				claim2Url, err := url.JoinPath(endpoint, testClaim2Digest)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Get(claim2Url)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var c2 api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&c2)
+				Expect(err).To(BeNil())
+				Expect(c2.Checked).To(BeTrue())
+				Expect(c2.Validity).To(BeFalse())
+			})
+		})
 	})
 
 	Context("Validation tests", func() {
@@ -453,8 +610,7 @@ var _ = Describe("Claim model tests", func() {
 				claimUrl, err := url.JoinPath(endpoint, claim2Digest)
 				Expect(err).To(BeNil())
 
-				verifyBody := api.ClaimVerification{
-				}
+				verifyBody := api.ClaimVerification{}
 				body, err := json.Marshal(verifyBody)
 				Expect(err).To(BeNil())
 
@@ -495,6 +651,152 @@ var _ = Describe("Claim model tests", func() {
 			})
 		})
 
-		
+		When("POST request is sent to verify all claims based on proofs", func() {
+			It("should verify claims with validity based on proof counts", func() {
+				srcBody, err := json.Marshal(sourceInput3)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(srcEndpoint, "application/json", bytes.NewBuffer(srcBody))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				var srcResp api.CreateSourceResponse
+				err = json.NewDecoder(resp.Body).Decode(&srcResp)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+
+				claim1Input := api.ClaimInput{
+					SourceUriDigest: srcResp.UriDigest,
+					Summary:         "Test claim 1 for verify all",
+					Title:           "Test Claim 1",
+					Uri:             "https://test-claim-verify-all-1",
+				}
+				body1, err := json.Marshal(claim1Input)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(endpoint, "application/json", bytes.NewBuffer(body1))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				var respBody map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&respBody)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+				testClaim1Digest := respBody["uriDigest"]
+
+				claim2Input := api.ClaimInput{
+					SourceUriDigest: srcResp.UriDigest,
+					Summary:         "Test claim 2 for verify all",
+					Title:           "Test Claim 2",
+					Uri:             "https://test-claim-verify-all-2",
+				}
+				body2, err := json.Marshal(claim2Input)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(endpoint, "application/json", bytes.NewBuffer(body2))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				err = json.NewDecoder(resp.Body).Decode(&respBody)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+				testClaim2Digest := respBody["uriDigest"]
+
+				proofEndpoint, err := url.JoinPath(baseUrl, "/api/v1/proof")
+				Expect(err).To(BeNil())
+
+				for i := 0; i < 3; i++ {
+					supports := true
+					proofInput := api.ProofInput{
+						ClaimUriDigest: testClaim1Digest,
+						ReviewedBy:     "ReviewerA",
+						SupportsClaim:  &supports,
+						Uri:            fmt.Sprintf("https://proof-claim1-support-%d", i),
+					}
+					proofBody, _ := json.Marshal(proofInput)
+					resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+					Expect(err).To(BeNil())
+					Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+					resp.Body.Close()
+				}
+
+				supports := false
+				proofInput := api.ProofInput{
+					ClaimUriDigest: testClaim1Digest,
+					ReviewedBy:     "ReviewerB",
+					SupportsClaim:  &supports,
+					Uri:            "https://proof-claim1-refute",
+				}
+				proofBody, _ := json.Marshal(proofInput)
+				resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+				resp.Body.Close()
+
+				supports = true
+				proofInput = api.ProofInput{
+					ClaimUriDigest: testClaim2Digest,
+					ReviewedBy:     "ReviewerC",
+					SupportsClaim:  &supports,
+					Uri:            "https://proof-claim2-support",
+				}
+				proofBody, _ = json.Marshal(proofInput)
+				resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+				resp.Body.Close()
+
+				for i := 0; i < 2; i++ {
+					supports := false
+					proofInput := api.ProofInput{
+						ClaimUriDigest: testClaim2Digest,
+						ReviewedBy:     "ReviewerD",
+						SupportsClaim:  &supports,
+						Uri:            fmt.Sprintf("https://proof-claim2-refute-%d", i),
+					}
+					proofBody, _ := json.Marshal(proofInput)
+					resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+					Expect(err).To(BeNil())
+					Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+					resp.Body.Close()
+				}
+
+				verifyAllUrl, err := url.JoinPath(baseUrl, "/api/v1/claims")
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(verifyAllUrl, "application/json", nil)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusAccepted))
+
+				claim1Url, err := url.JoinPath(endpoint, testClaim1Digest)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Get(claim1Url)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var c1 api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&c1)
+				Expect(err).To(BeNil())
+				Expect(c1.Checked).To(BeTrue())
+				Expect(c1.Validity).To(BeTrue())
+
+				claim2Url, err := url.JoinPath(endpoint, testClaim2Digest)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Get(claim2Url)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var c2 api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&c2)
+				Expect(err).To(BeNil())
+				Expect(c2.Checked).To(BeTrue())
+				Expect(c2.Validity).To(BeFalse())
+			})
+		})
 	})
 })
