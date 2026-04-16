@@ -124,14 +124,13 @@ func (sr *sourceRepository) PatchSourceByUriDigest(ctx context.Context, sourceIn
 }
 
 func (sr *sourceRepository) UpdateAllScores(ctx context.Context, updatedSources *[]api.Source) error {
-	// TODO: validate the array before this layer
 	var args []any
 	var query strings.Builder
 	srcDigests := []string{}
 	query.WriteString("UPDATE sources SET score = CASE uri_digest")
 
 	for _, src := range *updatedSources {
-		query.WriteString(" WHEN ? THEN ?")
+		query.WriteString(" WHEN ? THEN CAST(? AS FLOAT)")
 		args = append(args, src.UriDigest, fmt.Sprintf("%f", src.Score))
 		srcDigests = append(srcDigests, src.UriDigest)
 	}
