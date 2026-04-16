@@ -19,7 +19,7 @@ type SourceRepository interface {
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error)
 	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourcePatchInput, uriDigest string) error
-	UpdateSourceScores(ctx context.Context, updatedSources *[]api.Source) error
+	UpdateAllScores(ctx context.Context, updatedSources *[]api.Source) error
 }
 
 type sourceRepository struct {
@@ -123,7 +123,7 @@ func (sr *sourceRepository) PatchSourceByUriDigest(ctx context.Context, sourceIn
 	return result.Error
 }
 
-func (sr *sourceRepository) UpdateSourceScores(ctx context.Context, updatedSources *[]api.Source) error {
+func (sr *sourceRepository) UpdateAllScores(ctx context.Context, updatedSources *[]api.Source) error {
 	// TODO: validate the array before this layer
 	var args []any
 	var query strings.Builder

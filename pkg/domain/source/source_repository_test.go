@@ -148,7 +148,7 @@ var _ = Describe("Source model repository layer unit tests", Ordered, func() {
 				}
 
 				// Update scores
-				err = sourceRepo.UpdateSourceScores(context.TODO(), &updatedSources)
+				err = sourceRepo.UpdateAllScores(context.TODO(), &updatedSources)
 				Expect(err).ToNot(HaveOccurred())
 
 				// Verify scores were updated

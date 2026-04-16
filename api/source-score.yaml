@@ -34,7 +34,7 @@ paths:
     post:
       tags:
       - sources
-      operationId: updateScores
+      operationId: updateAllScores
       responses:
         202:
           description: score update triggered

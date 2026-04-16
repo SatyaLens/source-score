@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
+	"source-score/pkg/domain/claim"
 	"strings"
 
 	"source-score/pkg/helpers"
@@ -18,16 +19,19 @@ var (
 	validate = validator.New()
 )
 
+//go:generate go tool counterfeiter . SourceService
 type SourceService interface {
 	DeleteSourceByUriDigest(ctx context.Context, uriDigest string) error
 	GetSources(ctx context.Context) ([]api.Source, error)
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error)
 	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourcePatchInput, uriDigest string) error
+	UpdateAllScores(ctx context.Context) error
 }
 
 type sourceService struct {
 	sourceRepo SourceRepository
+	claimRepo  claim.ClaimRepository
 }
 
 func init() {
@@ -114,4 +118,37 @@ func (svc *sourceService) PatchSourceByUriDigest(ctx context.Context, sourceInpu
 		return fmt.Errorf("%w: %s", apperrors.ErrSourceNotFound, err.Error())
 	}
 	return err
+}
+
+func (svc *sourceService) UpdateAllScores(ctx context.Context) error {
+	srcsClaims, err := svc.claimRepo.GetCheckedClaimsBySources(ctx)
+	if err != nil {
+		return err
+	}
+
+	var updatedSources []api.Source
+	for src, claims := range srcsClaims {
+		totalCtr := len(claims)
+		trueCtr := 0
+
+		for _, claim := range claims {
+			if claim.Validity {
+				trueCtr += 1
+			}
+		}
+
+		source, err := svc.sourceRepo.GetSourceByUriDigest(ctx, src)
+		if err != nil {
+			return err
+		}
+
+		source.Score = float64(trueCtr) / float64(totalCtr)
+		updatedSources = append(updatedSources, *source)
+	}
+
+	if len(updatedSources) > 0 {
+		return svc.sourceRepo.UpdateAllScores(ctx, &updatedSources)
+	}
+
+	return nil
 }

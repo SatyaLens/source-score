@@ -107,5 +107,5 @@ func (r *router) PatchProof(ctx *gin.Context, uriDigest string) {
 	r.proofHandler.PatchProofByUriDigest(ctx, uriDigest)
 }
 
-func (r *router) UpdateScores(ctx *gin.Context) {
+func (r *router) UpdateAllScores(ctx *gin.Context) {
 }
