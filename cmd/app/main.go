@@ -61,14 +61,14 @@ func main() {
 		api.Claim{},
 	)
 
-	srcRepo := source.NewSourceRepository(context.Background(), dbClient)
-	srcSvc := source.NewSourceService(context.Background(), srcRepo)
-
-	claimRepo := claim.NewClaimRepository(context.Background(), dbClient)
-	claimSvc := claim.NewClaimService(context.Background(), claimRepo)
-
 	proofRepo := proof.NewProofRepository(context.Background(), dbClient)
 	proofSvc := proof.NewProofService(context.Background(), proofRepo)
+
+	claimRepo := claim.NewClaimRepository(context.Background(), dbClient)
+	claimSvc := claim.NewClaimService(context.Background(), claimRepo, proofSvc)
+
+	srcRepo := source.NewSourceRepository(context.Background(), dbClient)
+	srcSvc := source.NewSourceService(context.Background(), srcRepo)
 
 	server := gin.Default()
 	api.RegisterHandlersWithOptions(

@@ -75,6 +75,17 @@ type FakeClaimService struct {
 		result1 string
 		result2 error
 	}
+	VerifyAllClaimsStub        func(context.Context) error
+	verifyAllClaimsMutex       sync.RWMutex
+	verifyAllClaimsArgsForCall []struct {
+		arg1 context.Context
+	}
+	verifyAllClaimsReturns struct {
+		result1 error
+	}
+	verifyAllClaimsReturnsOnCall map[int]struct {
+		result1 error
+	}
 	VerifyClaimByUriDigestStub        func(context.Context, *api.ClaimVerification, string) error
 	verifyClaimByUriDigestMutex       sync.RWMutex
 	verifyClaimByUriDigestArgsForCall []struct {
@@ -409,6 +420,67 @@ func (fake *FakeClaimService) PostClaimReturnsOnCall(i int, result1 string, resu
 		result1 string
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeClaimService) VerifyAllClaims(arg1 context.Context) error {
+	fake.verifyAllClaimsMutex.Lock()
+	ret, specificReturn := fake.verifyAllClaimsReturnsOnCall[len(fake.verifyAllClaimsArgsForCall)]
+	fake.verifyAllClaimsArgsForCall = append(fake.verifyAllClaimsArgsForCall, struct {
+		arg1 context.Context
+	}{arg1})
+	stub := fake.VerifyAllClaimsStub
+	fakeReturns := fake.verifyAllClaimsReturns
+	fake.recordInvocation("VerifyAllClaims", []interface{}{arg1})
+	fake.verifyAllClaimsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeClaimService) VerifyAllClaimsCallCount() int {
+	fake.verifyAllClaimsMutex.RLock()
+	defer fake.verifyAllClaimsMutex.RUnlock()
+	return len(fake.verifyAllClaimsArgsForCall)
+}
+
+func (fake *FakeClaimService) VerifyAllClaimsCalls(stub func(context.Context) error) {
+	fake.verifyAllClaimsMutex.Lock()
+	defer fake.verifyAllClaimsMutex.Unlock()
+	fake.VerifyAllClaimsStub = stub
+}
+
+func (fake *FakeClaimService) VerifyAllClaimsArgsForCall(i int) context.Context {
+	fake.verifyAllClaimsMutex.RLock()
+	defer fake.verifyAllClaimsMutex.RUnlock()
+	argsForCall := fake.verifyAllClaimsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeClaimService) VerifyAllClaimsReturns(result1 error) {
+	fake.verifyAllClaimsMutex.Lock()
+	defer fake.verifyAllClaimsMutex.Unlock()
+	fake.VerifyAllClaimsStub = nil
+	fake.verifyAllClaimsReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeClaimService) VerifyAllClaimsReturnsOnCall(i int, result1 error) {
+	fake.verifyAllClaimsMutex.Lock()
+	defer fake.verifyAllClaimsMutex.Unlock()
+	fake.VerifyAllClaimsStub = nil
+	if fake.verifyAllClaimsReturnsOnCall == nil {
+		fake.verifyAllClaimsReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.verifyAllClaimsReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeClaimService) VerifyClaimByUriDigest(arg1 context.Context, arg2 *api.ClaimVerification, arg3 string) error {

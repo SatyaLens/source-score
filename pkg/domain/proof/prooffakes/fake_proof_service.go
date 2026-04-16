@@ -48,6 +48,19 @@ type FakeProofService struct {
 		result1 []api.Proof
 		result2 error
 	}
+	GetProofsByClaimsStub        func(context.Context) (map[string][]api.Proof, error)
+	getProofsByClaimsMutex       sync.RWMutex
+	getProofsByClaimsArgsForCall []struct {
+		arg1 context.Context
+	}
+	getProofsByClaimsReturns struct {
+		result1 map[string][]api.Proof
+		result2 error
+	}
+	getProofsByClaimsReturnsOnCall map[int]struct {
+		result1 map[string][]api.Proof
+		result2 error
+	}
 	PatchProofByUriDigestStub        func(context.Context, *api.ProofPatchInput, string) error
 	patchProofByUriDigestMutex       sync.RWMutex
 	patchProofByUriDigestArgsForCall []struct {
@@ -266,6 +279,70 @@ func (fake *FakeProofService) GetProofsReturnsOnCall(i int, result1 []api.Proof,
 	}
 	fake.getProofsReturnsOnCall[i] = struct {
 		result1 []api.Proof
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeProofService) GetProofsByClaims(arg1 context.Context) (map[string][]api.Proof, error) {
+	fake.getProofsByClaimsMutex.Lock()
+	ret, specificReturn := fake.getProofsByClaimsReturnsOnCall[len(fake.getProofsByClaimsArgsForCall)]
+	fake.getProofsByClaimsArgsForCall = append(fake.getProofsByClaimsArgsForCall, struct {
+		arg1 context.Context
+	}{arg1})
+	stub := fake.GetProofsByClaimsStub
+	fakeReturns := fake.getProofsByClaimsReturns
+	fake.recordInvocation("GetProofsByClaims", []interface{}{arg1})
+	fake.getProofsByClaimsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeProofService) GetProofsByClaimsCallCount() int {
+	fake.getProofsByClaimsMutex.RLock()
+	defer fake.getProofsByClaimsMutex.RUnlock()
+	return len(fake.getProofsByClaimsArgsForCall)
+}
+
+func (fake *FakeProofService) GetProofsByClaimsCalls(stub func(context.Context) (map[string][]api.Proof, error)) {
+	fake.getProofsByClaimsMutex.Lock()
+	defer fake.getProofsByClaimsMutex.Unlock()
+	fake.GetProofsByClaimsStub = stub
+}
+
+func (fake *FakeProofService) GetProofsByClaimsArgsForCall(i int) context.Context {
+	fake.getProofsByClaimsMutex.RLock()
+	defer fake.getProofsByClaimsMutex.RUnlock()
+	argsForCall := fake.getProofsByClaimsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeProofService) GetProofsByClaimsReturns(result1 map[string][]api.Proof, result2 error) {
+	fake.getProofsByClaimsMutex.Lock()
+	defer fake.getProofsByClaimsMutex.Unlock()
+	fake.GetProofsByClaimsStub = nil
+	fake.getProofsByClaimsReturns = struct {
+		result1 map[string][]api.Proof
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeProofService) GetProofsByClaimsReturnsOnCall(i int, result1 map[string][]api.Proof, result2 error) {
+	fake.getProofsByClaimsMutex.Lock()
+	defer fake.getProofsByClaimsMutex.Unlock()
+	fake.GetProofsByClaimsStub = nil
+	if fake.getProofsByClaimsReturnsOnCall == nil {
+		fake.getProofsByClaimsReturnsOnCall = make(map[int]struct {
+			result1 map[string][]api.Proof
+			result2 error
+		})
+	}
+	fake.getProofsByClaimsReturnsOnCall[i] = struct {
+		result1 map[string][]api.Proof
 		result2 error
 	}{result1, result2}
 }

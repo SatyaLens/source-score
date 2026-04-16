@@ -88,6 +88,18 @@ type FakeClaimRepository struct {
 	verifyClaimByUriDigestReturnsOnCall map[int]struct {
 		result1 error
 	}
+	VerifyClaimsStub        func(context.Context, []api.Claim) error
+	verifyClaimsMutex       sync.RWMutex
+	verifyClaimsArgsForCall []struct {
+		arg1 context.Context
+		arg2 []api.Claim
+	}
+	verifyClaimsReturns struct {
+		result1 error
+	}
+	verifyClaimsReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -470,6 +482,73 @@ func (fake *FakeClaimRepository) VerifyClaimByUriDigestReturnsOnCall(i int, resu
 		})
 	}
 	fake.verifyClaimByUriDigestReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeClaimRepository) VerifyClaims(arg1 context.Context, arg2 []api.Claim) error {
+	var arg2Copy []api.Claim
+	if arg2 != nil {
+		arg2Copy = make([]api.Claim, len(arg2))
+		copy(arg2Copy, arg2)
+	}
+	fake.verifyClaimsMutex.Lock()
+	ret, specificReturn := fake.verifyClaimsReturnsOnCall[len(fake.verifyClaimsArgsForCall)]
+	fake.verifyClaimsArgsForCall = append(fake.verifyClaimsArgsForCall, struct {
+		arg1 context.Context
+		arg2 []api.Claim
+	}{arg1, arg2Copy})
+	stub := fake.VerifyClaimsStub
+	fakeReturns := fake.verifyClaimsReturns
+	fake.recordInvocation("VerifyClaims", []interface{}{arg1, arg2Copy})
+	fake.verifyClaimsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeClaimRepository) VerifyClaimsCallCount() int {
+	fake.verifyClaimsMutex.RLock()
+	defer fake.verifyClaimsMutex.RUnlock()
+	return len(fake.verifyClaimsArgsForCall)
+}
+
+func (fake *FakeClaimRepository) VerifyClaimsCalls(stub func(context.Context, []api.Claim) error) {
+	fake.verifyClaimsMutex.Lock()
+	defer fake.verifyClaimsMutex.Unlock()
+	fake.VerifyClaimsStub = stub
+}
+
+func (fake *FakeClaimRepository) VerifyClaimsArgsForCall(i int) (context.Context, []api.Claim) {
+	fake.verifyClaimsMutex.RLock()
+	defer fake.verifyClaimsMutex.RUnlock()
+	argsForCall := fake.verifyClaimsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeClaimRepository) VerifyClaimsReturns(result1 error) {
+	fake.verifyClaimsMutex.Lock()
+	defer fake.verifyClaimsMutex.Unlock()
+	fake.VerifyClaimsStub = nil
+	fake.verifyClaimsReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeClaimRepository) VerifyClaimsReturnsOnCall(i int, result1 error) {
+	fake.verifyClaimsMutex.Lock()
+	defer fake.verifyClaimsMutex.Unlock()
+	fake.VerifyClaimsStub = nil
+	if fake.verifyClaimsReturnsOnCall == nil {
+		fake.verifyClaimsReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.verifyClaimsReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }

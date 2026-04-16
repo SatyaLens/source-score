@@ -20,6 +20,7 @@ type ProofService interface {
 	GetProofByUriDigest(ctx context.Context, uriDigest string) (*api.Proof, error)
 	DeleteProofByUriDigest(ctx context.Context, uriDigest string) error
 	PatchProofByUriDigest(ctx context.Context, proofInput *api.ProofPatchInput, uriDigest string) error
+	GetProofsByClaims(ctx context.Context) (map[string][]api.Proof, error)
 }
 
 type proofService struct {
@@ -105,4 +106,22 @@ func (svc *proofService) PostProof(ctx context.Context, proofInput *api.ProofInp
 	}
 
 	return svc.proofRepo.PostProof(ctx, proofInput)
+}
+
+func (svc *proofService) GetProofsByClaims(ctx context.Context) (map[string][]api.Proof, error) {
+	allProofs, err := svc.GetProofs(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	claimsProofs := make(map[string][]api.Proof)
+	for _, proof := range allProofs {
+		if proofs, ok := claimsProofs[proof.ClaimUriDigest]; ok {
+			claimsProofs[proof.ClaimUriDigest] = append(proofs, proof)
+		} else {
+			claimsProofs[proof.ClaimUriDigest] = []api.Proof{proof}
+		}
+	}
+
+	return claimsProofs, nil
 }

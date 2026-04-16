@@ -9,6 +9,7 @@ import (
 	"source-score/pkg/apperrors"
 	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/claim/claimfakes"
+	"source-score/pkg/domain/proof/prooffakes"
 
 	"gorm.io/gorm"
 
@@ -18,7 +19,8 @@ import (
 
 var (
 	fakeClaimRepo = claimfakes.FakeClaimRepository{}
-	claimSvc      = claim.NewClaimService(context.TODO(), &fakeClaimRepo)
+	fakeProofSvc  = prooffakes.FakeProofService{}
+	claimSvc      = claim.NewClaimService(context.TODO(), &fakeClaimRepo, &fakeProofSvc)
 )
 
 var _ = Describe("Claim model service layer unit tests", Ordered, func() {
@@ -173,6 +175,73 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(argDigest).To(Equal(claim2Digest))
 				Expect(argVerification.Validity).ToNot(BeNil())
 				Expect(*argVerification.Validity).To(BeFalse())
+			})
+		})
+
+		When("Verifying all claims based on their proofs", func() {
+			It("Should verify claims with validity based on proof counts", func() {
+				claim1 := api.Claim{
+					UriDigest: claim1Digest,
+					Title:     "Claim 1",
+					Summary:   "Summary 1",
+					Checked:   false,
+					Validity:  false,
+				}
+				claim2 := api.Claim{
+					UriDigest: claim2Digest,
+					Title:     "Claim 2",
+					Summary:   "Summary 2",
+					Checked:   false,
+					Validity:  false,
+				}
+
+				proofsForClaim1 := []api.Proof{
+					{ClaimUriDigest: claim1Digest, SupportsClaim: true},
+					{ClaimUriDigest: claim1Digest, SupportsClaim: true},
+					{ClaimUriDigest: claim1Digest, SupportsClaim: true},
+					{ClaimUriDigest: claim1Digest, SupportsClaim: false},
+				}
+
+				proofsForClaim2 := []api.Proof{
+					{ClaimUriDigest: claim2Digest, SupportsClaim: true},
+					{ClaimUriDigest: claim2Digest, SupportsClaim: false},
+					{ClaimUriDigest: claim2Digest, SupportsClaim: false},
+				}
+
+				claimsProofs := map[string][]api.Proof{
+					claim1Digest: proofsForClaim1,
+					claim2Digest: proofsForClaim2,
+				}
+
+				fakeProofSvc.GetProofsByClaimsReturns(claimsProofs, nil)
+				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(2, &claim1, nil)
+				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(3, &claim2, nil)
+				fakeClaimRepo.VerifyClaimsReturns(nil)
+
+				err := claimSvc.VerifyAllClaims(context.TODO())
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeClaimRepo.VerifyClaimsCallCount()).To(Equal(1))
+				_, updatedClaims := fakeClaimRepo.VerifyClaimsArgsForCall(0)
+				Expect(len(updatedClaims)).To(Equal(2))
+
+				var updatedClaim1, updatedClaim2 *api.Claim
+				for i := range updatedClaims {
+					switch updatedClaims[i].UriDigest {
+					case claim1Digest:
+						updatedClaim1 = &updatedClaims[i]
+					case claim2Digest:
+						updatedClaim2 = &updatedClaims[i]
+					}
+				}
+
+				Expect(updatedClaim1).ToNot(BeNil())
+				Expect(updatedClaim1.Checked).To(BeTrue())
+				Expect(updatedClaim1.Validity).To(BeTrue())
+
+				Expect(updatedClaim2).ToNot(BeNil())
+				Expect(updatedClaim2.Checked).To(BeTrue())
+				Expect(updatedClaim2.Validity).To(BeFalse())
 			})
 		})
 	})

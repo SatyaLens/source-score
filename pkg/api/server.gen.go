@@ -140,6 +140,9 @@ type ServerInterface interface {
 	// (GET /api/v1/claims)
 	GetClaims(c *gin.Context)
 
+	// (POST /api/v1/claims)
+	VerifyAllClaims(c *gin.Context)
+
 	// (POST /api/v1/proof)
 	PostProof(c *gin.Context)
 
@@ -303,6 +306,19 @@ func (siw *ServerInterfaceWrapper) GetClaims(c *gin.Context) {
 	}
 
 	siw.Handler.GetClaims(c)
+}
+
+// VerifyAllClaims operation middleware
+func (siw *ServerInterfaceWrapper) VerifyAllClaims(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.VerifyAllClaims(c)
 }
 
 // PostProof operation middleware
@@ -547,6 +563,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.PATCH(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.PatchClaim)
 	router.POST(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.VerifyClaim)
 	router.GET(options.BaseURL+"/api/v1/claims", wrapper.GetClaims)
+	router.POST(options.BaseURL+"/api/v1/claims", wrapper.VerifyAllClaims)
 	router.POST(options.BaseURL+"/api/v1/proof", wrapper.PostProof)
 	router.DELETE(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.DeleteProof)
 	router.GET(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.GetProof)

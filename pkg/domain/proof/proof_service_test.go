@@ -112,6 +112,40 @@ var _ = Describe("Proof model service layer unit tests", Ordered, func() {
 				Expect(*c).To(Equal(sampleProof1))
 			})
 		})
+
+		When("Getting proofs grouped by claims", func() {
+			It("Should return a map of claim uri digests to their proofs", func() {
+				// Create additional proof for a different claim
+				claimDigest2 := "a96fe15d3040685b06d0c195d54a13692a9002db148498f185babfb6a083f801"
+				proof3 := api.Proof{
+					ClaimUriDigest: claimDigest2,
+					ReviewedBy:     "ReviewerC",
+					SupportsClaim:  true,
+					Uri:            "https://sample-proof-3",
+					UriDigest:      "abc123",
+				}
+
+				allProofs := []api.Proof{sampleProof1, sampleProof2, proof3}
+				fakeProofRepo.GetProofsReturnsOnCall(1, allProofs, nil)
+
+				claimsProofs, err := proofSvc.GetProofsByClaims(context.TODO())
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claimsProofs).ToNot(BeNil())
+				Expect(len(claimsProofs)).To(Equal(2))
+
+				// Verify first claim has 2 proofs
+				proofs1, exists := claimsProofs[claimDigest]
+				Expect(exists).To(BeTrue())
+				Expect(len(proofs1)).To(Equal(2))
+				Expect(proofs1).To(ContainElements(sampleProof1, sampleProof2))
+
+				// Verify second claim has 1 proof
+				proofs2, exists := claimsProofs[claimDigest2]
+				Expect(exists).To(BeTrue())
+				Expect(len(proofs2)).To(Equal(1))
+				Expect(proofs2[0]).To(Equal(proof3))
+			})
+		})
 	})
 
 	Context("Proof POST validation tests", func() {

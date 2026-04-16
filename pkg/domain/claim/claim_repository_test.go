@@ -115,6 +115,84 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				Expect(validated.Validity).To(BeTrue())
 			})
 		})
+
+		When("Verifying multiple claims at once", func() {
+			It("Should update checked and validity fields for all provided claims", func() {
+				// Create a new source for this test
+				newSource := api.Source{
+					Name:      "Test Source for VerifyClaims",
+					Score:     0,
+					Summary:   "Test source summary",
+					Tags:      "test-tag",
+					Uri:       "https://test-source-verify",
+					UriDigest: "test-source-digest-123",
+				}
+				result := testDB.Create(&newSource)
+				Expect(result.Error).ToNot(HaveOccurred())
+
+				// Create 3 claims associated with the new source
+				claim3Input := api.ClaimInput{
+					SourceUriDigest: newSource.UriDigest,
+					Summary:         "Test claim 3 summary",
+					Title:           "Test Claim 3",
+					Uri:             "https://test-claim-3",
+				}
+				digest3, err := claimRepo.PostClaim(context.TODO(), &claim3Input)
+				Expect(err).ToNot(HaveOccurred())
+
+				claim4Input := api.ClaimInput{
+					SourceUriDigest: newSource.UriDigest,
+					Summary:         "Test claim 4 summary",
+					Title:           "Test Claim 4",
+					Uri:             "https://test-claim-4",
+				}
+				digest4, err := claimRepo.PostClaim(context.TODO(), &claim4Input)
+				Expect(err).ToNot(HaveOccurred())
+
+				claim5Input := api.ClaimInput{
+					SourceUriDigest: newSource.UriDigest,
+					Summary:         "Test claim 5 summary",
+					Title:           "Test Claim 5",
+					Uri:             "https://test-claim-5",
+				}
+				digest5, err := claimRepo.PostClaim(context.TODO(), &claim5Input)
+				Expect(err).ToNot(HaveOccurred())
+
+				// Prepare updated claims - 2 claims with different validity values
+				updatedClaims := []api.Claim{
+					{UriDigest: digest3, Validity: true},
+					{UriDigest: digest4, Validity: false},
+				}
+
+				// Call VerifyClaims
+				err = claimRepo.VerifyClaims(context.TODO(), updatedClaims)
+				Expect(err).ToNot(HaveOccurred())
+
+				// Verify claim 3 - should be checked=true, validity=true
+				claim3, err := claimRepo.GetClaimByUriDigest(context.TODO(), digest3)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claim3.Checked).To(BeTrue())
+				Expect(claim3.Validity).To(BeTrue())
+				Expect(claim3.Title).To(Equal(claim3Input.Title))
+				Expect(claim3.Summary).To(Equal(claim3Input.Summary))
+
+				// Verify claim 4 - should be checked=true, validity=false
+				claim4, err := claimRepo.GetClaimByUriDigest(context.TODO(), digest4)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claim4.Checked).To(BeTrue())
+				Expect(claim4.Validity).To(BeFalse())
+				Expect(claim4.Title).To(Equal(claim4Input.Title))
+				Expect(claim4.Summary).To(Equal(claim4Input.Summary))
+
+				// Verify claim 5 - should remain unchanged (checked=false, validity=false)
+				claim5, err := claimRepo.GetClaimByUriDigest(context.TODO(), digest5)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claim5.Checked).To(BeFalse())
+				Expect(claim5.Validity).To(BeFalse())
+				Expect(claim5.Title).To(Equal(claim5Input.Title))
+				Expect(claim5.Summary).To(Equal(claim5Input.Summary))
+			})
+		})
 	})
 
 	Context("Validation tests", func() {
