@@ -179,7 +179,7 @@ func (svc *claimService) VerifyAllClaims(ctx context.Context) error {
 	}
 
 	if len(updatedClaims) > 0 {
-		err = svc.claimRepo.VerifyClaims(ctx, updatedClaims)
+		err = svc.claimRepo.VerifyAllClaims(ctx, updatedClaims)
 		if err != nil {
 			return err
 		}

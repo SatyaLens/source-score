@@ -140,7 +140,7 @@ type ServerInterface interface {
 	// (GET /api/v1/claims)
 	GetClaims(c *gin.Context)
 
-	// (POST /api/v1/claims)
+	// (POST /api/v1/claims/verify)
 	VerifyAllClaims(c *gin.Context)
 
 	// (POST /api/v1/proof)
@@ -172,6 +172,9 @@ type ServerInterface interface {
 
 	// (GET /api/v1/sources)
 	GetSources(c *gin.Context)
+
+	// (POST /api/v1/sources/scores)
+	UpdateAllScores(c *gin.Context)
 
 	// (GET /ping)
 	GetPing(c *gin.Context)
@@ -517,6 +520,19 @@ func (siw *ServerInterfaceWrapper) GetSources(c *gin.Context) {
 	siw.Handler.GetSources(c)
 }
 
+// UpdateAllScores operation middleware
+func (siw *ServerInterfaceWrapper) UpdateAllScores(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UpdateAllScores(c)
+}
+
 // GetPing operation middleware
 func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
 
@@ -563,7 +579,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.PATCH(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.PatchClaim)
 	router.POST(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.VerifyClaim)
 	router.GET(options.BaseURL+"/api/v1/claims", wrapper.GetClaims)
-	router.POST(options.BaseURL+"/api/v1/claims", wrapper.VerifyAllClaims)
+	router.POST(options.BaseURL+"/api/v1/claims/verify", wrapper.VerifyAllClaims)
 	router.POST(options.BaseURL+"/api/v1/proof", wrapper.PostProof)
 	router.DELETE(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.DeleteProof)
 	router.GET(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.GetProof)
@@ -574,5 +590,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.GetSource)
 	router.PATCH(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.PatchSource)
 	router.GET(options.BaseURL+"/api/v1/sources", wrapper.GetSources)
+	router.POST(options.BaseURL+"/api/v1/sources/scores", wrapper.UpdateAllScores)
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 }

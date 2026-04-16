@@ -20,7 +20,8 @@ type ClaimRepository interface {
 	DeleteClaimByUriDigest(ctx context.Context, claim *api.Claim) error
 	PatchClaimByUriDigest(ctx context.Context, claimInput *api.ClaimPatchInput, uriDigest string) error
 	VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
-	VerifyClaims(ctx context.Context, updatedClaims []api.Claim) error
+	VerifyAllClaims(ctx context.Context, updatedClaims []api.Claim) error
+	GetCheckedClaimsBySources(ctx context.Context) (map[string][]api.Claim, error)
 }
 
 type claimRepository struct {
@@ -134,7 +135,7 @@ func (cr *claimRepository) VerifyClaimByUriDigest(ctx context.Context, claimVeri
 	return result.Error
 }
 
-func (cr *claimRepository) VerifyClaims(ctx context.Context, updatedClaims []api.Claim) error {
+func (cr *claimRepository) VerifyAllClaims(ctx context.Context, updatedClaims []api.Claim) error {
 	var args []any
 	var query strings.Builder
 	claimDigests := []string{}
@@ -156,4 +157,25 @@ func (cr *claimRepository) VerifyClaims(ctx context.Context, updatedClaims []api
 
 	fmt.Printf("rows updated: %d\n", result.RowsAffected)
 	return nil
+}
+
+func (cr *claimRepository) GetCheckedClaimsBySources(ctx context.Context) (map[string][]api.Claim, error) {
+	srcsClaims := make(map[string][]api.Claim)
+	var claims []api.Claim
+
+	result := cr.client.DB.Where("checked = true").Find(&claims)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	for _, claim := range claims {
+		if srcClaims, ok := srcsClaims[claim.SourceUriDigest]; ok {
+			srcsClaims[claim.SourceUriDigest] = append(srcClaims, claim)
+		} else {
+			srcsClaims[claim.SourceUriDigest] = []api.Claim{claim}
+		}
+	}
+
+	return srcsClaims, nil
 }

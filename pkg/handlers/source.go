@@ -3,10 +3,13 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log/slog"
 	"net/http"
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
 	"source-score/pkg/domain/source"
+	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +17,10 @@ import (
 type SourceHandler struct {
 	sourceSvc source.SourceService
 }
+
+var (
+	scoreJobRunning atomic.Bool
+)
 
 func NewSourceHandler(ctx context.Context, sourceSvc source.SourceService) *SourceHandler {
 	return &SourceHandler{
@@ -149,4 +156,20 @@ func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context, uriDigest stri
 	}
 
 	ctx.Status(http.StatusNoContent)
+}
+
+func (sh *SourceHandler) UpdateAllScores(ctx *gin.Context) {
+	if scoreJobRunning.CompareAndSwap(false, true) {
+		go func(c *gin.Context) {
+			defer scoreJobRunning.Store(false)
+			if err := sh.sourceSvc.UpdateAllScores(c); err != nil {
+				slog.Error(fmt.Sprintf("source score update job failed with error: %v", err))
+			}
+		}(ctx.Copy())
+
+		ctx.Status(http.StatusAccepted)
+		return
+	}
+
+	ctx.Status(http.StatusConflict)
 }

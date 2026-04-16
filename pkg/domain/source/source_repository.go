@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"source-score/pkg/api"
 	"source-score/pkg/db/pgsql"
@@ -18,6 +19,7 @@ type SourceRepository interface {
 	GetSourceByUriDigest(ctx context.Context, uriDigest string) (*api.Source, error)
 	PostSource(ctx context.Context, sourceInput *api.SourceInput) (string, error)
 	PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourcePatchInput, uriDigest string) error
+	UpdateAllScores(ctx context.Context, updatedSources *[]api.Source) error
 }
 
 type sourceRepository struct {
@@ -119,4 +121,28 @@ func (sr *sourceRepository) PatchSourceByUriDigest(ctx context.Context, sourceIn
 	)
 
 	return result.Error
+}
+
+func (sr *sourceRepository) UpdateAllScores(ctx context.Context, updatedSources *[]api.Source) error {
+	var args []any
+	var query strings.Builder
+	srcDigests := []string{}
+	query.WriteString("UPDATE sources SET score = CASE uri_digest")
+
+	for _, src := range *updatedSources {
+		query.WriteString(" WHEN ? THEN CAST(? AS FLOAT)")
+		args = append(args, src.UriDigest, fmt.Sprintf("%f", src.Score))
+		srcDigests = append(srcDigests, src.UriDigest)
+	}
+
+	query.WriteString(" END WHERE uri_digest IN ?")
+	args = append(args, srcDigests)
+
+	result := sr.client.DB.Exec(query.String(), args...)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	fmt.Printf("rows updated: %d\n", result.RowsAffected)
+	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"source-score/pkg/api"
 	"source-score/pkg/db/pgsql"
+	"source-score/pkg/domain/claim/claimfakes"
 	"source-score/pkg/domain/source"
 	"source-score/pkg/domain/source/sourcefakes"
 	"source-score/pkg/helpers"
@@ -36,6 +37,7 @@ var (
 
 	// fakes
 	fakeSourceRepo = sourcefakes.FakeSourceRepository{}
+	fakeClaimRepo  = claimfakes.FakeClaimRepository{}
 )
 
 func TestSource(t *testing.T) {
@@ -82,7 +84,7 @@ func TestSource(t *testing.T) {
 		sourceRepo = source.NewSourceRepository(context.TODO(), &pgsql.Client{
 			DB: testDB,
 		})
-		sourceSvc = source.NewSourceService(context.TODO(), &fakeSourceRepo)
+		sourceSvc = source.NewSourceService(context.TODO(), &fakeSourceRepo, &fakeClaimRepo)
 	})
 
 	var _ = AfterSuite(func() {
