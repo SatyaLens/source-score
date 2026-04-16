@@ -46,9 +46,10 @@ func init() {
 	}
 }
 
-func NewSourceService(ctx context.Context, sourceRepo SourceRepository) SourceService {
+func NewSourceService(ctx context.Context, sourceRepo SourceRepository, claimRepo claim.ClaimRepository) SourceService {
 	return &sourceService{
 		sourceRepo: sourceRepo,
+		claimRepo:  claimRepo,
 	}
 }
 

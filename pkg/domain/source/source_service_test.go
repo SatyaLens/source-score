@@ -98,6 +98,65 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 				Expect(*src).To(Equal(updatedSource))
 			})
 		})
+
+		When("Updating all source scores based on checked claims", func() {
+			It("Should calculate and update scores based on claim validity", func() {
+				// Create a new source
+				testSource := api.Source{
+					Name:      "Test Source for Score Update",
+					Score:     0,
+					Summary:   "Test source",
+					Tags:      "test",
+					Uri:       "https://test-source",
+					UriDigest: "test-source-digest",
+				}
+
+				// Create 2 checked claims: 1 with validity=true, 1 with validity=false
+				claim2 := api.Claim{
+					UriDigest:       "claim2-digest",
+					SourceUriDigest: testSource.UriDigest,
+					Title:           "Claim 2",
+					Summary:         "Checked claim - valid",
+					Checked:         true,
+					Validity:        true,
+				}
+
+				claim3 := api.Claim{
+					UriDigest:       "claim3-digest",
+					SourceUriDigest: testSource.UriDigest,
+					Title:           "Claim 3",
+					Summary:         "Checked claim - invalid",
+					Checked:         true,
+					Validity:        false,
+				}
+
+				// Mock GetCheckedClaimsBySources to return only checked claims
+				checkedClaimsMap := map[string][]api.Claim{
+					testSource.UriDigest: {claim2, claim3},
+				}
+				fakeClaimRepo.GetCheckedClaimsBySourcesReturns(checkedClaimsMap, nil)
+
+				// Mock GetSourceByUriDigest to return the test source
+				callCount := fakeSourceRepo.GetSourceByUriDigestCallCount()
+				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(callCount, &testSource, nil)
+
+				// Mock UpdateAllScores
+				fakeSourceRepo.UpdateAllScoresReturns(nil)
+
+				// Call UpdateAllScores
+				err := sourceSvc.UpdateAllScores(context.TODO())
+				Expect(err).ToNot(HaveOccurred())
+
+				// Verify UpdateAllScores was called
+				Expect(fakeSourceRepo.UpdateAllScoresCallCount()).To(Equal(1))
+
+				// Verify the source score was updated to 0.5 (1 valid out of 2 checked claims)
+				_, updatedSources := fakeSourceRepo.UpdateAllScoresArgsForCall(0)
+				Expect(len(*updatedSources)).To(Equal(1))
+				Expect((*updatedSources)[0].UriDigest).To(Equal(testSource.UriDigest))
+				Expect((*updatedSources)[0].Score).To(Equal(0.5))
+			})
+		})
 	})
 
 	Context("Source POST validation tests", func() {
