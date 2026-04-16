@@ -184,12 +184,12 @@ func (ch *ClaimHandler) ValidateClaimByUriDigest(ctx *gin.Context, uriDigest str
 
 func (ch *ClaimHandler) VerifyAllClaims(ctx *gin.Context) {
 	if verificationJobRunning.CompareAndSwap(false, true) {
-		go func() {
+		go func(c *gin.Context) {
 			defer verificationJobRunning.Store(false)
-			if err := ch.claimSvc.VerifyAllClaims(ctx); err != nil {
+			if err := ch.claimSvc.VerifyAllClaims(c); err != nil {
 				slog.Error(fmt.Sprintf("claim verification job failed with error: %v", err))
 			}
-		}()
+		}(ctx.Copy())
 
 		ctx.Status(http.StatusAccepted)
 		return

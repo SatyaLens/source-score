@@ -141,7 +141,7 @@ func (cr *claimRepository) VerifyClaims(ctx context.Context, updatedClaims []api
 	query.WriteString("UPDATE claims SET checked = true, validity = CASE uri_digest")
 
 	for _, claim := range updatedClaims {
-		query.WriteString(" WHEN ? THEN ?")
+		query.WriteString(" WHEN ? THEN CAST(? AS BOOLEAN)")
 		args = append(args, claim.UriDigest, claim.Validity)
 		claimDigests = append(claimDigests, claim.UriDigest)
 	}
