@@ -3,10 +3,12 @@ package acceptance_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"source-score/pkg/api"
 	"strings"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -185,6 +187,173 @@ var _ = Describe("Source model tests", func() {
 				resp, err = http.Get(srcUrl)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
+			})
+		})
+
+		When("Updating all source scores based on checked claims", func() {
+			It("Should update source score to 0.5 when 1 valid and 1 invalid claim exist", func() {
+				// Create a new source
+				srcInput := api.SourceInput{
+					Name:    "Test Source for Score Update",
+					Summary: "sample summary",
+					Tags:    "tag99",
+					Uri:     "https://test-source-score-update",
+				}
+				srcBody, err := json.Marshal(srcInput)
+				Expect(err).To(BeNil())
+
+				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(srcBody))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				var srcResp api.CreateSourceResponse
+				err = json.NewDecoder(resp.Body).Decode(&srcResp)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+
+				// Create claim endpoint
+				claimEndpoint, err := url.JoinPath(baseUrl, "/api/v1/claim")
+				Expect(err).To(BeNil())
+
+				// Create claim 1
+				claim1Input := api.ClaimInput{
+					SourceUriDigest: srcResp.UriDigest,
+					Summary:         "Test claim 1 for score update",
+					Title:           "Test Claim 1",
+					Uri:             "https://test-claim-score-1",
+				}
+				body1, err := json.Marshal(claim1Input)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(claimEndpoint, "application/json", bytes.NewBuffer(body1))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				var respBody map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&respBody)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+				testClaim1Digest := respBody["uriDigest"]
+
+				// Create claim 2
+				claim2Input := api.ClaimInput{
+					SourceUriDigest: srcResp.UriDigest,
+					Summary:         "Test claim 2 for score update",
+					Title:           "Test Claim 2",
+					Uri:             "https://test-claim-score-2",
+				}
+				body2, err := json.Marshal(claim2Input)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(claimEndpoint, "application/json", bytes.NewBuffer(body2))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				err = json.NewDecoder(resp.Body).Decode(&respBody)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+				testClaim2Digest := respBody["uriDigest"]
+
+				// Create claim 3 (no proofs)
+				claim3Input := api.ClaimInput{
+					SourceUriDigest: srcResp.UriDigest,
+					Summary:         "Test claim 3 for score update",
+					Title:           "Test Claim 3",
+					Uri:             "https://test-claim-score-3",
+				}
+				body3, err := json.Marshal(claim3Input)
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(claimEndpoint, "application/json", bytes.NewBuffer(body3))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+				resp.Body.Close()
+
+				// Create proof for claim 1 (supporting = true)
+				proofEndpoint, err := url.JoinPath(baseUrl, "/api/v1/proof")
+				Expect(err).To(BeNil())
+
+				supports := true
+				proofInput := api.ProofInput{
+					ClaimUriDigest: testClaim1Digest,
+					ReviewedBy:     "ReviewerA",
+					SupportsClaim:  &supports,
+					Uri:            "https://proof-claim1-true",
+				}
+				proofBody, _ := json.Marshal(proofInput)
+				resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+				resp.Body.Close()
+
+				// Create proof for claim 2 (supporting = false)
+				supports = false
+				proofInput = api.ProofInput{
+					ClaimUriDigest: testClaim2Digest,
+					ReviewedBy:     "ReviewerB",
+					SupportsClaim:  &supports,
+					Uri:            "https://proof-claim2-false",
+				}
+				proofBody, _ = json.Marshal(proofInput)
+				resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+				resp.Body.Close()
+
+				// Hit the verify all claims endpoint
+				verifyAllUrl, err := url.JoinPath(baseUrl, "/api/v1/claims/verify")
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(verifyAllUrl, "application/json", nil)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusAccepted))
+
+				// Loop until verify completes (no 409)
+				for {
+					resp, err = http.Post(verifyAllUrl, "application/json", nil)
+					Expect(err).To(BeNil())
+					resp.Body.Close()
+					if resp.StatusCode != http.StatusConflict {
+						break
+					}
+					time.Sleep(100 * time.Millisecond)
+				}
+
+				// Hit the update all scores endpoint
+				updateScoresUrl, err := url.JoinPath(baseUrl, "/api/v1/sources/scores")
+				Expect(err).To(BeNil())
+
+				resp, err = http.Post(updateScoresUrl, "application/json", nil)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusAccepted))
+
+				// Loop until update scores completes (no 409)
+				for {
+					resp, err = http.Post(updateScoresUrl, "application/json", nil)
+					Expect(err).To(BeNil())
+					resp.Body.Close()
+					if resp.StatusCode != http.StatusConflict {
+						break
+					}
+					time.Sleep(100 * time.Millisecond)
+				}
+
+				// Get the source and verify score is 0.5
+				srcUrl, err := url.JoinPath(endpoint, srcResp.UriDigest)
+				Expect(err).To(BeNil())
+				resp, err = http.Get(srcUrl)
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var src api.Source
+				err = json.NewDecoder(resp.Body).Decode(&src)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+
+				fmt.Printf("Source score: %f\n", src.Score)
+				Expect(src.Score).To(Equal(0.5))
 			})
 		})
 	})

@@ -269,6 +269,7 @@ var _ = Describe("Claim repository layer unit tests", func() {
 
 				claims := srcsClaims[newSource.UriDigest]
 				provingClaim, err := claimRepo.GetClaimByUriDigest(context.TODO(), digest6)
+				Expect(err).ToNot(HaveOccurred())
 				uncheckedClaim, err := claimRepo.GetClaimByUriDigest(context.TODO(), digest7)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(claims).To(ContainElement(*provingClaim))

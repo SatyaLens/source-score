@@ -108,4 +108,5 @@ func (r *router) PatchProof(ctx *gin.Context, uriDigest string) {
 }
 
 func (r *router) UpdateAllScores(ctx *gin.Context) {
+	r.srcHandler.UpdateAllScores(ctx)
 }
