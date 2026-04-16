@@ -3,6 +3,7 @@ package claim_test
 import (
 	"context"
 	"errors"
+	"time"
 
 	"source-score/pkg/api"
 
@@ -51,20 +52,6 @@ var _ = Describe("Claim repository layer unit tests", func() {
 					sampleClaim1,
 					sampleClaim2,
 				))
-			})
-		})
-
-		When("Getting claims grouped by sources", func() {
-			It("Should return a map of source uri digests to their claims", func() {
-				srcClaims, err := claimRepo.GetClaimsBySources(context.TODO())
-				Expect(err).ToNot(HaveOccurred())
-				Expect(srcClaims).ToNot(BeNil())
-
-				// verify the map contains the source digest
-				claims, exists := srcClaims[srcDigest]
-				Expect(exists).To(BeTrue())
-				Expect(len(claims)).To(Equal(2))
-				Expect(claims).To(ContainElements(sampleClaim1, sampleClaim2))
 			})
 		})
 
@@ -164,7 +151,7 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				}
 
 				// Call VerifyClaims
-				err = claimRepo.VerifyClaims(context.TODO(), updatedClaims)
+				err = claimRepo.VerifyAllClaims(context.TODO(), updatedClaims)
 				Expect(err).ToNot(HaveOccurred())
 
 				// Verify claim 3 - should be checked=true, validity=true
@@ -190,6 +177,102 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				Expect(claim5.Validity).To(BeFalse())
 				Expect(claim5.Title).To(Equal(claim5Input.Title))
 				Expect(claim5.Summary).To(Equal(claim5Input.Summary))
+			})
+		})
+
+		When("Getting checked claims grouped by sources", func() {
+			It("Should return only checked claims grouped by source uri digest", func() {
+				// Create a new source
+				newSource := api.Source{
+					Name:      "Test Source for GetCheckedClaims",
+					Score:     0,
+					Summary:   "Test source summary",
+					Tags:      "test-tag",
+					Uri:       "https://test-source-checked",
+					UriDigest: "test-source-digest-456",
+				}
+				result := testDB.Create(&newSource)
+				Expect(result.Error).ToNot(HaveOccurred())
+
+				// Create 2 claims
+				claim6Input := api.ClaimInput{
+					SourceUriDigest: newSource.UriDigest,
+					Summary:         "Test claim 6 summary",
+					Title:           "Test Claim 6",
+					Uri:             "https://test-claim-6",
+				}
+				digest6, err := claimRepo.PostClaim(context.TODO(), &claim6Input)
+				Expect(err).ToNot(HaveOccurred())
+
+				claim7Input := api.ClaimInput{
+					SourceUriDigest: newSource.UriDigest,
+					Summary:         "Test claim 7 summary",
+					Title:           "Test Claim 7",
+					Uri:             "https://test-claim-7",
+				}
+				digest7, err := claimRepo.PostClaim(context.TODO(), &claim7Input)
+				Expect(err).ToNot(HaveOccurred())
+
+				// Create 2 proofs for claim 6 (2 supporting, 0 refuting)
+				proof1 := api.Proof{
+					ClaimUriDigest: digest6,
+					ReviewedBy:     "ReviewerX",
+					SupportsClaim:  true,
+					Uri:            "https://proof-1-for-claim6",
+					UriDigest:      "proof1digest",
+				}
+				result = testDB.Create(&proof1)
+				Expect(result.Error).ToNot(HaveOccurred())
+
+				proof2 := api.Proof{
+					ClaimUriDigest: digest6,
+					ReviewedBy:     "ReviewerY",
+					SupportsClaim:  true,
+					Uri:            "https://proof-2-for-claim6",
+					UriDigest:      "proof2digest",
+				}
+				result = testDB.Create(&proof2)
+				Expect(result.Error).ToNot(HaveOccurred())
+
+				// Call VerifyClaims to mark claim 6 as checked
+				updatedClaims := []api.Claim{
+					{UriDigest: digest6, Validity: true},
+				}
+				err = claimRepo.VerifyAllClaims(context.TODO(), updatedClaims)
+				Expect(err).ToNot(HaveOccurred())
+
+				// Eventually call GetCheckedClaimsBySources and verify claim 6 is present
+				Eventually(func() bool {
+					srcsClaims, err := claimRepo.GetCheckedClaimsBySources(context.TODO())
+					if err != nil {
+						return false
+					}
+
+					// Check if the source digest exists in the map
+					claims, exists := srcsClaims[newSource.UriDigest]
+					if !exists {
+						return false
+					}
+
+					// Check if claim 6 is in the list
+					for _, claim := range claims {
+						if claim.UriDigest == digest6 && claim.Checked == true {
+							return true
+						}
+					}
+					return false
+				}, 10*time.Second, 1*time.Second).Should(BeTrue())
+
+				// Verify claim 7 is NOT in the checked claims (it was not verified)
+				srcsClaims, err := claimRepo.GetCheckedClaimsBySources(context.TODO())
+				Expect(err).ToNot(HaveOccurred())
+
+				claims := srcsClaims[newSource.UriDigest]
+				provingClaim, err := claimRepo.GetClaimByUriDigest(context.TODO(), digest6)
+				uncheckedClaim, err := claimRepo.GetClaimByUriDigest(context.TODO(), digest7)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claims).To(ContainElement(*provingClaim))
+				Expect(claims).ToNot(ContainElement(*uncheckedClaim))
 			})
 		})
 

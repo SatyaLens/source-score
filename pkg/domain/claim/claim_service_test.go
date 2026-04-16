@@ -216,13 +216,13 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				fakeProofSvc.GetProofsByClaimsReturns(claimsProofs, nil)
 				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(2, &claim1, nil)
 				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(3, &claim2, nil)
-				fakeClaimRepo.VerifyClaimsReturns(nil)
+				fakeClaimRepo.VerifyAllClaimsReturns(nil)
 
 				err := claimSvc.VerifyAllClaims(context.TODO())
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeClaimRepo.VerifyClaimsCallCount()).To(Equal(1))
-				_, updatedClaims := fakeClaimRepo.VerifyClaimsArgsForCall(0)
+				Expect(fakeClaimRepo.VerifyAllClaimsCallCount()).To(Equal(1))
+				_, updatedClaims := fakeClaimRepo.VerifyAllClaimsArgsForCall(0)
 				Expect(len(updatedClaims)).To(Equal(2))
 
 				var updatedClaim1, updatedClaim2 *api.Claim

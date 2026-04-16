@@ -62,7 +62,7 @@ func TestClaim(t *testing.T) {
 		testDB, err = gorm.Open(sqlite.Open(testDBFile))
 		Expect(err).ToNot(HaveOccurred())
 
-		err = testDB.AutoMigrate(&api.Source{}, &api.Claim{})
+		err = testDB.AutoMigrate(&api.Source{}, &api.Claim{}, &api.Proof{})
 		Expect(err).ToNot(HaveOccurred())
 
 		result := testDB.Create(&sampleSource)
