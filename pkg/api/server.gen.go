@@ -140,7 +140,7 @@ type ServerInterface interface {
 	// (GET /api/v1/claims)
 	GetClaims(c *gin.Context)
 
-	// (POST /api/v1/claims)
+	// (POST /api/v1/claims/verify)
 	VerifyAllClaims(c *gin.Context)
 
 	// (POST /api/v1/proof)
@@ -579,7 +579,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.PATCH(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.PatchClaim)
 	router.POST(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.VerifyClaim)
 	router.GET(options.BaseURL+"/api/v1/claims", wrapper.GetClaims)
-	router.POST(options.BaseURL+"/api/v1/claims", wrapper.VerifyAllClaims)
+	router.POST(options.BaseURL+"/api/v1/claims/verify", wrapper.VerifyAllClaims)
 	router.POST(options.BaseURL+"/api/v1/proof", wrapper.PostProof)
 	router.DELETE(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.DeleteProof)
 	router.GET(options.BaseURL+"/api/v1/proof/:uriDigest", wrapper.GetProof)

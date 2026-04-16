@@ -135,6 +135,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Claim'
 
+  /api/v1/claims/verify:
     post:
       tags:
       - claims

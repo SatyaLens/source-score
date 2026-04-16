@@ -403,7 +403,7 @@ var _ = Describe("Claim model tests", func() {
 				}
 
 				// Hit the verify all claims endpoint
-				verifyAllUrl, err := url.JoinPath(baseUrl, "/api/v1/claims")
+				verifyAllUrl, err := url.JoinPath(baseUrl, "/api/v1/claims/verify")
 				Expect(err).To(BeNil())
 
 				resp, err = http.Post(verifyAllUrl, "application/json", nil)
