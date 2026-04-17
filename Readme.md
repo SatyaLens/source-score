@@ -6,6 +6,12 @@
 
 Source Score is a microservice that rates information sources based on the validity of their claims. The system evaluates sources by analyzing claims made by those sources and the supporting or refuting evidence (proofs) for each claim. Sources receive a score between 0 and 1, calculated as the ratio of valid claims to total verified claims.
 
+## API Documentation
+
+Swagger UI is available at `/swagger` when the service is running. The OpenAPI specification can be accessed at `/swagger/spec`.
+
+Check out the [test instance](https://source-score.onrender.com/swagger) and hit the endpoints ;)   
+
 ## Data Models
 
 ### Source
