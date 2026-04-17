@@ -21,6 +21,7 @@ import (
 	"source-score/pkg/helpers"
 	apiServer "source-score/pkg/http"
 	"source-score/pkg/logger"
+	"source-score/pkg/middleware"
 )
 
 func main() {
@@ -73,6 +74,13 @@ func main() {
 	srcSvc := source.NewSourceService(context.Background(), srcRepo, claimRepo)
 
 	server := gin.Default()
+	// register middlewares
+	endpoints := server.Group("/api")
+	// secure with API key if the env var is set
+	if key, ok := os.LookupEnv("API_KEY"); ok {
+		endpoints.Use(middleware.APIKeyMiddleware(key))
+	}
+
 	api.RegisterHandlersWithOptions(
 		server,
 		apiServer.NewRouter(context.Background(), srcSvc, claimSvc, proofSvc),
