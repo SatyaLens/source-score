@@ -2,7 +2,11 @@ openapi: 3.0.0
 info:
   title: Source Score Microservice
   description: An application to rate sources based on the validity of their claims
-  version: 0.0.1
+  version: 0.1.0
+
+servers:
+  - url: /
+    description: Current host
 
 paths:
   /ping:

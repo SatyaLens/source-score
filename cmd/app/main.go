@@ -6,6 +6,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	embed "source-score"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -16,6 +17,7 @@ import (
 	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/proof"
 	"source-score/pkg/domain/source"
+	"source-score/pkg/handlers"
 	"source-score/pkg/helpers"
 	apiServer "source-score/pkg/http"
 	"source-score/pkg/logger"
@@ -76,6 +78,11 @@ func main() {
 		apiServer.NewRouter(context.Background(), srcSvc, claimSvc, proofSvc),
 		loggerOpts,
 	)
+
+	// Register Swagger UI routes
+	swaggerHandler := handlers.NewSwaggerHandler(embed.OpenAPI)
+	server.GET("/swagger", swaggerHandler.ServeUI)
+	server.GET("/swagger/spec", swaggerHandler.ServeSpec)
 
 	err := server.Run()
 	if err != nil {
