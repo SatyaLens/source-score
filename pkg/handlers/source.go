@@ -38,9 +38,10 @@ func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context, uriDigest str
 				gin.H{"error": err.Error()},
 			)
 		default:
+			slog.Error("failed to delete source", "error", err, "uriDigest", uriDigest)
 			ctx.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": err.Error()},
+				gin.H{"error": "internal server error"},
 			)
 		}
 		return
@@ -52,9 +53,10 @@ func (sh *SourceHandler) DeleteSourceByUriDigest(ctx *gin.Context, uriDigest str
 func (sh *SourceHandler) GetSources(ctx *gin.Context) {
 	sources, err := sh.sourceSvc.GetSources(ctx)
 	if err != nil {
+		slog.Error("failed to get sources", "error", err)
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{"error": "internal server error"},
 		)
 		return
 	}
@@ -75,9 +77,10 @@ func (sh *SourceHandler) GetSourceByUriDigest(ctx *gin.Context, uriDigest string
 				gin.H{"error": err.Error()},
 			)
 		default:
+			slog.Error("failed to get source", "error", err, "uriDigest", uriDigest)
 			ctx.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": err.Error()},
+				gin.H{"error": "internal server error"},
 			)
 		}
 		return
@@ -93,6 +96,7 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 	sourceInput := &api.SourceInput{}
 	err := ctx.ShouldBindJSON(sourceInput)
 	if err != nil {
+		slog.Error("failed to bind source input", "error", err)
 		ctx.JSON(
 			http.StatusBadRequest,
 			gin.H{"error": err.Error()},
@@ -109,9 +113,10 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 				gin.H{"error": err.Error()},
 			)
 		default:
+			slog.Error("failed to create source", "error", err)
 			ctx.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": err.Error()},
+				gin.H{"error": "internal server error"},
 			)
 		}
 		return
@@ -127,6 +132,7 @@ func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context, uriDigest stri
 	sourceInput := &api.SourcePatchInput{}
 	err := ctx.ShouldBindJSON(sourceInput)
 	if err != nil {
+		slog.Error("failed to bind source patch input", "error", err, "uriDigest", uriDigest)
 		ctx.JSON(
 			http.StatusBadRequest,
 			gin.H{"error": err.Error()},
@@ -147,9 +153,10 @@ func (sh *SourceHandler) PatchSourceByUriDigest(ctx *gin.Context, uriDigest stri
 				gin.H{"error": err.Error()},
 			)
 		default:
+			slog.Error("failed to patch source", "error", err, "uriDigest", uriDigest)
 			ctx.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": err.Error()},
+				gin.H{"error": "internal server error"},
 			)
 		}
 		return

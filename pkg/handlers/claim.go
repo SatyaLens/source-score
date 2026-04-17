@@ -29,9 +29,10 @@ func NewClaimHandler(ctx context.Context, claimSvc claim.ClaimService) *ClaimHan
 func (ch *ClaimHandler) GetClaims(ctx *gin.Context) {
 	claims, err := ch.claimSvc.GetClaims(ctx)
 	if err != nil {
+		slog.Error("failed to get claims", "error", err)
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{"error": "internal server error"},
 		)
 		return
 	}
@@ -45,6 +46,7 @@ func (ch *ClaimHandler) GetClaims(ctx *gin.Context) {
 func (ch *ClaimHandler) PostClaim(ctx *gin.Context) {
 	claimInput := &api.ClaimInput{}
 	if err := ctx.ShouldBindJSON(claimInput); err != nil {
+		slog.Error("failed to bind claim input", "error", err)
 		ctx.JSON(
 			http.StatusBadRequest,
 			gin.H{"error": err.Error()},
@@ -61,7 +63,8 @@ func (ch *ClaimHandler) PostClaim(ctx *gin.Context) {
 				gin.H{"error": err.Error()},
 			)
 		default:
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			slog.Error("failed to create claim", "error", err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		}
 		return
 	}
@@ -79,9 +82,10 @@ func (ch *ClaimHandler) GetClaimByUriDigest(ctx *gin.Context, uriDigest string) 
 				gin.H{"error": err.Error()},
 			)
 		default:
+			slog.Error("failed to get claim", "error", err, "uriDigest", uriDigest)
 			ctx.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": err.Error()},
+				gin.H{"error": "internal server error"},
 			)
 		}
 		return
@@ -103,9 +107,10 @@ func (ch *ClaimHandler) DeleteClaimByUriDigest(ctx *gin.Context, uriDigest strin
 				gin.H{"error": err.Error()},
 			)
 		default:
+			slog.Error("failed to delete claim", "error", err, "uriDigest", uriDigest)
 			ctx.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": err.Error()},
+				gin.H{"error": "internal server error"},
 			)
 		}
 		return
@@ -117,6 +122,7 @@ func (ch *ClaimHandler) DeleteClaimByUriDigest(ctx *gin.Context, uriDigest strin
 func (ch *ClaimHandler) PatchClaimByUriDigest(ctx *gin.Context, uriDigest string) {
 	claimInput := &api.ClaimPatchInput{}
 	if err := ctx.ShouldBindJSON(claimInput); err != nil {
+		slog.Error("failed to bind claim patch input", "error", err, "uriDigest", uriDigest)
 		ctx.JSON(
 			http.StatusBadRequest,
 			gin.H{"error": err.Error()},
@@ -137,9 +143,10 @@ func (ch *ClaimHandler) PatchClaimByUriDigest(ctx *gin.Context, uriDigest string
 				gin.H{"error": err.Error()},
 			)
 		default:
+			slog.Error("failed to patch claim", "error", err, "uriDigest", uriDigest)
 			ctx.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": err.Error()},
+				gin.H{"error": "internal server error"},
 			)
 		}
 		return
@@ -151,6 +158,7 @@ func (ch *ClaimHandler) PatchClaimByUriDigest(ctx *gin.Context, uriDigest string
 func (ch *ClaimHandler) ValidateClaimByUriDigest(ctx *gin.Context, uriDigest string) {
 	claimVerification := &api.ClaimVerification{}
 	if err := ctx.ShouldBindJSON(claimVerification); err != nil {
+		slog.Error("failed to bind claim verification input", "error", err, "uriDigest", uriDigest)
 		ctx.JSON(
 			http.StatusBadRequest,
 			gin.H{"error": err.Error()},
@@ -171,9 +179,10 @@ func (ch *ClaimHandler) ValidateClaimByUriDigest(ctx *gin.Context, uriDigest str
 				gin.H{"error": err.Error()},
 			)
 		default:
+			slog.Error("failed to verify claim", "error", err, "uriDigest", uriDigest)
 			ctx.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": err.Error()},
+				gin.H{"error": "internal server error"},
 			)
 		}
 		return

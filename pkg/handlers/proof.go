@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
@@ -22,7 +23,8 @@ func NewProofHandler(ctx context.Context, proofSvc proof.ProofService) *ProofHan
 func (ph *ProofHandler) GetProofs(ctx *gin.Context) {
 	proofs, err := ph.proofSvc.GetProofs(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		slog.Error("failed to get proofs", "error", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -32,6 +34,7 @@ func (ph *ProofHandler) GetProofs(ctx *gin.Context) {
 func (ph *ProofHandler) PostProof(ctx *gin.Context) {
 	proofInput := &api.ProofInput{}
 	if err := ctx.ShouldBindJSON(proofInput); err != nil {
+		slog.Error("failed to bind proof input", "error", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -42,7 +45,8 @@ func (ph *ProofHandler) PostProof(ctx *gin.Context) {
 		case errors.Is(err, apperrors.ErrInvalidProof):
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		default:
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			slog.Error("failed to create proof", "error", err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		}
 		return
 	}
@@ -57,7 +61,8 @@ func (ph *ProofHandler) GetProofByUriDigest(ctx *gin.Context, uriDigest string) 
 		case errors.Is(err, apperrors.ErrProofNotFound):
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		default:
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			slog.Error("failed to get proof", "error", err, "uriDigest", uriDigest)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		}
 		return
 	}
@@ -72,7 +77,8 @@ func (ph *ProofHandler) DeleteProofByUriDigest(ctx *gin.Context, uriDigest strin
 		case errors.Is(err, apperrors.ErrProofNotFound):
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		default:
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			slog.Error("failed to delete proof", "error", err, "uriDigest", uriDigest)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		}
 		return
 	}
@@ -83,6 +89,7 @@ func (ph *ProofHandler) DeleteProofByUriDigest(ctx *gin.Context, uriDigest strin
 func (ph *ProofHandler) PatchProofByUriDigest(ctx *gin.Context, uriDigest string) {
 	proofInput := &api.ProofPatchInput{}
 	if err := ctx.ShouldBindJSON(proofInput); err != nil {
+		slog.Error("failed to bind proof patch input", "error", err, "uriDigest", uriDigest)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -94,7 +101,8 @@ func (ph *ProofHandler) PatchProofByUriDigest(ctx *gin.Context, uriDigest string
 		case errors.Is(err, apperrors.ErrProofNotFound):
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		default:
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			slog.Error("failed to patch proof", "error", err, "uriDigest", uriDigest)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		}
 		return
 	}
