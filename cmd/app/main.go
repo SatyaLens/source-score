@@ -35,8 +35,8 @@ func main() {
 		}),
 	)
 
-	// initialize the server
-	loggerOpts := api.GinServerOptions{
+	// initialize the logger middleware
+	serverOpts := api.GinServerOptions{
 		Middlewares: []api.MiddlewareFunc{
 			// function to add request headers to log fields
 			func(c *gin.Context) {
@@ -75,22 +75,34 @@ func main() {
 
 	server := gin.Default()
 
-	// Secure with API key if the env var is set
-	if key, ok := os.LookupEnv("API_KEY"); ok {
-		slog.Info("API Key found, securing the API")
-		server.Use(middleware.APIKeyMiddleware(key))
-	}
-
-	api.RegisterHandlersWithOptions(
-		server,
-		apiServer.NewRouter(context.Background(), srcSvc, claimSvc, proofSvc),
-		loggerOpts,
-	)
+	// Register liveness route
+	pingHandler := handlers.NewPingHandler()
+	server.GET("/ping", pingHandler.GetPing)
 
 	// Register Swagger UI routes
 	swaggerHandler := handlers.NewSwaggerHandler(embed.OpenAPI)
 	server.GET("/swagger", swaggerHandler.ServeUI)
 	server.GET("/swagger/spec", swaggerHandler.ServeSpec)
+
+	// Apply rate limiter middleware (10 requests per second, burst 20)
+	if os.Getenv("RATE_LIMIT_DISABLED") != "true" {
+		slog.Info("Rate limiter enabled")
+		// server.Use(middleware.RateLimiterMiddleware(10, 20))
+		serverOpts.Middlewares = append(serverOpts.Middlewares, api.MiddlewareFunc(middleware.RateLimiterMiddleware(10, 20)))
+	}
+
+	// Secure with API key if the env var is set
+	if key, ok := os.LookupEnv("API_KEY"); ok {
+		slog.Info("API Key found, securing the API")
+		// server.Use(middleware.APIKeyMiddleware(key))
+		serverOpts.Middlewares = append(serverOpts.Middlewares, api.MiddlewareFunc(middleware.APIKeyMiddleware(key)))
+	}
+
+	api.RegisterHandlersWithOptions(
+		server,
+		apiServer.NewRouter(context.Background(), srcSvc, claimSvc, proofSvc),
+		serverOpts,
+	)
 
 	err := server.Run()
 	if err != nil {

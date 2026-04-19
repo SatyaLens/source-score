@@ -26,6 +26,7 @@ services:
     - PG_HOST=database
     - SUPER_USER_PASSWORD=sourcescore
     - API_KEY=test-key
+    - RATE_LIMIT_DISABLED=true
     ports:
     - "8080:8080"
   adminer:

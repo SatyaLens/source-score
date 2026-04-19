@@ -9,17 +9,17 @@ servers:
     description: Current host
 
 paths:
-  /ping:
-    get:
-      summary: Health check endpoint
-      description: Returns a simple pong response to verify the service is running
-      responses:
-        200:
-          description: Service is healthy
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Pong'
+  # /ping:
+  #   get:
+  #     summary: Health check endpoint
+  #     description: Returns a simple pong response to verify the service is running
+  #     responses:
+  #       200:
+  #         description: Service is healthy
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Pong'
 
   /api/v1/sources:
     get:
@@ -404,15 +404,15 @@ paths:
 
 components:
   schemas:
-    Pong:
-      type: object
-      required:
-      - pong
-      properties:
-        pong:
-          type: string
-          example: pong
-          description: Simple response string to confirm service health
+    # Pong:
+    #   type: object
+    #   required:
+    #   - pong
+    #   properties:
+    #     pong:
+    #       type: string
+    #       example: pong
+    #       description: Simple response string to confirm service health
 
     SourceInput:
       type: object

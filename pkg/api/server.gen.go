@@ -11,91 +11,151 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-// Claim defines model for Claim.
+// Claim Complete claim entity with verification status
 type Claim struct {
-	Checked         bool   `binding:"required" json:"checked"`
+	// Checked Indicates whether the claim has been verified
+	Checked bool `binding:"required" json:"checked"`
+
+	// SourceUriDigest SHA-256 hash of the parent source URI
 	SourceUriDigest string `binding:"required" json:"sourceUriDigest"`
-	Summary         string `binding:"required" json:"summary"`
-	Title           string `binding:"required" json:"title"`
-	Uri             string `binding:"required" json:"uri"`
-	UriDigest       string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
-	Validity        bool   `binding:"required" json:"validity"`
+
+	// Summary Detailed description of the claim
+	Summary string `binding:"required" json:"summary"`
+
+	// Title Short title of the claim
+	Title string `binding:"required" json:"title"`
+
+	// Uri Unique HTTPS URL of the claim
+	Uri string `binding:"required" json:"uri"`
+
+	// UriDigest SHA-256 hash of the URI, used as primary key
+	UriDigest string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
+
+	// Validity Indicates whether the claim is valid (true) or invalid (false) based on proof analysis
+	Validity bool `binding:"required" json:"validity"`
 }
 
-// ClaimInput defines model for ClaimInput.
+// ClaimInput Input schema for creating a new claim
 type ClaimInput struct {
+	// SourceUriDigest SHA-256 hash of the parent source URI
 	SourceUriDigest string `binding:"required" json:"sourceUriDigest" validate:"nonempty"`
-	Summary         string `binding:"required" json:"summary" validate:"nonempty"`
-	Title           string `binding:"required" json:"title" validate:"nonempty"`
-	Uri             string `binding:"required" json:"uri" validate:"httpsurl"`
+
+	// Summary Detailed description of the claim
+	Summary string `binding:"required" json:"summary" validate:"nonempty"`
+
+	// Title Short title of the claim
+	Title string `binding:"required" json:"title" validate:"nonempty"`
+
+	// Uri Unique HTTPS URL identifying the claim
+	Uri string `binding:"required" json:"uri" validate:"httpsurl"`
 }
 
-// ClaimPatchInput defines model for ClaimPatchInput.
+// ClaimPatchInput Input schema for partially updating a claim
 type ClaimPatchInput struct {
+	// Summary Updated detailed description
 	Summary *string `json:"summary" validate:"omitnil,nonempty"`
-	Title   *string `json:"title" validate:"omitnil,nonempty"`
+
+	// Title Updated short title
+	Title *string `json:"title" validate:"omitnil,nonempty"`
 }
 
-// ClaimVerification defines model for ClaimVerification.
+// ClaimVerification Input schema for manually verifying a claim
 type ClaimVerification struct {
+	// Validity Whether the claim is valid (true) or invalid (false)
 	Validity *bool `binding:"required" json:"validity,omitempty" validate:"nonempty"`
 }
 
-// CreateSourceResponse defines model for CreateSourceResponse.
+// CreateSourceResponse Response after successfully creating a source
 type CreateSourceResponse struct {
+	// UriDigest SHA-256 hash of the source URI
 	UriDigest string `binding:"required" json:"uriDigest"`
 }
 
-// Pong defines model for Pong.
-type Pong struct {
-	Pong string `json:"pong"`
-}
-
-// Proof defines model for Proof.
+// Proof Complete proof entity
 type Proof struct {
+	// ClaimUriDigest SHA-256 hash of the claim URI
 	ClaimUriDigest string `binding:"required" json:"claimUriDigest"`
-	ReviewedBy     string `binding:"required" json:"reviewedBy"`
-	SupportsClaim  bool   `binding:"required" json:"supportsClaim"`
-	Uri            string `binding:"required" json:"uri"`
-	UriDigest      string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
+
+	// ReviewedBy Identifier of the reviewer
+	ReviewedBy string `binding:"required" json:"reviewedBy"`
+
+	// SupportsClaim Whether this proof supports (true) or refutes (false) the claim
+	SupportsClaim bool `binding:"required" json:"supportsClaim"`
+
+	// Uri Unique HTTPS URL of the proof source
+	Uri string `binding:"required" json:"uri"`
+
+	// UriDigest SHA-256 hash of the URI, used as primary key
+	UriDigest string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
 }
 
-// ProofInput defines model for ProofInput.
+// ProofInput Input schema for creating a new proof
 type ProofInput struct {
+	// ClaimUriDigest SHA-256 hash of the claim URI being evaluated (no spaces allowed)
 	ClaimUriDigest string `binding:"required" json:"claimUriDigest" validate:"nonempty,nospace"`
-	ReviewedBy     string `binding:"required" json:"reviewedBy" validate:"nonempty,nospace"`
-	SupportsClaim  *bool  `binding:"required" json:"supportsClaim,omitempty" validate:"nonempty"`
-	Uri            string `binding:"required" json:"uri" validate:"httpsurl"`
+
+	// ReviewedBy Identifier of the reviewer who evaluated this proof (no spaces allowed)
+	ReviewedBy string `binding:"required" json:"reviewedBy" validate:"nonempty,nospace"`
+
+	// SupportsClaim Whether this proof supports (true) or refutes (false) the claim
+	SupportsClaim *bool `binding:"required" json:"supportsClaim,omitempty" validate:"nonempty"`
+
+	// Uri Unique HTTPS URL of the proof source
+	Uri string `binding:"required" json:"uri" validate:"httpsurl"`
 }
 
-// ProofPatchInput defines model for ProofPatchInput.
+// ProofPatchInput Input schema for updating proof reviewer
 type ProofPatchInput struct {
+	// ReviewedBy Updated reviewer identifier (no spaces allowed)
 	ReviewedBy string `binding:"required" json:"reviewedBy" validate:"nonempty,nospace"`
 }
 
-// Source defines model for Source.
+// Source Complete source entity with calculated credibility score
 type Source struct {
-	Name      string  `binding:"required" json:"name"`
-	Score     float64 `binding:"required" json:"score"`
-	Summary   string  `binding:"required" json:"summary"`
-	Tags      string  `binding:"required" json:"tags"`
-	Uri       string  `binding:"required" json:"uri"`
-	UriDigest string  `binding:"required" gorm:"primaryKey" json:"uriDigest"`
+	// Name Display name of the source
+	Name string `binding:"required" json:"name"`
+
+	// Score Credibility score (0.0 to 1.0) calculated as ratio of valid to total verified claims
+	Score float64 `binding:"required" json:"score"`
+
+	// Summary Brief description of the source
+	Summary string `binding:"required" json:"summary"`
+
+	// Tags Comma-separated categorization tags
+	Tags string `binding:"required" json:"tags"`
+
+	// Uri Unique HTTPS URL of the source
+	Uri string `binding:"required" json:"uri"`
+
+	// UriDigest SHA-256 hash of the URI, used as primary key
+	UriDigest string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
 }
 
-// SourceInput defines model for SourceInput.
+// SourceInput Input schema for creating a new source
 type SourceInput struct {
-	Name    string `binding:"required" json:"name" validate:"nonempty"`
+	// Name Display name of the information source
+	Name string `binding:"required" json:"name" validate:"nonempty"`
+
+	// Summary Brief description of the source
 	Summary string `binding:"required" json:"summary" validate:"nonempty"`
-	Tags    string `binding:"required" json:"tags" validate:"nonempty,nospace"`
-	Uri     string `binding:"required" json:"uri" validate:"httpsurl"`
+
+	// Tags Comma-separated tags for categorization (no spaces allowed)
+	Tags string `binding:"required" json:"tags" validate:"nonempty,nospace"`
+
+	// Uri Unique HTTPS URL identifying the source
+	Uri string `binding:"required" json:"uri" validate:"httpsurl"`
 }
 
-// SourcePatchInput defines model for SourcePatchInput.
+// SourcePatchInput Input schema for partially updating a source
 type SourcePatchInput struct {
-	Name    *string `json:"name" validate:"omitnil,nonempty"`
+	// Name Updated display name
+	Name *string `json:"name" validate:"omitnil,nonempty"`
+
+	// Summary Updated description
 	Summary *string `json:"summary" validate:"omitnil,nonempty"`
-	Tags    *string `json:"tags" validate:"omitnil,nospace,nonempty"`
+
+	// Tags Updated comma-separated tags (no spaces allowed)
+	Tags *string `json:"tags" validate:"omitnil,nospace,nonempty"`
 }
 
 // PostClaimJSONRequestBody defines body for PostClaim for application/json ContentType.
@@ -121,63 +181,60 @@ type PatchSourceJSONRequestBody = SourcePatchInput
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-
+	// Create a new claim
 	// (POST /api/v1/claim)
 	PostClaim(c *gin.Context)
-
+	// Delete a claim
 	// (DELETE /api/v1/claim/{uriDigest})
 	DeleteClaim(c *gin.Context, uriDigest string)
-
+	// Get claim by URI digest
 	// (GET /api/v1/claim/{uriDigest})
 	GetClaim(c *gin.Context, uriDigest string)
-
+	// Update claim fields
 	// (PATCH /api/v1/claim/{uriDigest})
 	PatchClaim(c *gin.Context, uriDigest string)
-
+	// Verify a single claim
 	// (POST /api/v1/claim/{uriDigest})
 	VerifyClaim(c *gin.Context, uriDigest string)
-
+	// Get all claims
 	// (GET /api/v1/claims)
 	GetClaims(c *gin.Context)
-
+	// Verify all claims
 	// (POST /api/v1/claims/verify)
 	VerifyAllClaims(c *gin.Context)
-
+	// Create a new proof
 	// (POST /api/v1/proof)
 	PostProof(c *gin.Context)
-
+	// Delete a proof
 	// (DELETE /api/v1/proof/{uriDigest})
 	DeleteProof(c *gin.Context, uriDigest string)
-
+	// Get proof by URI digest
 	// (GET /api/v1/proof/{uriDigest})
 	GetProof(c *gin.Context, uriDigest string)
-
+	// Update proof reviewer
 	// (PATCH /api/v1/proof/{uriDigest})
 	PatchProof(c *gin.Context, uriDigest string)
-
+	// Get all proofs
 	// (GET /api/v1/proofs)
 	GetProofs(c *gin.Context)
-
+	// Create a new source
 	// (POST /api/v1/source)
 	PostSource(c *gin.Context)
-
+	// Delete a source
 	// (DELETE /api/v1/source/{uriDigest})
 	DeleteSource(c *gin.Context, uriDigest string)
-
+	// Get source by URI digest
 	// (GET /api/v1/source/{uriDigest})
 	GetSource(c *gin.Context, uriDigest string)
-
+	// Update source fields
 	// (PATCH /api/v1/source/{uriDigest})
 	PatchSource(c *gin.Context, uriDigest string)
-
+	// Get all sources
 	// (GET /api/v1/sources)
 	GetSources(c *gin.Context)
-
+	// Update all source scores
 	// (POST /api/v1/sources/scores)
 	UpdateAllScores(c *gin.Context)
-
-	// (GET /ping)
-	GetPing(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -533,19 +590,6 @@ func (siw *ServerInterfaceWrapper) UpdateAllScores(c *gin.Context) {
 	siw.Handler.UpdateAllScores(c)
 }
 
-// GetPing operation middleware
-func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetPing(c)
-}
-
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -591,5 +635,4 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.PATCH(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.PatchSource)
 	router.GET(options.BaseURL+"/api/v1/sources", wrapper.GetSources)
 	router.POST(options.BaseURL+"/api/v1/sources/scores", wrapper.UpdateAllScores)
-	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 }
