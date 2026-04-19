@@ -11,6 +11,10 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+const (
+	ApiKeyAuthScopes = "ApiKeyAuth.Scopes"
+)
+
 // Claim Complete claim entity with verification status
 type Claim struct {
 	// Checked Indicates whether the claim has been verified
@@ -249,6 +253,8 @@ type MiddlewareFunc func(c *gin.Context)
 // PostClaim operation middleware
 func (siw *ServerInterfaceWrapper) PostClaim(c *gin.Context) {
 
+	c.Set(ApiKeyAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -272,6 +278,8 @@ func (siw *ServerInterfaceWrapper) DeleteClaim(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -297,6 +305,8 @@ func (siw *ServerInterfaceWrapper) GetClaim(c *gin.Context) {
 		return
 	}
 
+	c.Set(ApiKeyAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -320,6 +330,8 @@ func (siw *ServerInterfaceWrapper) PatchClaim(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -345,6 +357,8 @@ func (siw *ServerInterfaceWrapper) VerifyClaim(c *gin.Context) {
 		return
 	}
 
+	c.Set(ApiKeyAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -357,6 +371,8 @@ func (siw *ServerInterfaceWrapper) VerifyClaim(c *gin.Context) {
 
 // GetClaims operation middleware
 func (siw *ServerInterfaceWrapper) GetClaims(c *gin.Context) {
+
+	c.Set(ApiKeyAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -371,6 +387,8 @@ func (siw *ServerInterfaceWrapper) GetClaims(c *gin.Context) {
 // VerifyAllClaims operation middleware
 func (siw *ServerInterfaceWrapper) VerifyAllClaims(c *gin.Context) {
 
+	c.Set(ApiKeyAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -383,6 +401,8 @@ func (siw *ServerInterfaceWrapper) VerifyAllClaims(c *gin.Context) {
 
 // PostProof operation middleware
 func (siw *ServerInterfaceWrapper) PostProof(c *gin.Context) {
+
+	c.Set(ApiKeyAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -408,6 +428,8 @@ func (siw *ServerInterfaceWrapper) DeleteProof(c *gin.Context) {
 		return
 	}
 
+	c.Set(ApiKeyAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -431,6 +453,8 @@ func (siw *ServerInterfaceWrapper) GetProof(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -456,6 +480,8 @@ func (siw *ServerInterfaceWrapper) PatchProof(c *gin.Context) {
 		return
 	}
 
+	c.Set(ApiKeyAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -469,6 +495,8 @@ func (siw *ServerInterfaceWrapper) PatchProof(c *gin.Context) {
 // GetProofs operation middleware
 func (siw *ServerInterfaceWrapper) GetProofs(c *gin.Context) {
 
+	c.Set(ApiKeyAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -481,6 +509,8 @@ func (siw *ServerInterfaceWrapper) GetProofs(c *gin.Context) {
 
 // PostSource operation middleware
 func (siw *ServerInterfaceWrapper) PostSource(c *gin.Context) {
+
+	c.Set(ApiKeyAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -506,6 +536,8 @@ func (siw *ServerInterfaceWrapper) DeleteSource(c *gin.Context) {
 		return
 	}
 
+	c.Set(ApiKeyAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -529,6 +561,8 @@ func (siw *ServerInterfaceWrapper) GetSource(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -554,6 +588,8 @@ func (siw *ServerInterfaceWrapper) PatchSource(c *gin.Context) {
 		return
 	}
 
+	c.Set(ApiKeyAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -567,6 +603,8 @@ func (siw *ServerInterfaceWrapper) PatchSource(c *gin.Context) {
 // GetSources operation middleware
 func (siw *ServerInterfaceWrapper) GetSources(c *gin.Context) {
 
+	c.Set(ApiKeyAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -579,6 +617,8 @@ func (siw *ServerInterfaceWrapper) GetSources(c *gin.Context) {
 
 // UpdateAllScores operation middleware
 func (siw *ServerInterfaceWrapper) UpdateAllScores(c *gin.Context) {
+
+	c.Set(ApiKeyAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)

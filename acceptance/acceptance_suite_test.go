@@ -33,7 +33,7 @@ const (
 
 var (
 	baseUrl        string
-	commonHeaders  = map[string]string{"X-API-Key": "test-key"}
+	commonHeaders  = map[string]string{"X-API-Key": "demo-api-key"}
 	client         = &http.Client{Timeout: 10 * time.Second}
 	serverPort     = os.Getenv("PORT")
 	sourceInput1 = api.SourceInput{
