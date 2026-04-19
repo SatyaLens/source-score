@@ -33,7 +33,7 @@ var _ = Describe("Proof model tests", func() {
 				srcBody, err := json.Marshal(sourceInput4)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(srcEndpoint, "application/json", bytes.NewBuffer(srcBody))
+				resp, err := doRequest(http.MethodPost, srcEndpoint, srcBody)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -53,7 +53,7 @@ var _ = Describe("Proof model tests", func() {
 				claimBody, err := json.Marshal(claimInput)
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(claimEndpoint, "application/json", bytes.NewBuffer(claimBody))
+				resp, err = doRequest(http.MethodPost, claimEndpoint, claimBody)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -74,7 +74,7 @@ var _ = Describe("Proof model tests", func() {
 				body1, err := json.Marshal(proof1)
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(endpoint, "application/json", bytes.NewBuffer(body1))
+				resp, err = doRequest(http.MethodPost, endpoint, body1)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -95,7 +95,7 @@ var _ = Describe("Proof model tests", func() {
 				body2, err := json.Marshal(proof2)
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(endpoint, "application/json", bytes.NewBuffer(body2))
+				resp, err = doRequest(http.MethodPost, endpoint, body2)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -109,7 +109,7 @@ var _ = Describe("Proof model tests", func() {
 
 		When("GET requests are sent to fetch proofs", func() {
 			It("should return all the created proofs and individual proof", func() {
-				resp, err := http.Get(proofsEndpoint)
+				resp, err := doRequest(http.MethodGet, proofsEndpoint, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -125,7 +125,7 @@ var _ = Describe("Proof model tests", func() {
 				proofUrl, err := url.JoinPath(endpoint, proof1Digest)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Get(proofUrl)
+				resp, err := doRequest(http.MethodGet, proofUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -150,6 +150,7 @@ var _ = Describe("Proof model tests", func() {
 
 				req, err := http.NewRequest(http.MethodPatch, proofUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 
 				resp, err := client.Do(req)
@@ -158,7 +159,7 @@ var _ = Describe("Proof model tests", func() {
 				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 
 				// verify update
-				resp, err = http.Get(proofUrl)
+				resp, err = doRequest(http.MethodGet, proofUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -177,6 +178,8 @@ var _ = Describe("Proof model tests", func() {
 
 				req, err := http.NewRequest(http.MethodDelete, proofUrl, nil)
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
+
 
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -184,7 +187,7 @@ var _ = Describe("Proof model tests", func() {
 				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 
 				// verify deletion
-				resp, err = http.Get(proofUrl)
+				resp, err = doRequest(http.MethodGet, proofUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
@@ -205,7 +208,7 @@ var _ = Describe("Proof model tests", func() {
 				body, err := json.Marshal(proof)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -230,7 +233,7 @@ var _ = Describe("Proof model tests", func() {
 				body, err := json.Marshal(proof)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -255,7 +258,7 @@ var _ = Describe("Proof model tests", func() {
 				body, err := json.Marshal(proof)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -279,7 +282,7 @@ var _ = Describe("Proof model tests", func() {
 				body, err := json.Marshal(proof)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -304,7 +307,7 @@ var _ = Describe("Proof model tests", func() {
 				body, err := json.Marshal(proof)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -324,6 +327,8 @@ var _ = Describe("Proof model tests", func() {
 
 				req, err := http.NewRequest(http.MethodDelete, proofUrl, nil)
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
+
 
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -348,6 +353,7 @@ var _ = Describe("Proof model tests", func() {
 
 				req, err := http.NewRequest(http.MethodPatch, proofUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 
 				resp, err := client.Do(req)
@@ -374,6 +380,7 @@ var _ = Describe("Proof model tests", func() {
 
 				req, err := http.NewRequest(http.MethodPatch, proofUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 
 				resp, err := client.Do(req)
