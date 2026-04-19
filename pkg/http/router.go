@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"net/http"
 	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/proof"
 	"source-score/pkg/domain/source"
@@ -62,12 +61,6 @@ func (r *router) PostClaim(ctx *gin.Context) {
 
 func (r *router) GetClaim(ctx *gin.Context, uriDigest string) {
 	r.claimHandler.GetClaimByUriDigest(ctx, uriDigest)
-}
-
-func (r *router) GetPing(ctx *gin.Context) {
-	message := r.pingHandler.GetPing(ctx)
-
-	ctx.JSON(http.StatusOK, gin.H{"data": message})
 }
 
 func (r *router) DeleteClaim(ctx *gin.Context, uriDigest string) {

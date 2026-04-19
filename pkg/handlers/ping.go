@@ -1,7 +1,9 @@
 package handlers
 
 import (
-	"context"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type PingHandler struct {
@@ -14,6 +16,6 @@ func NewPingHandler() *PingHandler {
 	}
 }
 
-func (ph PingHandler) GetPing(ctx context.Context) string {
-	return ph.message
+func (ph PingHandler) GetPing(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{"data": ph.message})
 }
