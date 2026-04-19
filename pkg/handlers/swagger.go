@@ -64,7 +64,10 @@ func (h *SwaggerHandler) ServeUI(c *gin.Context) {
                 plugins: [
                     SwaggerUIBundle.plugins.DownloadUrl
                 ],
-                layout: "StandaloneLayout"
+                layout: "StandaloneLayout",
+                onComplete: function () {
+                    ui.preauthorizeApiKey("ApiKeyAuth", "demo-api-key");
+                }
             });
         };
     </script>

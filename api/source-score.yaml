@@ -8,19 +8,10 @@ servers:
   - url: /
     description: Current host
 
-paths:
-  # /ping:
-  #   get:
-  #     summary: Health check endpoint
-  #     description: Returns a simple pong response to verify the service is running
-  #     responses:
-  #       200:
-  #         description: Service is healthy
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Pong'
+security:
+  - ApiKeyAuth: []
 
+paths:
   /api/v1/sources:
     get:
       summary: Get all sources
@@ -403,17 +394,13 @@ paths:
           description: Proof not found
 
 components:
-  schemas:
-    # Pong:
-    #   type: object
-    #   required:
-    #   - pong
-    #   properties:
-    #     pong:
-    #       type: string
-    #       example: pong
-    #       description: Simple response string to confirm service health
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
 
+  schemas:
     SourceInput:
       type: object
       description: Input schema for creating a new source
