@@ -1,6 +1,7 @@
 package acceptance_test
 
 import (
+	"bytes"
 	"log"
 	"net"
 	"net/http"
@@ -31,10 +32,10 @@ const (
 )
 
 var (
-	baseUrl string
-
-	client       = &http.Client{Timeout: 10 * time.Second}
-	serverPort   = os.Getenv("PORT")
+	baseUrl        string
+	commonHeaders  = map[string]string{"X-API-Key": "test-key"}
+	client         = &http.Client{Timeout: 10 * time.Second}
+	serverPort     = os.Getenv("PORT")
 	sourceInput1 = api.SourceInput{
 		Name:    "Sample Source 1",
 		Summary: "Sample summary",
@@ -141,4 +142,32 @@ func isLocalPortOpen(port string) bool {
 	}
 	_ = conn.Close()
 	return true
+}
+
+func addCommonHeaders(req *http.Request) {
+	for key, value := range commonHeaders {
+		req.Header.Set(key, value)
+	}
+}
+
+func doRequest(method, url string, body []byte) (*http.Response, error) {
+	var req *http.Request
+	var err error
+
+	if body != nil {
+		req, err = http.NewRequest(method, url, bytes.NewBuffer(body))
+	} else {
+		req, err = http.NewRequest(method, url, nil)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	addCommonHeaders(req)
+
+	return client.Do(req)
 }

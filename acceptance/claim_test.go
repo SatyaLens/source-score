@@ -34,7 +34,7 @@ var _ = Describe("Claim model tests", func() {
 				srcBody, err := json.Marshal(sourceInput3)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(srcEndpoint, "application/json", bytes.NewBuffer(srcBody))
+				resp, err := doRequest(http.MethodPost, srcEndpoint, srcBody)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -52,7 +52,7 @@ var _ = Describe("Claim model tests", func() {
 				body1, err := json.Marshal(claim1)
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(endpoint, "application/json", bytes.NewBuffer(body1))
+				resp, err = doRequest(http.MethodPost, endpoint, body1)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -72,7 +72,7 @@ var _ = Describe("Claim model tests", func() {
 				body2, err := json.Marshal(claim2)
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(endpoint, "application/json", bytes.NewBuffer(body2))
+				resp, err = doRequest(http.MethodPost, endpoint, body2)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -87,7 +87,7 @@ var _ = Describe("Claim model tests", func() {
 
 		When("GET requests are sent to fetch claims", func() {
 			It("should return all the created claims", func() {
-				resp, err := http.Get(claimsEndpoint)
+				resp, err := doRequest(http.MethodGet, claimsEndpoint, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -110,7 +110,7 @@ var _ = Describe("Claim model tests", func() {
 				claimUrl, err := url.JoinPath(endpoint, claim1Digest)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Get(claimUrl)
+				resp, err := doRequest(http.MethodGet, claimUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -138,6 +138,7 @@ var _ = Describe("Claim model tests", func() {
 
 				req, err := http.NewRequest(http.MethodPatch, claimUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 
 				resp, err := client.Do(req)
@@ -146,7 +147,7 @@ var _ = Describe("Claim model tests", func() {
 				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 
 				// verify update
-				resp, err = http.Get(claimUrl)
+				resp, err = doRequest(http.MethodGet, claimUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -171,6 +172,7 @@ var _ = Describe("Claim model tests", func() {
 
 				req, err := http.NewRequest(http.MethodPatch, claimUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 
 				resp, err := client.Do(req)
@@ -179,7 +181,7 @@ var _ = Describe("Claim model tests", func() {
 				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 
 				// verify update
-				resp, err = http.Get(claimUrl)
+				resp, err = doRequest(http.MethodGet, claimUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -205,6 +207,7 @@ var _ = Describe("Claim model tests", func() {
 
 				req, err := http.NewRequest(http.MethodPatch, claimUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 
 				resp, err := client.Do(req)
@@ -213,7 +216,7 @@ var _ = Describe("Claim model tests", func() {
 				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 
 				// verify update
-				resp, err = http.Get(claimUrl)
+				resp, err = doRequest(http.MethodGet, claimUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -241,13 +244,13 @@ var _ = Describe("Claim model tests", func() {
 		// 		body, err := json.Marshal(verifyBody)
 		// 		Expect(err).To(BeNil())
 
-		// 		resp, err := http.Post(claimUrl, "application/json", bytes.NewBuffer(body))
+		// 		resp, err := doRequest(http.MethodPost, claimUrl, body)
 		// 		Expect(err).To(BeNil())
 		// 		defer resp.Body.Close()
 		// 		Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 
 		// 		// verify the claim was updated
-		// 		resp, err = http.Get(claimUrl)
+		// 		resp, err = doRequest(http.MethodGet, claimUrl, nil)
 		// 		Expect(err).To(BeNil())
 		// 		defer resp.Body.Close()
 		// 		Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -267,6 +270,7 @@ var _ = Describe("Claim model tests", func() {
 
 				req, err := http.NewRequest(http.MethodDelete, claimUrl, nil)
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -274,7 +278,7 @@ var _ = Describe("Claim model tests", func() {
 				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 
 				// verify deletion
-				resp, err = http.Get(claimUrl)
+				resp, err = doRequest(http.MethodGet, claimUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
@@ -293,7 +297,7 @@ var _ = Describe("Claim model tests", func() {
 				srcBody, err := json.Marshal(srcInput)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(srcEndpoint, "application/json", bytes.NewBuffer(srcBody))
+				resp, err := doRequest(http.MethodPost, srcEndpoint, srcBody)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -312,7 +316,7 @@ var _ = Describe("Claim model tests", func() {
 				body1, err := json.Marshal(claim1Input)
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(endpoint, "application/json", bytes.NewBuffer(body1))
+				resp, err = doRequest(http.MethodPost, endpoint, body1)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -332,7 +336,7 @@ var _ = Describe("Claim model tests", func() {
 				body2, err := json.Marshal(claim2Input)
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(endpoint, "application/json", bytes.NewBuffer(body2))
+				resp, err = doRequest(http.MethodPost, endpoint, body2)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -354,7 +358,7 @@ var _ = Describe("Claim model tests", func() {
 						Uri:            fmt.Sprintf("https://proof-claim1-support-%d", i),
 					}
 					proofBody, _ := json.Marshal(proofInput)
-					resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+					resp, err = doRequest(http.MethodPost, proofEndpoint, proofBody)
 					Expect(err).To(BeNil())
 					Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 					resp.Body.Close()
@@ -368,7 +372,7 @@ var _ = Describe("Claim model tests", func() {
 					Uri:            "https://proof-claim1-refute",
 				}
 				proofBody, _ := json.Marshal(proofInput)
-				resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+				resp, err = doRequest(http.MethodPost, proofEndpoint, proofBody)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 				resp.Body.Close()
@@ -382,7 +386,7 @@ var _ = Describe("Claim model tests", func() {
 					Uri:            "https://proof-claim2-support",
 				}
 				proofBody, _ = json.Marshal(proofInput)
-				resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+				resp, err = doRequest(http.MethodPost, proofEndpoint, proofBody)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 				resp.Body.Close()
@@ -396,7 +400,7 @@ var _ = Describe("Claim model tests", func() {
 						Uri:            fmt.Sprintf("https://proof-claim2-refute-%d", i),
 					}
 					proofBody, _ := json.Marshal(proofInput)
-					resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+					resp, err = doRequest(http.MethodPost, proofEndpoint, proofBody)
 					Expect(err).To(BeNil())
 					Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 					resp.Body.Close()
@@ -406,7 +410,7 @@ var _ = Describe("Claim model tests", func() {
 				verifyAllUrl, err := url.JoinPath(baseUrl, "/api/v1/claims/verify")
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(verifyAllUrl, "application/json", nil)
+				resp, err = doRequest(http.MethodPost, verifyAllUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusAccepted))
@@ -416,7 +420,7 @@ var _ = Describe("Claim model tests", func() {
 					claim1Url, err := url.JoinPath(endpoint, testClaim1Digest)
 					g.Expect(err).To(BeNil())
 
-					resp, err = http.Get(claim1Url)
+					resp, err = doRequest(http.MethodGet, claim1Url, nil)
 					g.Expect(err).To(BeNil())
 					g.Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
@@ -431,7 +435,7 @@ var _ = Describe("Claim model tests", func() {
 					claim2Url, err := url.JoinPath(endpoint, testClaim2Digest)
 					g.Expect(err).To(BeNil())
 
-					resp, err = http.Get(claim2Url)
+					resp, err = doRequest(http.MethodGet, claim2Url, nil)
 					g.Expect(err).To(BeNil())
 					g.Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
@@ -458,7 +462,7 @@ var _ = Describe("Claim model tests", func() {
 				body, err := json.Marshal(claim)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -482,7 +486,7 @@ var _ = Describe("Claim model tests", func() {
 				body, err := json.Marshal(claim)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -507,7 +511,7 @@ var _ = Describe("Claim model tests", func() {
 				body, err := json.Marshal(claim)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -525,7 +529,7 @@ var _ = Describe("Claim model tests", func() {
 				claimUrl, err := url.JoinPath(endpoint, "doesnotexist")
 				Expect(err).To(BeNil())
 
-				resp, err := http.Get(claimUrl)
+				resp, err := doRequest(http.MethodGet, claimUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
@@ -544,6 +548,7 @@ var _ = Describe("Claim model tests", func() {
 
 				req, err := http.NewRequest(http.MethodDelete, claimUrl, nil)
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -571,6 +576,7 @@ var _ = Describe("Claim model tests", func() {
 
 				req, err := http.NewRequest(http.MethodPatch, claimUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 
 				resp, err := client.Do(req)
@@ -599,6 +605,7 @@ var _ = Describe("Claim model tests", func() {
 
 				req, err := http.NewRequest(http.MethodPatch, claimUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 
 				resp, err := client.Do(req)
@@ -625,7 +632,7 @@ var _ = Describe("Claim model tests", func() {
 		// 		body, err := json.Marshal(verifyBody)
 		// 		Expect(err).To(BeNil())
 
-		// 		resp, err := http.Post(claimUrl, "application/json", bytes.NewBuffer(body))
+		// 		resp, err := doRequest(http.MethodPost, claimUrl, body)
 		// 		Expect(err).To(BeNil())
 		// 		defer resp.Body.Close()
 		// 		Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -651,7 +658,7 @@ var _ = Describe("Claim model tests", func() {
 		// 		body, err := json.Marshal(verifyBody)
 		// 		Expect(err).To(BeNil())
 
-		// 		resp, err := http.Post(claimUrl, "application/json", bytes.NewBuffer(body))
+		// 		resp, err := doRequest(http.MethodPost, claimUrl, body)
 		// 		Expect(err).To(BeNil())
 		// 		defer resp.Body.Close()
 		// 		Expect(resp.StatusCode).To(Equal(http.StatusNotFound))

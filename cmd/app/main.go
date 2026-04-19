@@ -74,11 +74,11 @@ func main() {
 	srcSvc := source.NewSourceService(context.Background(), srcRepo, claimRepo)
 
 	server := gin.Default()
-	// register middlewares
-	endpoints := server.Group("/api")
-	// secure with API key if the env var is set
+
+	// Secure with API key if the env var is set
 	if key, ok := os.LookupEnv("API_KEY"); ok {
-		endpoints.Use(middleware.APIKeyMiddleware(key))
+		slog.Info("API Key found, securing the API")
+		server.Use(middleware.APIKeyMiddleware(key))
 	}
 
 	api.RegisterHandlersWithOptions(

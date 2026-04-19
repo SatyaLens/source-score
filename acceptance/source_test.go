@@ -3,7 +3,6 @@ package acceptance_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"source-score/pkg/api"
@@ -33,11 +32,7 @@ var _ = Describe("Source model tests", func() {
 			It("should return successful response", func() {
 				var respBody api.CreateSourceResponse
 
-				resp, err := http.Post(
-					endpoint,
-					"application/json",
-					bytes.NewBuffer(body1),
-				)
+				resp, err := doRequest(http.MethodPost, endpoint, body1)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 				err = json.NewDecoder(resp.Body).Decode(&respBody)
@@ -45,11 +40,7 @@ var _ = Describe("Source model tests", func() {
 				Expect(respBody.UriDigest).To(Equal(uriDigest1))
 				resp.Body.Close()
 
-				resp, err = http.Post(
-					endpoint,
-					"application/json",
-					bytes.NewBuffer(body2),
-				)
+				resp, err = doRequest(http.MethodPost, endpoint, body2)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 				err = json.NewDecoder(resp.Body).Decode(&respBody)
@@ -63,7 +54,7 @@ var _ = Describe("Source model tests", func() {
 			It("should return the created source", func() {
 				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
 				Expect(err).To(BeNil())
-				resp, err := http.Get(srcUrl)
+				resp, err := doRequest(http.MethodGet, srcUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -74,7 +65,7 @@ var _ = Describe("Source model tests", func() {
 			It("should return all sources", func() {
 				sourcesUrl, err := url.JoinPath(baseUrl, "/api/v1/sources")
 				Expect(err).To(BeNil())
-				resp, err := http.Get(sourcesUrl)
+				resp, err := doRequest(http.MethodGet, sourcesUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -102,11 +93,9 @@ var _ = Describe("Source model tests", func() {
 
 				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
 				Expect(err).To(BeNil())
-				req, err := http.NewRequest(
-					http.MethodPatch,
-					srcUrl,
-					bytes.NewBuffer(reqBody))
+				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(reqBody))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -115,7 +104,7 @@ var _ = Describe("Source model tests", func() {
 
 				By("verifying source got updated")
 				var src api.Source
-				resp, err = http.Get(srcUrl)
+				resp, err = doRequest(http.MethodGet, srcUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -141,11 +130,9 @@ var _ = Describe("Source model tests", func() {
 
 				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
 				Expect(err).To(BeNil())
-				req, err := http.NewRequest(
-					http.MethodPatch,
-					srcUrl,
-					bytes.NewBuffer(reqBody))
+				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(reqBody))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -154,7 +141,7 @@ var _ = Describe("Source model tests", func() {
 
 				By("verifying source got updated")
 				var src api.Source
-				resp, err = http.Get(srcUrl)
+				resp, err = doRequest(http.MethodGet, srcUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -171,12 +158,9 @@ var _ = Describe("Source model tests", func() {
 			It("should delete the created source", func() {
 				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
 				Expect(err).To(BeNil())
-				req, err := http.NewRequest(
-					http.MethodDelete,
-					srcUrl,
-					nil,
-				)
+				req, err := http.NewRequest(http.MethodDelete, srcUrl, nil)
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -184,7 +168,7 @@ var _ = Describe("Source model tests", func() {
 				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 
 				By("verifying source got deleted")
-				resp, err = http.Get(srcUrl)
+				resp, err = doRequest(http.MethodGet, srcUrl, nil)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
 			})
@@ -202,7 +186,7 @@ var _ = Describe("Source model tests", func() {
 				srcBody, err := json.Marshal(srcInput)
 				Expect(err).To(BeNil())
 
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(srcBody))
+				resp, err := doRequest(http.MethodPost, endpoint, srcBody)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -225,7 +209,7 @@ var _ = Describe("Source model tests", func() {
 				body1, err := json.Marshal(claim1Input)
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(claimEndpoint, "application/json", bytes.NewBuffer(body1))
+				resp, err = doRequest(http.MethodPost, claimEndpoint, body1)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -245,7 +229,7 @@ var _ = Describe("Source model tests", func() {
 				body2, err := json.Marshal(claim2Input)
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(claimEndpoint, "application/json", bytes.NewBuffer(body2))
+				resp, err = doRequest(http.MethodPost, claimEndpoint, body2)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 
@@ -264,7 +248,7 @@ var _ = Describe("Source model tests", func() {
 				body3, err := json.Marshal(claim3Input)
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(claimEndpoint, "application/json", bytes.NewBuffer(body3))
+				resp, err = doRequest(http.MethodPost, claimEndpoint, body3)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
 				resp.Body.Close()
@@ -281,7 +265,7 @@ var _ = Describe("Source model tests", func() {
 					Uri:            "https://proof-claim1-true",
 				}
 				proofBody, _ := json.Marshal(proofInput)
-				resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+				resp, err = doRequest(http.MethodPost, proofEndpoint, proofBody)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 				resp.Body.Close()
@@ -295,7 +279,7 @@ var _ = Describe("Source model tests", func() {
 					Uri:            "https://proof-claim2-false",
 				}
 				proofBody, _ = json.Marshal(proofInput)
-				resp, err = http.Post(proofEndpoint, "application/json", bytes.NewBuffer(proofBody))
+				resp, err = doRequest(http.MethodPost, proofEndpoint, proofBody)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 				resp.Body.Close()
@@ -304,14 +288,15 @@ var _ = Describe("Source model tests", func() {
 				verifyAllUrl, err := url.JoinPath(baseUrl, "/api/v1/claims/verify")
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(verifyAllUrl, "application/json", nil)
+				// resp, err = http.Post(verifyAllUrl, "application/json", nil)
+				resp, err = doRequest(http.MethodPost, verifyAllUrl, nil)
 				Expect(err).To(BeNil())
 				resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusAccepted))
 
 				// Loop until verify completes (no 409)
 				for {
-					resp, err = http.Post(verifyAllUrl, "application/json", nil)
+					resp, err = doRequest(http.MethodPost, verifyAllUrl, nil)
 					Expect(err).To(BeNil())
 					resp.Body.Close()
 					if resp.StatusCode != http.StatusConflict {
@@ -324,14 +309,14 @@ var _ = Describe("Source model tests", func() {
 				updateScoresUrl, err := url.JoinPath(baseUrl, "/api/v1/sources/scores")
 				Expect(err).To(BeNil())
 
-				resp, err = http.Post(updateScoresUrl, "application/json", nil)
+				resp, err = doRequest(http.MethodPost, updateScoresUrl, nil)
 				Expect(err).To(BeNil())
 				resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusAccepted))
 
 				// Loop until update scores completes (no 409)
 				for {
-					resp, err = http.Post(updateScoresUrl, "application/json", nil)
+					resp, err = doRequest(http.MethodPost, updateScoresUrl, nil)
 					Expect(err).To(BeNil())
 					resp.Body.Close()
 					if resp.StatusCode != http.StatusConflict {
@@ -343,7 +328,7 @@ var _ = Describe("Source model tests", func() {
 				// Get the source and verify score is 0.5
 				srcUrl, err := url.JoinPath(endpoint, srcResp.UriDigest)
 				Expect(err).To(BeNil())
-				resp, err = http.Get(srcUrl)
+				resp, err = doRequest(http.MethodGet, srcUrl, nil)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
@@ -352,7 +337,6 @@ var _ = Describe("Source model tests", func() {
 				Expect(err).To(BeNil())
 				resp.Body.Close()
 
-				fmt.Printf("Source score: %f\n", src.Score)
 				Expect(src.Score).To(Equal(0.5))
 			})
 		})
@@ -363,7 +347,7 @@ var _ = Describe("Source model tests", func() {
 			It("should return 404 error", func() {
 				srcUrl, err := url.JoinPath(endpoint, "invalid-digest")
 				Expect(err).To(BeNil())
-				resp, err := http.Get(srcUrl)
+				resp, err := doRequest(http.MethodGet, srcUrl, nil)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
@@ -374,12 +358,10 @@ var _ = Describe("Source model tests", func() {
 			It("should return 404 error", func() {
 				srcUrl, err := url.JoinPath(endpoint, "invalid-digest")
 				Expect(err).To(BeNil())
-				req, err := http.NewRequest(
-					http.MethodDelete,
-					srcUrl,
-					nil,
-				)
+				req, err := http.NewRequest(http.MethodDelete, srcUrl, nil)
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
+
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
@@ -390,7 +372,7 @@ var _ = Describe("Source model tests", func() {
 		When("POST request with missing required fields is sent", func() {
 			It("should return 400 Bad Request with error message", func() {
 				invalidBody := []byte(`{}`)
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(invalidBody))
+				resp, err := doRequest(http.MethodPost, endpoint, invalidBody)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -405,7 +387,7 @@ var _ = Describe("Source model tests", func() {
 		When("POST request with missing tags field is sent", func() {
 			It("should return 400 Bad Request with error message", func() {
 				invalidBody := []byte(`{"name":"valid name","summary":"valid summary","uri":"https://example.com"}`)
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(invalidBody))
+				resp, err := doRequest(http.MethodPost, endpoint, invalidBody)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -426,7 +408,7 @@ var _ = Describe("Source model tests", func() {
 					Uri:     "https://example.com",
 				}
 				body, _ := json.Marshal(invalidInput)
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -448,7 +430,7 @@ var _ = Describe("Source model tests", func() {
 					Uri:     "https://example.com",
 				}
 				body, _ := json.Marshal(invalidInput)
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -470,7 +452,7 @@ var _ = Describe("Source model tests", func() {
 					Uri:     "https://example.com",
 				}
 				body, _ := json.Marshal(invalidInput)
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -492,7 +474,7 @@ var _ = Describe("Source model tests", func() {
 					Uri:     "https://example.com",
 				}
 				body, _ := json.Marshal(invalidInput)
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -513,7 +495,7 @@ var _ = Describe("Source model tests", func() {
 					Uri:     "",
 				}
 				body, _ := json.Marshal(invalidInput)
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -535,7 +517,7 @@ var _ = Describe("Source model tests", func() {
 					Uri:     "http://example.com",
 				}
 				body, _ := json.Marshal(invalidInput)
-				resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(body))
+				resp, err := doRequest(http.MethodPost, endpoint, body)
 				Expect(err).To(BeNil())
 				defer resp.Body.Close()
 				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
@@ -558,6 +540,7 @@ var _ = Describe("Source model tests", func() {
 				Expect(err).To(BeNil())
 				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -586,6 +569,7 @@ var _ = Describe("Source model tests", func() {
 				Expect(err).To(BeNil())
 				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -614,6 +598,7 @@ var _ = Describe("Source model tests", func() {
 				Expect(err).To(BeNil())
 				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -642,6 +627,7 @@ var _ = Describe("Source model tests", func() {
 				Expect(err).To(BeNil())
 				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -670,6 +656,7 @@ var _ = Describe("Source model tests", func() {
 				Expect(err).To(BeNil())
 				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
 				Expect(err).To(BeNil())
+				addCommonHeaders(req)
 				req.Header.Set("Content-Type", "application/json")
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())

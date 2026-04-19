@@ -17,7 +17,7 @@ var _ = Describe("API Tests", func() {
 
 		When("GET request is sent to /ping", func() {
 			It("should get Pong message in reponse", func() {
-				resp, err := http.Get(endpoint)
+				resp, err := doRequest(http.MethodGet, endpoint, nil)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusOK))
 
