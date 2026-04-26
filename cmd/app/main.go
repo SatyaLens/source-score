@@ -9,6 +9,7 @@ import (
 	embed "source-score"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	"gorm.io/gorm"
 
 	"source-score/pkg/api"
@@ -74,6 +75,14 @@ func main() {
 	srcSvc := source.NewSourceService(context.Background(), srcRepo, claimRepo)
 
 	server := gin.Default()
+
+	// set CORS rules
+	server.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"https://satyalens.github.io"},
+		AllowMethods:     []string{"GET", "OPTIONS"},
+		AllowHeaders:     []string{"Content-Type", "X-API-Key"},
+		AllowCredentials: true,
+	}))
 
 	// Register liveness route
 	pingHandler := handlers.NewPingHandler()
