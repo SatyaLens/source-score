@@ -261,7 +261,7 @@ var _ = Describe("Source model tests", func() {
 				proofInput := api.ProofInput{
 					ClaimUriDigest: testClaim1Digest,
 					ReviewedBy:     "ReviewerA",
-					SupportsClaim:  &supports,
+					SupportsClaim:  supports,
 					Uri:            "https://proof-claim1-true",
 				}
 				proofBody, _ := json.Marshal(proofInput)
@@ -275,7 +275,7 @@ var _ = Describe("Source model tests", func() {
 				proofInput = api.ProofInput{
 					ClaimUriDigest: testClaim2Digest,
 					ReviewedBy:     "ReviewerB",
-					SupportsClaim:  &supports,
+					SupportsClaim:  supports,
 					Uri:            "https://proof-claim2-false",
 				}
 				proofBody, _ = json.Marshal(proofInput)

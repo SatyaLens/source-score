@@ -354,7 +354,7 @@ var _ = Describe("Claim model tests", func() {
 					proofInput := api.ProofInput{
 						ClaimUriDigest: testClaim1Digest,
 						ReviewedBy:     "ReviewerA",
-						SupportsClaim:  &supports,
+						SupportsClaim:  supports,
 						Uri:            fmt.Sprintf("https://proof-claim1-support-%d", i),
 					}
 					proofBody, _ := json.Marshal(proofInput)
@@ -368,7 +368,7 @@ var _ = Describe("Claim model tests", func() {
 				proofInput := api.ProofInput{
 					ClaimUriDigest: testClaim1Digest,
 					ReviewedBy:     "ReviewerB",
-					SupportsClaim:  &supports,
+					SupportsClaim:  supports,
 					Uri:            "https://proof-claim1-refute",
 				}
 				proofBody, _ := json.Marshal(proofInput)
@@ -382,7 +382,7 @@ var _ = Describe("Claim model tests", func() {
 				proofInput = api.ProofInput{
 					ClaimUriDigest: testClaim2Digest,
 					ReviewedBy:     "ReviewerC",
-					SupportsClaim:  &supports,
+					SupportsClaim:  supports,
 					Uri:            "https://proof-claim2-support",
 				}
 				proofBody, _ = json.Marshal(proofInput)
@@ -396,7 +396,7 @@ var _ = Describe("Claim model tests", func() {
 					proofInput := api.ProofInput{
 						ClaimUriDigest: testClaim2Digest,
 						ReviewedBy:     "ReviewerD",
-						SupportsClaim:  &supports,
+						SupportsClaim:  supports,
 						Uri:            fmt.Sprintf("https://proof-claim2-refute-%d", i),
 					}
 					proofBody, _ := json.Marshal(proofInput)

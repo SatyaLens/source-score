@@ -54,7 +54,7 @@ func (pr *proofRepository) PostProof(ctx context.Context, proofInput *api.ProofI
 	proof := &api.Proof{
 		ClaimUriDigest: proofInput.ClaimUriDigest,
 		ReviewedBy:     proofInput.ReviewedBy,
-		SupportsClaim:  *proofInput.SupportsClaim,
+		SupportsClaim:  proofInput.SupportsClaim,
 		Uri:            proofInput.Uri,
 		UriDigest:      uriDigest,
 	}

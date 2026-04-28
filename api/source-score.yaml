@@ -649,6 +649,7 @@ components:
       required:
       - claimUriDigest
       - reviewedBy
+      - supportsClaim
       - uri
       properties:
         claimUriDigest:

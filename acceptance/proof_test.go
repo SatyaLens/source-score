@@ -68,7 +68,7 @@ var _ = Describe("Proof model tests", func() {
 				proof1 := api.ProofInput{
 					ClaimUriDigest: sampleProof1.ClaimUriDigest,
 					ReviewedBy:     sampleProof1.ReviewedBy,
-					SupportsClaim:  &sampleProof1.SupportsClaim,
+					SupportsClaim:  sampleProof1.SupportsClaim,
 					Uri:            sampleProof1.Uri,
 				}
 				body1, err := json.Marshal(proof1)
@@ -89,7 +89,7 @@ var _ = Describe("Proof model tests", func() {
 				proof2 := api.ProofInput{
 					ClaimUriDigest: sampleProof2.ClaimUriDigest,
 					ReviewedBy:     sampleProof2.ReviewedBy,
-					SupportsClaim:  &sampleProof2.SupportsClaim,
+					SupportsClaim:  sampleProof2.SupportsClaim,
 					Uri:            sampleProof2.Uri,
 				}
 				body2, err := json.Marshal(proof2)
@@ -202,7 +202,7 @@ var _ = Describe("Proof model tests", func() {
 				proof := api.ProofInput{
 					ClaimUriDigest: "claim digest",
 					ReviewedBy:     "ValidReviewer",
-					SupportsClaim:  &supports,
+					SupportsClaim:  supports,
 					Uri:            "https://example.com",
 				}
 				body, err := json.Marshal(proof)
@@ -227,7 +227,7 @@ var _ = Describe("Proof model tests", func() {
 				proof := api.ProofInput{
 					ClaimUriDigest: "validclaimdigest",
 					ReviewedBy:     "Reviewer Name",
-					SupportsClaim:  &supports,
+					SupportsClaim:  supports,
 					Uri:            "https://example.com",
 				}
 				body, err := json.Marshal(proof)
@@ -252,7 +252,7 @@ var _ = Describe("Proof model tests", func() {
 				proof := api.ProofInput{
 					ClaimUriDigest: "",
 					ReviewedBy:     "",
-					SupportsClaim:  &supports,
+					SupportsClaim:  supports,
 					Uri:            "https://example.com",
 				}
 				body, err := json.Marshal(proof)
@@ -301,7 +301,7 @@ var _ = Describe("Proof model tests", func() {
 				proof := api.ProofInput{
 					ClaimUriDigest: "validclaimdigest",
 					ReviewedBy:     "ValidReviewer",
-					SupportsClaim:  &supports,
+					SupportsClaim:  supports,
 					Uri:            "http://not-https.com",
 				}
 				body, err := json.Marshal(proof)

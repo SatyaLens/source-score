@@ -102,7 +102,7 @@ type ProofInput struct {
 	ReviewedBy string `binding:"required" json:"reviewedBy" validate:"nonempty,nospace"`
 
 	// SupportsClaim Whether this proof supports (true) or refutes (false) the claim
-	SupportsClaim *bool `binding:"required" json:"supportsClaim,omitempty" validate:"nonempty"`
+	SupportsClaim bool `binding:"required" json:"supportsClaim" validate:"nonempty"`
 
 	// Uri Unique HTTPS URL of the proof source
 	Uri string `binding:"required" json:"uri" validate:"httpsurl"`
