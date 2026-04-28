@@ -63,6 +63,7 @@ func main() {
 		context.Background(),
 		api.Source{},
 		api.Claim{},
+		api.Proof{},
 	)
 
 	proofRepo := proof.NewProofRepository(context.Background(), dbClient)
