@@ -53,6 +53,19 @@ var _ = Describe("Proof repository layer unit tests", Ordered, func() {
 			})
 		})
 
+		When("Retrieving proofs by claim uri digest", func() {
+			It("Should return all proofs associated with the claim digest", func() {
+				proofs, err := proofRepo.GetProofsByClaimDigest(context.TODO(), claimDigest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(len(proofs)).To(Equal(2))
+
+				Expect(proofs).To(ContainElements(
+					sampleProof1,
+					sampleProof2,
+				))
+			})
+		})
+
 		When("Retrieving a single proof by uri digest", func() {
 			It("Should return the matching proof record", func() {
 				p, err := proofRepo.GetProofByUriDigest(context.TODO(), proof1Digest)

@@ -21,6 +21,7 @@ type ProofService interface {
 	DeleteProofByUriDigest(ctx context.Context, uriDigest string) error
 	PatchProofByUriDigest(ctx context.Context, proofInput *api.ProofPatchInput, uriDigest string) error
 	GetProofsByClaims(ctx context.Context) (map[string][]api.Proof, error)
+	GetProofsByClaimDigest(ctx context.Context, digest string) ([]api.Proof, error)
 }
 
 type proofService struct {
@@ -124,4 +125,8 @@ func (svc *proofService) GetProofsByClaims(ctx context.Context) (map[string][]ap
 	}
 
 	return claimsProofs, nil
+}
+
+func (svc *proofService) GetProofsByClaimDigest(ctx context.Context, digest string) ([]api.Proof, error) {
+	return svc.proofRepo.GetProofsByClaimDigest(ctx, digest)
 }
