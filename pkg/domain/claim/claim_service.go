@@ -24,6 +24,7 @@ type ClaimService interface {
 	PatchClaimByUriDigest(ctx context.Context, claimInput *api.ClaimPatchInput, uriDigest string) error
 	VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
 	VerifyAllClaims(ctx context.Context) error
+	GetClaimsBySourceDigest(ctx context.Context, sourceDigest string) ([]api.Claim, error)
 }
 
 type claimService struct {
@@ -186,4 +187,8 @@ func (svc *claimService) VerifyAllClaims(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (svc *claimService) GetClaimsBySourceDigest(ctx context.Context, digest string) ([]api.Claim, error) {
+	return svc.claimRepo.GetClaimsBySourceDigest(ctx, digest)
 }

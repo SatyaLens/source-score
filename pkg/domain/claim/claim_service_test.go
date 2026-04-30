@@ -86,6 +86,21 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 			})
 		})
 
+		When("Retrieving claims by source uri digest", func() {
+			It("Should return all claims associated with the source digest", func() {
+				expected := []api.Claim{sampleClaim1, sampleClaim2}
+				fakeClaimRepo.GetClaimsBySourceDigestReturnsOnCall(0, expected, nil)
+
+				claims, err := claimSvc.GetClaimsBySourceDigest(context.TODO(), sampleSource.UriDigest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(len(claims)).To(Equal(2))
+				Expect(claims).To(ContainElements(expected))
+				Expect(fakeClaimRepo.GetClaimsBySourceDigestCallCount()).To(Equal(1))
+				_, arg := fakeClaimRepo.GetClaimsBySourceDigestArgsForCall(0)
+				Expect(arg).To(Equal(sampleSource.UriDigest))
+			})
+		})
+
 		When("Deleting a claim by its uri digest", func() {
 			It("Should delete the correct claim record via repository", func() {
 				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(1, &sampleClaim1, nil)

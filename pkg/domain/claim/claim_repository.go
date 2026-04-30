@@ -22,6 +22,7 @@ type ClaimRepository interface {
 	VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
 	VerifyAllClaims(ctx context.Context, updatedClaims []api.Claim) error
 	GetCheckedClaimsBySources(ctx context.Context) (map[string][]api.Claim, error)
+	GetClaimsBySourceDigest(ctx context.Context, sourceDigest string) ([]api.Claim, error)
 }
 
 type claimRepository struct {
@@ -178,4 +179,16 @@ func (cr *claimRepository) GetCheckedClaimsBySources(ctx context.Context) (map[s
 	}
 
 	return srcsClaims, nil
+}
+
+func (cr *claimRepository) GetClaimsBySourceDigest(ctx context.Context, sourceDigest string) ([]api.Claim, error) {
+	var claims []api.Claim
+	result := cr.client.DB.Where("source_uri_digest = ?", sourceDigest).Find(&claims)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	slog.InfoContext(ctx, fmt.Sprintf("returned %d claims", len(claims)))
+
+	return claims, nil
 }

@@ -64,6 +64,19 @@ var _ = Describe("Claim repository layer unit tests", func() {
 			})
 		})
 
+		When("Retrieving claims by source uri digest", func() {
+			It("Should return all claims associated with the source digest", func() {
+				claims, err := claimRepo.GetClaimsBySourceDigest(context.TODO(), sampleSource.UriDigest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(len(claims)).To(Equal(2))
+
+				Expect(claims).To(ContainElements(
+					sampleClaim1,
+					sampleClaim2,
+				))
+			})
+		})
+
 		When("Patching a claim by its uri digest", func() {
 			It("Should update the correct claim record in the DB", func() {
 				newSummary := "Updated claim summary"
