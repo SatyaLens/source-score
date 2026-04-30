@@ -111,7 +111,7 @@ func (pr *proofRepository) PatchProofByUriDigest(ctx context.Context, proofInput
 
 func (pr *proofRepository) GetProofsByClaimDigest(ctx context.Context, digest string) ([]api.Proof, error) {
 	var proofs []api.Proof
-	result := pr.client.DB.Where("claim_uri_digest = ?", digest).Find(&proofs)
+	result := pr.client.DB.WithContext(ctx).Where("claim_uri_digest = ?", digest).Find(&proofs)
 
 	if result.Error != nil {
 		return nil, result.Error

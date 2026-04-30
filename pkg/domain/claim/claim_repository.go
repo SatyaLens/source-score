@@ -183,7 +183,7 @@ func (cr *claimRepository) GetCheckedClaimsBySources(ctx context.Context) (map[s
 
 func (cr *claimRepository) GetClaimsBySourceDigest(ctx context.Context, sourceDigest string) ([]api.Claim, error) {
 	var claims []api.Claim
-	result := cr.client.DB.Where("source_uri_digest = ?", sourceDigest).Find(&claims)
+	result := cr.client.DB.WithContext(ctx).Where("source_uri_digest = ?", sourceDigest).Find(&claims)
 
 	if result.Error != nil {
 		return nil, result.Error

@@ -137,6 +137,22 @@ var _ = Describe("Proof model tests", func() {
 				Expect(p.UriDigest).To(Equal(proof1Digest))
 				Expect(p).To(Equal(sampleProof1))
 			})
+
+			It("should return all proofs for the given claim digest", func() {
+				claimProofsUrl, err := url.JoinPath(baseUrl, "/api/v1/claim", claim3Digest, "proofs")
+				Expect(err).To(BeNil())
+
+				resp, err := doRequest(http.MethodGet, claimProofsUrl, nil)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var proofs []api.Proof
+				err = json.NewDecoder(resp.Body).Decode(&proofs)
+				Expect(err).To(BeNil())
+				Expect(len(proofs)).To(BeNumerically(">=", 2))
+				Expect(proofs).To(ContainElements(sampleProof1, sampleProof2))
+			})
 		})
 
 		When("PATCH request is sent to update a proof", func() {
@@ -179,7 +195,6 @@ var _ = Describe("Proof model tests", func() {
 				req, err := http.NewRequest(http.MethodDelete, proofUrl, nil)
 				Expect(err).To(BeNil())
 				addCommonHeaders(req)
-
 
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())
@@ -328,7 +343,6 @@ var _ = Describe("Proof model tests", func() {
 				req, err := http.NewRequest(http.MethodDelete, proofUrl, nil)
 				Expect(err).To(BeNil())
 				addCommonHeaders(req)
-
 
 				resp, err := client.Do(req)
 				Expect(err).To(BeNil())

@@ -206,3 +206,20 @@ func (ch *ClaimHandler) VerifyAllClaims(ctx *gin.Context) {
 
 	ctx.Status(http.StatusConflict)
 }
+
+func (ch *ClaimHandler) GetClaimsBySourceDigest(ctx *gin.Context, sourceDigest string) {
+	claims, err := ch.claimSvc.GetClaimsBySourceDigest(ctx, sourceDigest)
+	if err != nil {
+		slog.Error("failed to get claims by source digest", "error", err, "sourceDigest", sourceDigest)
+		ctx.JSON(
+			http.StatusInternalServerError,
+			gin.H{"error": "internal server error"},
+		)
+		return
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		claims,
+	)
+}
