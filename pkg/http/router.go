@@ -103,3 +103,11 @@ func (r *router) PatchProof(ctx *gin.Context, uriDigest string) {
 func (r *router) UpdateAllScores(ctx *gin.Context) {
 	r.srcHandler.UpdateAllScores(ctx)
 }
+
+func (r *router) GetClaimsBySourceDigest(ctx *gin.Context, sourceDigest string) {
+	r.claimHandler.GetClaimsBySourceDigest(ctx, sourceDigest)
+}
+
+func (r *router) GetProofsByClaimDigest(ctx *gin.Context, claimDigest string) {
+	r.proofHandler.GetProofsByClaimDigest(ctx, claimDigest)
+}

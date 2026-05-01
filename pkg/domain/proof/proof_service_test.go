@@ -146,6 +146,21 @@ var _ = Describe("Proof model service layer unit tests", Ordered, func() {
 				Expect(proofs2[0]).To(Equal(proof3))
 			})
 		})
+
+		When("Retrieving proofs by claim uri digest", func() {
+			It("Should return the matching proofs from repository", func() {
+				expected := []api.Proof{sampleProof1, sampleProof2}
+				fakeProofRepo.GetProofsByClaimDigestReturnsOnCall(0, expected, nil)
+
+				proofs, err := proofSvc.GetProofsByClaimDigest(context.TODO(), claimDigest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(len(proofs)).To(Equal(2))
+				Expect(proofs).To(ContainElements(expected))
+				Expect(fakeProofRepo.GetProofsByClaimDigestCallCount()).To(Equal(1))
+				_, arg := fakeProofRepo.GetProofsByClaimDigestArgsForCall(0)
+				Expect(arg).To(Equal(claimDigest))
+			})
+		})
 	})
 
 	Context("Proof POST validation tests", func() {

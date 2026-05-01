@@ -103,6 +103,26 @@ var _ = Describe("Claim model tests", func() {
 					sampleClaim2,
 				))
 			})
+
+			It("should return all claims for the given source digest", func() {
+				sourceClaimsUrl, err := url.JoinPath(baseUrl, "/api/v1/source", uriDigest3, "claims")
+				Expect(err).To(BeNil())
+
+				resp, err := doRequest(http.MethodGet, sourceClaimsUrl, nil)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var claims []api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&claims)
+				Expect(err).To(BeNil())
+				Expect(len(claims)).To(BeNumerically(">=", 2))
+
+				Expect(claims).To(ContainElements(
+					sampleClaim1,
+					sampleClaim2,
+				))
+			})
 		})
 
 		When("GET request is sent to retrieve a single claim by digest", func() {

@@ -200,6 +200,9 @@ type ServerInterface interface {
 	// Verify a single claim
 	// (POST /api/v1/claim/{uriDigest})
 	VerifyClaim(c *gin.Context, uriDigest string)
+	// Get all the proofs provided for a claim
+	// (GET /api/v1/claim/{uriDigest}/proofs)
+	GetProofsByClaimDigest(c *gin.Context, uriDigest string)
 	// Get all claims
 	// (GET /api/v1/claims)
 	GetClaims(c *gin.Context)
@@ -233,6 +236,9 @@ type ServerInterface interface {
 	// Update source fields
 	// (PATCH /api/v1/source/{uriDigest})
 	PatchSource(c *gin.Context, uriDigest string)
+	// Get all the claims made by a source
+	// (GET /api/v1/source/{uriDigest}/claims)
+	GetClaimsBySourceDigest(c *gin.Context, uriDigest string)
 	// Get all sources
 	// (GET /api/v1/sources)
 	GetSources(c *gin.Context)
@@ -367,6 +373,32 @@ func (siw *ServerInterfaceWrapper) VerifyClaim(c *gin.Context) {
 	}
 
 	siw.Handler.VerifyClaim(c, uriDigest)
+}
+
+// GetProofsByClaimDigest operation middleware
+func (siw *ServerInterfaceWrapper) GetProofsByClaimDigest(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProofsByClaimDigest(c, uriDigest)
 }
 
 // GetClaims operation middleware
@@ -600,6 +632,32 @@ func (siw *ServerInterfaceWrapper) PatchSource(c *gin.Context) {
 	siw.Handler.PatchSource(c, uriDigest)
 }
 
+// GetClaimsBySourceDigest operation middleware
+func (siw *ServerInterfaceWrapper) GetClaimsBySourceDigest(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "uriDigest" -------------
+	var uriDigest string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uriDigest", c.Param("uriDigest"), &uriDigest, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetClaimsBySourceDigest(c, uriDigest)
+}
+
 // GetSources operation middleware
 func (siw *ServerInterfaceWrapper) GetSources(c *gin.Context) {
 
@@ -662,6 +720,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.GetClaim)
 	router.PATCH(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.PatchClaim)
 	router.POST(options.BaseURL+"/api/v1/claim/:uriDigest", wrapper.VerifyClaim)
+	router.GET(options.BaseURL+"/api/v1/claim/:uriDigest/proofs", wrapper.GetProofsByClaimDigest)
 	router.GET(options.BaseURL+"/api/v1/claims", wrapper.GetClaims)
 	router.POST(options.BaseURL+"/api/v1/claims/verify", wrapper.VerifyAllClaims)
 	router.POST(options.BaseURL+"/api/v1/proof", wrapper.PostProof)
@@ -673,6 +732,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.DeleteSource)
 	router.GET(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.GetSource)
 	router.PATCH(options.BaseURL+"/api/v1/source/:uriDigest", wrapper.PatchSource)
+	router.GET(options.BaseURL+"/api/v1/source/:uriDigest/claims", wrapper.GetClaimsBySourceDigest)
 	router.GET(options.BaseURL+"/api/v1/sources", wrapper.GetSources)
 	router.POST(options.BaseURL+"/api/v1/sources/scores", wrapper.UpdateAllScores)
 }

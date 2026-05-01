@@ -18,6 +18,7 @@ type ProofRepository interface {
 	GetProofByUriDigest(ctx context.Context, uriDigest string) (*api.Proof, error)
 	DeleteProofByUriDigest(ctx context.Context, proof *api.Proof) error
 	PatchProofByUriDigest(ctx context.Context, proofInput *api.ProofPatchInput, uriDigest string) error
+	GetProofsByClaimDigest(ctx context.Context, digest string) ([]api.Proof, error)
 }
 
 type proofRepository struct {
@@ -106,4 +107,17 @@ func (pr *proofRepository) PatchProofByUriDigest(ctx context.Context, proofInput
 	slog.InfoContext(ctx, fmt.Sprintf("%d rows affected\n", result.RowsAffected))
 
 	return result.Error
+}
+
+func (pr *proofRepository) GetProofsByClaimDigest(ctx context.Context, digest string) ([]api.Proof, error) {
+	var proofs []api.Proof
+	result := pr.client.DB.WithContext(ctx).Where("claim_uri_digest = ?", digest).Find(&proofs)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	slog.InfoContext(ctx, fmt.Sprintf("returned %d proofs", len(proofs)))
+
+	return proofs, nil
 }

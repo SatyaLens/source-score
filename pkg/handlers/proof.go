@@ -109,3 +109,14 @@ func (ph *ProofHandler) PatchProofByUriDigest(ctx *gin.Context, uriDigest string
 
 	ctx.Status(http.StatusNoContent)
 }
+
+func (ph *ProofHandler) GetProofsByClaimDigest(ctx *gin.Context, claimDigest string) {
+	proofs, err := ph.proofSvc.GetProofsByClaimDigest(ctx, claimDigest)
+	if err != nil {
+		slog.Error("failed to get proofs by claim digest", "error", err, "claimDigest", claimDigest)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, proofs)
+}

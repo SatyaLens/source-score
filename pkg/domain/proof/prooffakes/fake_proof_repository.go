@@ -48,6 +48,20 @@ type FakeProofRepository struct {
 		result1 []api.Proof
 		result2 error
 	}
+	GetProofsByClaimDigestStub        func(context.Context, string) ([]api.Proof, error)
+	getProofsByClaimDigestMutex       sync.RWMutex
+	getProofsByClaimDigestArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	getProofsByClaimDigestReturns struct {
+		result1 []api.Proof
+		result2 error
+	}
+	getProofsByClaimDigestReturnsOnCall map[int]struct {
+		result1 []api.Proof
+		result2 error
+	}
 	PatchProofByUriDigestStub        func(context.Context, *api.ProofPatchInput, string) error
 	patchProofByUriDigestMutex       sync.RWMutex
 	patchProofByUriDigestArgsForCall []struct {
@@ -265,6 +279,71 @@ func (fake *FakeProofRepository) GetProofsReturnsOnCall(i int, result1 []api.Pro
 		})
 	}
 	fake.getProofsReturnsOnCall[i] = struct {
+		result1 []api.Proof
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeProofRepository) GetProofsByClaimDigest(arg1 context.Context, arg2 string) ([]api.Proof, error) {
+	fake.getProofsByClaimDigestMutex.Lock()
+	ret, specificReturn := fake.getProofsByClaimDigestReturnsOnCall[len(fake.getProofsByClaimDigestArgsForCall)]
+	fake.getProofsByClaimDigestArgsForCall = append(fake.getProofsByClaimDigestArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.GetProofsByClaimDigestStub
+	fakeReturns := fake.getProofsByClaimDigestReturns
+	fake.recordInvocation("GetProofsByClaimDigest", []interface{}{arg1, arg2})
+	fake.getProofsByClaimDigestMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeProofRepository) GetProofsByClaimDigestCallCount() int {
+	fake.getProofsByClaimDigestMutex.RLock()
+	defer fake.getProofsByClaimDigestMutex.RUnlock()
+	return len(fake.getProofsByClaimDigestArgsForCall)
+}
+
+func (fake *FakeProofRepository) GetProofsByClaimDigestCalls(stub func(context.Context, string) ([]api.Proof, error)) {
+	fake.getProofsByClaimDigestMutex.Lock()
+	defer fake.getProofsByClaimDigestMutex.Unlock()
+	fake.GetProofsByClaimDigestStub = stub
+}
+
+func (fake *FakeProofRepository) GetProofsByClaimDigestArgsForCall(i int) (context.Context, string) {
+	fake.getProofsByClaimDigestMutex.RLock()
+	defer fake.getProofsByClaimDigestMutex.RUnlock()
+	argsForCall := fake.getProofsByClaimDigestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeProofRepository) GetProofsByClaimDigestReturns(result1 []api.Proof, result2 error) {
+	fake.getProofsByClaimDigestMutex.Lock()
+	defer fake.getProofsByClaimDigestMutex.Unlock()
+	fake.GetProofsByClaimDigestStub = nil
+	fake.getProofsByClaimDigestReturns = struct {
+		result1 []api.Proof
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeProofRepository) GetProofsByClaimDigestReturnsOnCall(i int, result1 []api.Proof, result2 error) {
+	fake.getProofsByClaimDigestMutex.Lock()
+	defer fake.getProofsByClaimDigestMutex.Unlock()
+	fake.GetProofsByClaimDigestStub = nil
+	if fake.getProofsByClaimDigestReturnsOnCall == nil {
+		fake.getProofsByClaimDigestReturnsOnCall = make(map[int]struct {
+			result1 []api.Proof
+			result2 error
+		})
+	}
+	fake.getProofsByClaimDigestReturnsOnCall[i] = struct {
 		result1 []api.Proof
 		result2 error
 	}{result1, result2}

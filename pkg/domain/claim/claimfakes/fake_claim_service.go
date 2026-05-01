@@ -48,6 +48,20 @@ type FakeClaimService struct {
 		result1 []api.Claim
 		result2 error
 	}
+	GetClaimsBySourceDigestStub        func(context.Context, string) ([]api.Claim, error)
+	getClaimsBySourceDigestMutex       sync.RWMutex
+	getClaimsBySourceDigestArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	getClaimsBySourceDigestReturns struct {
+		result1 []api.Claim
+		result2 error
+	}
+	getClaimsBySourceDigestReturnsOnCall map[int]struct {
+		result1 []api.Claim
+		result2 error
+	}
 	PatchClaimByUriDigestStub        func(context.Context, *api.ClaimPatchInput, string) error
 	patchClaimByUriDigestMutex       sync.RWMutex
 	patchClaimByUriDigestArgsForCall []struct {
@@ -289,6 +303,71 @@ func (fake *FakeClaimService) GetClaimsReturnsOnCall(i int, result1 []api.Claim,
 		})
 	}
 	fake.getClaimsReturnsOnCall[i] = struct {
+		result1 []api.Claim
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClaimService) GetClaimsBySourceDigest(arg1 context.Context, arg2 string) ([]api.Claim, error) {
+	fake.getClaimsBySourceDigestMutex.Lock()
+	ret, specificReturn := fake.getClaimsBySourceDigestReturnsOnCall[len(fake.getClaimsBySourceDigestArgsForCall)]
+	fake.getClaimsBySourceDigestArgsForCall = append(fake.getClaimsBySourceDigestArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.GetClaimsBySourceDigestStub
+	fakeReturns := fake.getClaimsBySourceDigestReturns
+	fake.recordInvocation("GetClaimsBySourceDigest", []interface{}{arg1, arg2})
+	fake.getClaimsBySourceDigestMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeClaimService) GetClaimsBySourceDigestCallCount() int {
+	fake.getClaimsBySourceDigestMutex.RLock()
+	defer fake.getClaimsBySourceDigestMutex.RUnlock()
+	return len(fake.getClaimsBySourceDigestArgsForCall)
+}
+
+func (fake *FakeClaimService) GetClaimsBySourceDigestCalls(stub func(context.Context, string) ([]api.Claim, error)) {
+	fake.getClaimsBySourceDigestMutex.Lock()
+	defer fake.getClaimsBySourceDigestMutex.Unlock()
+	fake.GetClaimsBySourceDigestStub = stub
+}
+
+func (fake *FakeClaimService) GetClaimsBySourceDigestArgsForCall(i int) (context.Context, string) {
+	fake.getClaimsBySourceDigestMutex.RLock()
+	defer fake.getClaimsBySourceDigestMutex.RUnlock()
+	argsForCall := fake.getClaimsBySourceDigestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeClaimService) GetClaimsBySourceDigestReturns(result1 []api.Claim, result2 error) {
+	fake.getClaimsBySourceDigestMutex.Lock()
+	defer fake.getClaimsBySourceDigestMutex.Unlock()
+	fake.GetClaimsBySourceDigestStub = nil
+	fake.getClaimsBySourceDigestReturns = struct {
+		result1 []api.Claim
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClaimService) GetClaimsBySourceDigestReturnsOnCall(i int, result1 []api.Claim, result2 error) {
+	fake.getClaimsBySourceDigestMutex.Lock()
+	defer fake.getClaimsBySourceDigestMutex.Unlock()
+	fake.GetClaimsBySourceDigestStub = nil
+	if fake.getClaimsBySourceDigestReturnsOnCall == nil {
+		fake.getClaimsBySourceDigestReturnsOnCall = make(map[int]struct {
+			result1 []api.Claim
+			result2 error
+		})
+	}
+	fake.getClaimsBySourceDigestReturnsOnCall[i] = struct {
 		result1 []api.Claim
 		result2 error
 	}{result1, result2}
