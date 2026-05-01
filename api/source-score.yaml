@@ -143,7 +143,6 @@ paths:
       description: Retrieves a list of all the claims made by a given source
       tags:
       - claims
-      - source
       operationId: getClaimsBySourceDigest
       parameters:
       - in: path
@@ -316,7 +315,6 @@ paths:
       description: Retrieves a list of all the proofs stored for a given claim
       tags:
       - proofs
-      - claim
       operationId: getProofsByClaimDigest
       parameters:
       - in: path
