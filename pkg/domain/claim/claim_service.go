@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
 	"source-score/pkg/domain/proof"
@@ -145,6 +146,7 @@ func (svc *claimService) VerifyClaimByUriDigest(ctx context.Context, claimVerifi
 func (svc *claimService) VerifyAllClaims(ctx context.Context) error {
 	claimsProofs, err := svc.proofSvc.GetProofsByClaims(ctx)
 	if err != nil {
+		slog.Error("failed to get proofs to claims map", "error", err)
 		return err
 	}
 
@@ -166,7 +168,8 @@ func (svc *claimService) VerifyAllClaims(ctx context.Context) error {
 
 		updatedClaim, err := svc.GetClaimByUriDigest(ctx, claim)
 		if err != nil {
-			return err
+			slog.Error(fmt.Sprintf("failed to get claim for digest: %s", claim), "error", err)
+			continue
 		}
 
 		updatedClaim.Checked = true
@@ -182,6 +185,7 @@ func (svc *claimService) VerifyAllClaims(ctx context.Context) error {
 	if len(updatedClaims) > 0 {
 		err = svc.claimRepo.VerifyAllClaims(ctx, updatedClaims)
 		if err != nil {
+			slog.Error("failed to update claims for verification", "error", err)
 			return err
 		}
 	}
