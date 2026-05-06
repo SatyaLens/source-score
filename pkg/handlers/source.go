@@ -112,6 +112,11 @@ func (sh *SourceHandler) PostSource(ctx *gin.Context) {
 				http.StatusBadRequest,
 				gin.H{"error": err.Error()},
 			)
+		case errors.Is(err, apperrors.ErrDuplicateSource):
+			ctx.JSON(
+				http.StatusConflict,
+				gin.H{"error": err.Error()},
+			)
 		default:
 			slog.Error("failed to create source", "error", err)
 			ctx.JSON(

@@ -175,6 +175,13 @@ var _ = Describe("Source model repository layer unit tests", Ordered, func() {
 	})
 
 	Context("Validation tests", func() {
+		When("Creating a source that already exists", func() {
+			It("Should return a duplicate record error", func() {
+				_, err := sourceRepo.PostSource(context.TODO(), &sampleSourceInput2)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrDuplicatedKey)).To(BeTrue())
+			})
+		})
 		When("Patching a source that does not exist", func() {
 			It("Should return record not found error", func() {
 				name := "Twice Updated Sample Source 1"

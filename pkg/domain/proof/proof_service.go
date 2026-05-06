@@ -106,7 +106,17 @@ func (svc *proofService) PostProof(ctx context.Context, proofInput *api.ProofInp
 		return "", fmt.Errorf("%w: %s", apperrors.ErrInvalidProof, combinedErrs)
 	}
 
-	return svc.proofRepo.PostProof(ctx, proofInput)
+	digest, err := svc.proofRepo.PostProof(ctx, proofInput)
+	if err != nil {
+		switch {
+		case errors.Is(err, gorm.ErrDuplicatedKey):
+			return "", apperrors.ErrDuplicateProof
+		default:
+			return "", err
+		}
+	}
+
+	return digest, nil
 }
 
 func (svc *proofService) GetProofsByClaims(ctx context.Context) (map[string][]api.Proof, error) {

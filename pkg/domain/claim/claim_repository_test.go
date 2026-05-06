@@ -307,6 +307,21 @@ var _ = Describe("Claim repository layer unit tests", func() {
 	})
 
 	Context("Validation tests", func() {
+		When("Creating a claim that already exists", func() {
+			It("Should return gorm.ErrDuplicatedKey", func() {
+				input := api.ClaimInput{
+					SourceUriDigest: sampleClaim2.SourceUriDigest,
+					Summary:         sampleClaim2.Summary,
+					Title:           sampleClaim2.Title,
+					Uri:             sampleClaim2.Uri,
+				}
+
+				_, err := claimRepo.PostClaim(context.TODO(), &input)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrDuplicatedKey)).To(BeTrue())
+			})
+		})
+
 		When("Retrieving a non-existent claim by uri digest", func() {
 			It("Should return gorm.ErrRecordNotFound", func() {
 				_, err := claimRepo.GetClaimByUriDigest(context.TODO(), "doesnotexist")

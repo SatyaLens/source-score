@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"gorm.io/gorm"
 )
 
 const (
@@ -19,7 +20,13 @@ type conf struct {
 	SuperUserPassword string `env:"SUPER_USER_PASSWORD" yaml:"SUPER_USER_PASSWORD" env-required:"true"`
 }
 
-var Cfg conf
+var (
+	Cfg conf
+
+	GormConfig = &gorm.Config{
+		TranslateError: true,
+	}
+)
 
 func LoadConfig() {
 	if envPath, ok := os.LookupEnv("DOTENV_PATH"); ok {

@@ -94,7 +94,18 @@ func (svc *sourceService) PostSource(ctx context.Context, sourceInput *api.Sourc
 		combinedErrs = strings.TrimSpace(combinedErrs)
 		return "", fmt.Errorf("%w: %s", apperrors.ErrInvalidSource, combinedErrs)
 	}
-	return svc.sourceRepo.PostSource(ctx, sourceInput)
+
+	digest, err := svc.sourceRepo.PostSource(ctx, sourceInput)
+	if err != nil {
+		switch {
+		case errors.Is(err, gorm.ErrDuplicatedKey):
+			return "", apperrors.ErrDuplicateSource
+		default:
+			return "", err
+		}
+	}
+
+	return digest, nil
 }
 
 func (svc *sourceService) PatchSourceByUriDigest(ctx context.Context, sourceInput *api.SourcePatchInput, uriDigest string) error {

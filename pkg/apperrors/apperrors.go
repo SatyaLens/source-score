@@ -11,4 +11,7 @@ var (
 	ErrProofNotFound            = errors.New("proof not found")
 	ErrValidationLogic          = errors.New("validation logic error")
 	ErrInvalidClaimVerification = errors.New("invalid claim verification body")
+	ErrDuplicateSource          = errors.New("source already exists")
+	ErrDuplicateClaim           = errors.New("claim already exists")
+	ErrDuplicateProof           = errors.New("proof already exists")
 )
