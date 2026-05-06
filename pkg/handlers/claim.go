@@ -62,6 +62,11 @@ func (ch *ClaimHandler) PostClaim(ctx *gin.Context) {
 				http.StatusBadRequest,
 				gin.H{"error": err.Error()},
 			)
+		case errors.Is(err, apperrors.ErrDuplicateClaim):
+			ctx.JSON(
+				http.StatusConflict,
+				gin.H{"error": err.Error()},
+			)
 		default:
 			slog.Error("failed to create claim", "error", err)
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})

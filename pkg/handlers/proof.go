@@ -44,6 +44,8 @@ func (ph *ProofHandler) PostProof(ctx *gin.Context) {
 		switch {
 		case errors.Is(err, apperrors.ErrInvalidProof):
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		case errors.Is(err, apperrors.ErrDuplicateProof):
+			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		default:
 			slog.Error("failed to create proof", "error", err)
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
