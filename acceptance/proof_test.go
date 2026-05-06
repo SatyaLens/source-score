@@ -211,6 +211,29 @@ var _ = Describe("Proof model tests", func() {
 	})
 
 	Context("Validation tests", func() {
+		When("posting a proof that already exists", func() {
+			It("should return 409 Conflict with error message", func() {
+				dupProof := api.ProofInput{
+					ClaimUriDigest: claim3Digest,
+					ReviewedBy:     sampleProof2.ReviewedBy,
+					SupportsClaim:  &sampleProof2.SupportsClaim,
+					Uri:            sampleProof2.Uri,
+				}
+				body, err := json.Marshal(dupProof)
+				Expect(err).To(BeNil())
+
+				resp, err := doRequest(http.MethodPost, endpoint, body)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusConflict))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).ToNot(BeNil())
+				Expect(strings.Contains(strings.ToLower(errResp["error"].(string)), "proof already exists")).To(BeTrue())
+			})
+		})
 		When("POST request with space in ClaimUriDigest is sent", func() {
 			It("should return 400 with validation error mentioning nospace", func() {
 				supports := true

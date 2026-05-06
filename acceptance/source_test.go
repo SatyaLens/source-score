@@ -343,6 +343,25 @@ var _ = Describe("Source model tests", func() {
 	})
 
 	Context("Validation tests", func() {
+		When("posting a source that already exists", func() {
+			It("should return 409 Conflict with error message", func() {
+				// Try to create sourceInput2 again (already created above)
+				dupBody, err := json.Marshal(sourceInput2)
+				Expect(err).To(BeNil())
+
+				resp, err := doRequest(http.MethodPost, endpoint, dupBody)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusConflict))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).ToNot(BeNil())
+				Expect(strings.Contains(strings.ToLower(errResp["error"].(string)), "source already exists")).To(BeTrue())
+			})
+		})
+
 		When("GET request is sent for an invalid source", func() {
 			It("should return 404 error", func() {
 				srcUrl, err := url.JoinPath(endpoint, "invalid-digest")

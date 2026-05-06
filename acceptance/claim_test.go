@@ -471,6 +471,29 @@ var _ = Describe("Claim model tests", func() {
 	})
 
 	Context("Validation tests", func() {
+		When("posting a claim that already exists", func() {
+			It("should return 409 Conflict with error message", func() {
+				dupClaim := api.ClaimInput{
+					SourceUriDigest: uriDigest3,
+					Summary:         sampleClaim2.Summary,
+					Title:           sampleClaim2.Title,
+					Uri:             sampleClaim2.Uri,
+				}
+				body, err := json.Marshal(dupClaim)
+				Expect(err).To(BeNil())
+
+				resp, err := doRequest(http.MethodPost, endpoint, body)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusConflict))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).ToNot(BeNil())
+				Expect(strings.Contains(strings.ToLower(errResp["error"].(string)), "claim already exists")).To(BeTrue())
+			})
+		})
 		When("POST request with empty sourceUriDigest is sent", func() {
 			It("should return 400 with validation error", func() {
 				claim := api.ClaimInput{
