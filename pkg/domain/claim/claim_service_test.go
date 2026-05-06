@@ -262,6 +262,24 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 	})
 
 	Context("Validation tests", func() {
+		When("Posting a claim that already exists", func() {
+			It("Should return ErrDuplicateClaim", func() {
+				callCount := fakeClaimRepo.PostClaimCallCount()
+				fakeClaimRepo.PostClaimReturnsOnCall(callCount, "", gorm.ErrDuplicatedKey)
+
+				input := api.ClaimInput{
+					SourceUriDigest: sampleClaim2.SourceUriDigest,
+					Summary:         sampleClaim2.Summary,
+					Title:           sampleClaim2.Title,
+					Uri:             sampleClaim2.Uri,
+				}
+
+				_, err := claimSvc.PostClaim(context.TODO(), &input)
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrDuplicateClaim)).To(BeTrue())
+			})
+		})
+
 		When("Posting a claim with empty source uri digest", func() {
 			It("Should return ErrInvalidClaim", func() {
 				input := api.ClaimInput{

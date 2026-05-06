@@ -117,7 +117,16 @@ func (svc *claimService) PostClaim(ctx context.Context, claimInput *api.ClaimInp
 		return "", fmt.Errorf("%w: %s", apperrors.ErrInvalidClaim, combinedErrs)
 	}
 
-	return svc.claimRepo.PostClaim(ctx, claimInput)
+	digest, err := svc.claimRepo.PostClaim(ctx, claimInput)
+	if err != nil {
+		switch {
+		case errors.Is(err, gorm.ErrDuplicatedKey):
+			return "", apperrors.ErrDuplicateClaim
+		default:
+			return "", err
+		}
+	}
+	return digest, nil
 }
 
 func (svc *claimService) VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error {
