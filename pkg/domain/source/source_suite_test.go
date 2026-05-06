@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"source-score/pkg/api"
+	"source-score/pkg/conf"
 	"source-score/pkg/db/pgsql"
 	"source-score/pkg/domain/claim/claimfakes"
 	"source-score/pkg/domain/source"
@@ -42,7 +43,10 @@ var (
 
 func TestSource(t *testing.T) {
 	var _ = BeforeSuite(func() {
-		testDB, err = gorm.Open(sqlite.Open(testDBFile))
+		testDB, err = gorm.Open(
+			sqlite.Open(testDBFile),
+			conf.GormConfig,
+		)
 		Expect(err).ToNot(HaveOccurred())
 
 		err = testDB.AutoMigrate(&api.Source{}, &api.SourceInput{})

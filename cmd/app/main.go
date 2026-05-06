@@ -8,9 +8,8 @@ import (
 	"os"
 	embed "source-score"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
-	"gorm.io/gorm"
+	"github.com/gin-gonic/gin"
 
 	"source-score/pkg/api"
 	"source-score/pkg/conf"
@@ -57,7 +56,7 @@ func main() {
 		conf.Cfg.AppUserPassword,
 		conf.DbName,
 	)
-	dbClient := pgsql.NewClient(context.Background(), dsn, &gorm.Config{})
+	dbClient := pgsql.NewClient(context.Background(), dsn, conf.GormConfig)
 	// TODO: wrap this and call it securely
 	dbClient.SetAutoMigration(
 		context.Background(),

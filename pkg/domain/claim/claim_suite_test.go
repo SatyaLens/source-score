@@ -3,6 +3,7 @@ package claim_test
 import (
 	"context"
 	"source-score/pkg/api"
+	"source-score/pkg/conf"
 	"source-score/pkg/db/pgsql"
 	"source-score/pkg/domain/claim"
 	"source-score/pkg/helpers"
@@ -59,7 +60,10 @@ var (
 
 func TestClaim(t *testing.T) {
 	var _ = BeforeSuite(func() {
-		testDB, err = gorm.Open(sqlite.Open(testDBFile))
+		testDB, err = gorm.Open(
+			sqlite.Open(testDBFile),
+			conf.GormConfig,
+		)
 		Expect(err).ToNot(HaveOccurred())
 
 		err = testDB.AutoMigrate(&api.Source{}, &api.Claim{}, &api.Proof{})

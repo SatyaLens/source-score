@@ -160,6 +160,17 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 	})
 
 	Context("Source POST validation tests", func() {
+		When("Creating a source that already exists", func() {
+			It("Should return duplicate source error", func() {
+				callCount := fakeSourceRepo.PostSourceCallCount()
+				fakeSourceRepo.PostSourceReturnsOnCall(callCount, "", gorm.ErrDuplicatedKey)
+
+				_, err := sourceSvc.PostSource(context.TODO(), &sampleSourceInput1)
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrDuplicateSource)).To(BeTrue())
+			})
+		})
+
 		When("Creating a source with tags containing spaces", func() {
 			It("Should return invalid source error with nospace validation message", func() {
 				invalidInput := &api.SourceInput{
