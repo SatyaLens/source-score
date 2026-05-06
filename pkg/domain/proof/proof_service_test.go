@@ -164,6 +164,24 @@ var _ = Describe("Proof model service layer unit tests", Ordered, func() {
 	})
 
 	Context("Proof POST validation tests", func() {
+		When("Posting a proof that already exists", func() {
+			It("Should return ErrDuplicateProof", func() {
+				callCount := fakeProofRepo.PostProofCallCount()
+				fakeProofRepo.PostProofReturnsOnCall(callCount, "", gorm.ErrDuplicatedKey)
+
+				input := api.ProofInput{
+					ClaimUriDigest: sampleProof2.ClaimUriDigest,
+					ReviewedBy:     sampleProof2.ReviewedBy,
+					SupportsClaim:  &sampleProof2.SupportsClaim,
+					Uri:            sampleProof2.Uri,
+				}
+
+				_, err := proofSvc.PostProof(context.TODO(), &input)
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrDuplicateProof)).To(BeTrue())
+			})
+		})
+
 		When("Posting a proof with space in ClaimUriDigest", func() {
 			It("Should return invalid proof error with nospace validation message", func() {
 				supports := true

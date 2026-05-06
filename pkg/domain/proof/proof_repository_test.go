@@ -107,6 +107,20 @@ var _ = Describe("Proof repository layer unit tests", Ordered, func() {
 	})
 
 	Context("Validation tests", Ordered, func() {
+		When("Creating a proof that already exists", func() {
+			It("Should return gorm.ErrDuplicatedKey", func() {
+				proofInput := &api.ProofInput{
+					ClaimUriDigest: sampleProof2.ClaimUriDigest,
+					Uri:            sampleProof2.Uri,
+					SupportsClaim:  &sampleProof2.SupportsClaim,
+					ReviewedBy:     sampleProof2.ReviewedBy,
+				}
+				_, err := proofRepo.PostProof(context.TODO(), proofInput)
+				Expect(err).To(HaveOccurred())
+				Expect(errors.Is(err, gorm.ErrDuplicatedKey)).To(BeTrue())
+			})
+		})
+
 		When("Retrieving a non-existent proof by uri digest", func() {
 			It("Should return gorm.ErrRecordNotFound", func() {
 				_, err := proofRepo.GetProofByUriDigest(context.TODO(), "doesnotexist")
