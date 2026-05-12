@@ -486,6 +486,13 @@ components:
           x-oapi-codegen-extra-tags:
             validate: httpsurl
             binding: required
+        domainUrlNewsData:
+          type: string
+          description: Domain url corresponding to newsdata.io `domainurl` parameter
+          example: "timesofindia.indiatimes.com,theguardian.com"
+          x-oapi-codegen-extra-tags:
+            validate: nonempty,nospace
+            binding: required
 
     SourcePatchInput:
       type: object
@@ -512,6 +519,13 @@ components:
           example: "news,journalism,trusted"
           x-oapi-codegen-extra-tags:
             validate: omitnil,nospace,nonempty
+        domainUrlNewsData:
+          type: string
+          description: Domain url corresponding to newsdata.io `domainurl` parameter
+          example: "timesofindia.indiatimes.com,theguardian.com"
+          x-oapi-codegen-extra-tags:
+            validate: nonempty,nospace
+            binding: required
 
     Source:
       type: object
@@ -523,6 +537,7 @@ components:
       - tags
       - uri
       - uriDigest
+      - domainUrlNewsData
       properties:
         name:
           type: string
@@ -561,6 +576,13 @@ components:
           description: Unique HTTPS URL of the source
           example: "https://www.nytimes.com"
           x-oapi-codegen-extra-tags:
+            binding: required
+        domainUrlNewsData:
+          type: string
+          description: Domain url corresponding to newsdata.io `domainurl` parameter
+          example: "timesofindia.indiatimes.com,theguardian.com"
+          x-oapi-codegen-extra-tags:
+            validate: nonempty,nospace
             binding: required
 
     CreateSourceResponse:

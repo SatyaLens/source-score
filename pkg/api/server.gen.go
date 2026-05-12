@@ -116,6 +116,9 @@ type ProofPatchInput struct {
 
 // Source Complete source entity with calculated credibility score
 type Source struct {
+	// DomainUrlNewsData Domain url corresponding to newsdata.io `domainurl` parameter
+	DomainUrlNewsData string `binding:"required" json:"domainUrlNewsData" validate:"nonempty,nospace"`
+
 	// Name Display name of the source
 	Name string `binding:"required" json:"name"`
 
@@ -137,6 +140,9 @@ type Source struct {
 
 // SourceInput Input schema for creating a new source
 type SourceInput struct {
+	// DomainUrlNewsData Domain url corresponding to newsdata.io `domainurl` parameter
+	DomainUrlNewsData *string `binding:"required" json:"domainUrlNewsData,omitempty" validate:"nonempty,nospace"`
+
 	// Name Display name of the information source
 	Name string `binding:"required" json:"name" validate:"nonempty"`
 
@@ -152,6 +158,9 @@ type SourceInput struct {
 
 // SourcePatchInput Input schema for partially updating a source
 type SourcePatchInput struct {
+	// DomainUrlNewsData Domain url corresponding to newsdata.io `domainurl` parameter
+	DomainUrlNewsData *string `binding:"required" json:"domainUrlNewsData,omitempty" validate:"nonempty,nospace"`
+
 	// Name Updated display name
 	Name *string `json:"name" validate:"omitnil,nonempty"`
 
