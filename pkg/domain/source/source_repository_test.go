@@ -54,10 +54,12 @@ var _ = Describe("Source model repository layer unit tests", Ordered, func() {
 				name := "Updated Sample Source 1"
 				summary := "Updated Sample summary"
 				tags := "updated-tag1"
+				domainUrlNewsData := "source1.com"
 				sourceInput := &api.SourcePatchInput{
 					Name:    &name,
 					Summary: &summary,
 					Tags:    &tags,
+					DomainUrlNewsData: &domainUrlNewsData,
 				}
 
 				err := sourceRepo.PatchSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)

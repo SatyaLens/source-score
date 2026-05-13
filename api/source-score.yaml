@@ -491,7 +491,7 @@ components:
           description: Domain url corresponding to newsdata.io `domainurl` parameter
           example: "timesofindia.indiatimes.com,theguardian.com"
           x-oapi-codegen-extra-tags:
-            validate: nonempty,nospace
+            validate: omitnil,nonempty,nospace
             binding: required
 
     SourcePatchInput:
@@ -524,7 +524,7 @@ components:
           description: Domain url corresponding to newsdata.io `domainurl` parameter
           example: "timesofindia.indiatimes.com,theguardian.com"
           x-oapi-codegen-extra-tags:
-            validate: nonempty,nospace
+            validate: omitnil,nonempty,nospace
             binding: required
 
     Source:
@@ -582,7 +582,6 @@ components:
           description: Domain url corresponding to newsdata.io `domainurl` parameter
           example: "timesofindia.indiatimes.com,theguardian.com"
           x-oapi-codegen-extra-tags:
-            validate: nonempty,nospace
             binding: required
 
     CreateSourceResponse:

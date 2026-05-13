@@ -56,10 +56,12 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 				name := "Updated Sample Source 1"
 				summary := "Updated Sample summary"
 				tags := "updated-tag1"
+				domainUrlNewsData := "source1.com"
 				sourceInput := &api.SourcePatchInput{
 					Name:    &name,
 					Summary: &summary,
 					Tags:    &tags,
+					DomainUrlNewsData: &domainUrlNewsData,
 				}
 				updatedSource = sampleSource1
 				updatedSource.Name = "Updated Sample Source 1"
@@ -298,6 +300,38 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 				Expect(strings.ToLower(err.Error())).To(ContainSubstring("summary validation failed"))
 				Expect(strings.ToLower(err.Error())).To(ContainSubstring("tags validation failed"))
 				Expect(strings.ToLower(err.Error())).To(ContainSubstring("nonempty"))
+			})
+		})
+
+		When("Patching a source's DomainUrlNewsData field with empty string value", func() {
+			It("Should return invalid source error with nonempty validation message", func() {
+				emptyDomainUrlNewsData := ""
+				invalidInput := &api.SourcePatchInput{
+					DomainUrlNewsData: &emptyDomainUrlNewsData,
+				}
+
+				err := sourceSvc.PatchSourceByUriDigest(context.TODO(), invalidInput, uriDigest1)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidSource)).To(BeTrue())
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("domainurlnewsdata validation failed"))
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("nonempty"))
+			})
+		})
+
+		When("Patching a source's DomainUrlNewsData field with a string containing spaces", func() {
+			It("Should return invalid source error with nospace validation message", func() {
+				domainUrlNewsDataWithSpaces := "example com"
+				invalidInput := &api.SourcePatchInput{
+					DomainUrlNewsData: &domainUrlNewsDataWithSpaces,
+				}
+
+				err := sourceSvc.PatchSourceByUriDigest(context.TODO(), invalidInput, uriDigest1)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrInvalidSource)).To(BeTrue())
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("domainurlnewsdata validation failed"))
+				Expect(strings.ToLower(err.Error())).To(ContainSubstring("nospace"))
 			})
 		})
 	})
