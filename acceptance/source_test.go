@@ -50,6 +50,44 @@ var _ = Describe("Source model tests", func() {
 			})
 		})
 
+		When("POST request is sent with domainUrlNewsData field provided", func() {
+			It("should create source with domainUrlNewsData value", func() {
+				domainUrlNewsData := "example.com"
+				sourceInputWithDomain := api.SourceInput{
+					Name:              "Source with Domain",
+					Summary:           "Source with domainUrlNewsData field",
+					Tags:              "domain-test",
+					Uri:               "https://source-with-domain",
+					DomainUrlNewsData: &domainUrlNewsData,
+				}
+				body, err := json.Marshal(sourceInputWithDomain)
+				Expect(err).To(BeNil())
+
+				resp, err := doRequest(http.MethodPost, endpoint, body)
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(BeEquivalentTo(http.StatusCreated))
+
+				var respBody api.CreateSourceResponse
+				err = json.NewDecoder(resp.Body).Decode(&respBody)
+				Expect(err).To(BeNil())
+				resp.Body.Close()
+
+				By("verifying source was created with domainUrlNewsData")
+				srcUrl, err := url.JoinPath(endpoint, respBody.UriDigest)
+				Expect(err).To(BeNil())
+				resp, err = doRequest(http.MethodGet, srcUrl, nil)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var source api.Source
+				err = json.NewDecoder(resp.Body).Decode(&source)
+				Expect(err).To(BeNil())
+				Expect(source.DomainUrlNewsData).To(Equal(domainUrlNewsData))
+				Expect(source.Name).To(Equal("Source with Domain"))
+			})
+		})
+
 		When("GET request is sent to query the created source", func() {
 			It("should return the created source", func() {
 				srcUrl, err := url.JoinPath(endpoint, uriDigest1)
@@ -151,6 +189,42 @@ var _ = Describe("Source model tests", func() {
 				Expect(src.Name).To(Equal("twice updated name"))
 				Expect(src.Summary).To(Equal(updatedSummary))
 				Expect(src.Tags).To(Equal("twice-updated-tag"))
+			})
+		})
+
+		When("PATCH request is sent to update domainUrlNewsData field", func() {
+			It("should update the source's domainUrlNewsData value", func() {
+				updatedDomainUrlNewsData := "updated-domain.com"
+				updatedSrcInput := api.SourcePatchInput{
+					DomainUrlNewsData: &updatedDomainUrlNewsData,
+				}
+				reqBody, err := json.Marshal(updatedSrcInput)
+				Expect(err).To(BeNil())
+
+				srcUrl, err := url.JoinPath(endpoint, uriDigest2)
+				Expect(err).To(BeNil())
+				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(reqBody))
+				Expect(err).To(BeNil())
+				addCommonHeaders(req)
+				req.Header.Set("Content-Type", "application/json")
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
+				resp.Body.Close()
+
+				By("verifying domainUrlNewsData got updated")
+				var src api.Source
+				resp, err = doRequest(http.MethodGet, srcUrl, nil)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				err = json.NewDecoder(resp.Body).Decode(&src)
+				Expect(err).To(BeNil())
+				Expect(src.DomainUrlNewsData).To(Equal(updatedDomainUrlNewsData))
+				Expect(src.Name).To(Equal("Sample Source 2"))
+				Expect(src.Summary).To(Equal("Sample summary 2"))
+				Expect(src.Tags).To(Equal("tag2"))
 			})
 		})
 
@@ -687,6 +761,60 @@ var _ = Describe("Source model tests", func() {
 				Expect(err).To(BeNil())
 				Expect(errResp["error"]).ToNot(BeNil())
 				Expect(strings.ToLower(errResp["error"].(string))).To(ContainSubstring("source not found"))
+			})
+		})
+
+		When("POST request with whitespace in domainUrlNewsData field value is sent", func() {
+			It("should return 400 Bad Request with nospace validation error message", func() {
+				domainUrlNewsDataWithSpace := "example com"
+				invalidInput := api.SourceInput{
+					Name:              "Valid Name",
+					Summary:           "Valid Summary",
+					Tags:              "tag1,tag2",
+					Uri:               "https://example.com",
+					DomainUrlNewsData: &domainUrlNewsDataWithSpace,
+				}
+				body, _ := json.Marshal(invalidInput)
+				resp, err := doRequest(http.MethodPost, endpoint, body)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).ToNot(BeNil())
+				errorMsg := strings.ToLower(errResp["error"].(string))
+				Expect(errorMsg).To(ContainSubstring("domainurlnewsdata validation failed"))
+				Expect(errorMsg).To(ContainSubstring("nospace"))
+			})
+		})
+
+		When("PATCH request with empty string in domainUrlNewsData field value is sent", func() {
+			It("should return 400 Bad Request with nonempty validation error message", func() {
+				emptyDomainUrlNewsData := ""
+				invalidInput := api.SourcePatchInput{
+					DomainUrlNewsData: &emptyDomainUrlNewsData,
+				}
+				body, _ := json.Marshal(invalidInput)
+				srcUrl, err := url.JoinPath(endpoint, uriDigest2)
+				Expect(err).To(BeNil())
+				req, err := http.NewRequest(http.MethodPatch, srcUrl, bytes.NewBuffer(body))
+				Expect(err).To(BeNil())
+				addCommonHeaders(req)
+				req.Header.Set("Content-Type", "application/json")
+				resp, err := client.Do(req)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]any
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).ToNot(BeNil())
+				errorMsg := strings.ToLower(errResp["error"].(string))
+				Expect(errorMsg).To(ContainSubstring("domainurlnewsdata validation failed"))
+				Expect(errorMsg).To(ContainSubstring("nonempty"))
 			})
 		})
 

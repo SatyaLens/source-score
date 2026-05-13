@@ -72,6 +72,7 @@ var _ = Describe("Source model repository layer unit tests", Ordered, func() {
 				Expect(source.Tags).To(BeEquivalentTo(*sourceInput.Tags))
 				Expect(source.Uri).To(BeEquivalentTo(sampleSourceInput1.Uri))
 				Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))
+				Expect(source.DomainUrlNewsData).To(BeEquivalentTo(domainUrlNewsData))
 			})
 		})
 

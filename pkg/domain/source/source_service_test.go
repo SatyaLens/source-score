@@ -58,15 +58,16 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 				tags := "updated-tag1"
 				domainUrlNewsData := "source1.com"
 				sourceInput := &api.SourcePatchInput{
-					Name:    &name,
-					Summary: &summary,
-					Tags:    &tags,
+					Name:              &name,
+					Summary:           &summary,
+					Tags:              &tags,
 					DomainUrlNewsData: &domainUrlNewsData,
 				}
 				updatedSource = sampleSource1
 				updatedSource.Name = "Updated Sample Source 1"
 				updatedSource.Summary = "Updated Sample summary"
 				updatedSource.Tags = "updated-tag1"
+				updatedSource.DomainUrlNewsData = domainUrlNewsData
 				fakeSourceRepo.GetSourceByUriDigestReturnsOnCall(1, &updatedSource, nil)
 
 				err := sourceSvc.PatchSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
@@ -85,6 +86,7 @@ var _ = Describe("Source model service layer unit test", Ordered, func() {
 				Expect(source.Tags).To(BeEquivalentTo(*sourceInput.Tags))
 				Expect(source.Uri).To(BeEquivalentTo(sampleSourceInput1.Uri))
 				Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))
+				Expect(source.DomainUrlNewsData).To(BeEquivalentTo(domainUrlNewsData))
 			})
 		})
 

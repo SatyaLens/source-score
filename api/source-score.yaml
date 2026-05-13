@@ -492,7 +492,6 @@ components:
           example: "timesofindia.indiatimes.com,theguardian.com"
           x-oapi-codegen-extra-tags:
             validate: omitnil,nonempty,nospace
-            binding: required
 
     SourcePatchInput:
       type: object
@@ -525,7 +524,6 @@ components:
           example: "timesofindia.indiatimes.com,theguardian.com"
           x-oapi-codegen-extra-tags:
             validate: omitnil,nonempty,nospace
-            binding: required
 
     Source:
       type: object
