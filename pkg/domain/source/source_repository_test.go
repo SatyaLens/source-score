@@ -54,10 +54,12 @@ var _ = Describe("Source model repository layer unit tests", Ordered, func() {
 				name := "Updated Sample Source 1"
 				summary := "Updated Sample summary"
 				tags := "updated-tag1"
+				domainUrlNewsData := "source1.com"
 				sourceInput := &api.SourcePatchInput{
 					Name:    &name,
 					Summary: &summary,
 					Tags:    &tags,
+					DomainUrlNewsData: &domainUrlNewsData,
 				}
 
 				err := sourceRepo.PatchSourceByUriDigest(context.TODO(), sourceInput, uriDigest1)
@@ -70,6 +72,7 @@ var _ = Describe("Source model repository layer unit tests", Ordered, func() {
 				Expect(source.Tags).To(BeEquivalentTo(*sourceInput.Tags))
 				Expect(source.Uri).To(BeEquivalentTo(sampleSourceInput1.Uri))
 				Expect(source.UriDigest).To(BeEquivalentTo(uriDigest1))
+				Expect(source.DomainUrlNewsData).To(BeEquivalentTo(domainUrlNewsData))
 			})
 		})
 

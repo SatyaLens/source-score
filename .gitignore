@@ -3,6 +3,7 @@ source-score
 **coverage/
 coverage.out
 test_database.db
+.amazonq/
 
 # ide
 .vscode/

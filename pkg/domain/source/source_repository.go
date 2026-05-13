@@ -81,6 +81,10 @@ func (sr *sourceRepository) PostSource(ctx context.Context, sourceInput *api.Sou
 		UriDigest: uriDigest,
 	}
 
+	if sourceInput.DomainUrlNewsData != nil {
+		source.DomainUrlNewsData = *sourceInput.DomainUrlNewsData
+	}
+
 	result := sr.client.Create(ctx, source)
 	slog.InfoContext(
 		ctx,
@@ -112,6 +116,9 @@ func (sr *sourceRepository) PatchSourceByUriDigest(ctx context.Context, sourceIn
 	}
 	if sourceInput.Tags != nil {
 		source.Tags = *sourceInput.Tags
+	}
+	if sourceInput.DomainUrlNewsData != nil {
+		source.DomainUrlNewsData = *sourceInput.DomainUrlNewsData
 	}
 
 	result = sr.client.Update(ctx, source)
