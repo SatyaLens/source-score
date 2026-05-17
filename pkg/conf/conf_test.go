@@ -13,6 +13,7 @@ const (
 	SamplePwd   = "sample-pwd"
 	SampleHost  = "sample-host"
 	SampleSUPwd = "super-pwd"
+	SampleDbName = "test-db"
 )
 
 var _ = Describe("Conf Tests", func() {
@@ -42,6 +43,34 @@ var _ = Describe("Conf Tests", func() {
 			Expect(conf.Cfg.PgHost).To(BeEquivalentTo("env-host"))
 			Expect(conf.Cfg.Port).To(BeEquivalentTo("8999"))
 			Expect(conf.Cfg.SuperUserPassword).To(BeEquivalentTo("user-pwd"))
+		})
+	})
+
+	When("DbName field is read", func() {
+		It("should use default value when DB_NAME environment variable is not set", func() {
+			os.Unsetenv("DOTENV_PATH")
+			os.Unsetenv("DB_NAME")
+			os.Setenv("APP_USER_PASSWORD", SamplePwd)
+			os.Setenv("PG_HOST", SampleHost)
+			os.Setenv("PORT", SamplePort)
+			os.Setenv("SUPER_USER_PASSWORD", SampleSUPwd)
+
+			conf.LoadConfig()
+
+			Expect(conf.Cfg.DbName).To(BeEquivalentTo("sourcescore"))
+		})
+
+		It("should be overwritten when DB_NAME environment variable is set", func() {
+			os.Unsetenv("DOTENV_PATH")
+			os.Setenv("DB_NAME", SampleDbName)
+			os.Setenv("APP_USER_PASSWORD", SamplePwd)
+			os.Setenv("PG_HOST", SampleHost)
+			os.Setenv("PORT", SamplePort)
+			os.Setenv("SUPER_USER_PASSWORD", SampleSUPwd)
+
+			conf.LoadConfig()
+
+			Expect(conf.Cfg.DbName).To(BeEquivalentTo(SampleDbName))
 		})
 	})
 })

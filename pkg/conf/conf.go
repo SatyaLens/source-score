@@ -10,13 +10,13 @@ import (
 
 const (
 	AppUserName = "sourcescore"
-	DbName      = "sourcescore"
 )
 
 type conf struct {
 	AppUserPassword   string `env:"APP_USER_PASSWORD" yaml:"APP_USER_PASSWORD" env-required:"true"`
+	DbName            string `env:"DB_NAME" yaml:"DB_NAME" env-default:"sourcescore"`
 	PgHost            string `env:"PG_HOST" yaml:"PG_HOST" env-required:"true"`
-	Port              string `env:"PORT" yaml:"PORT"`
+	Port              string `env:"PORT" yaml:"PORT" env-default:"8080"`
 	SuperUserPassword string `env:"SUPER_USER_PASSWORD" yaml:"SUPER_USER_PASSWORD" env-required:"true"`
 }
 
