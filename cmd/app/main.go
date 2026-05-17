@@ -54,7 +54,7 @@ func main() {
 		conf.Cfg.PgHost,
 		conf.AppUserName,
 		conf.Cfg.AppUserPassword,
-		conf.DbName,
+		conf.Cfg.DbName,
 	)
 	dbClient := pgsql.NewClient(context.Background(), dsn, conf.GormConfig)
 	// TODO: wrap this and call it securely
