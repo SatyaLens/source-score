@@ -492,6 +492,11 @@ components:
           example: "timesofindia.indiatimes.com,theguardian.com"
           x-oapi-codegen-extra-tags:
             validate: omitnil,nonempty,nospace
+      example:
+        name: "New York Times"
+        summary: "American daily newspaper based in New York City"
+        tags: "news,media,journalism"
+        uri: "https://www.nytimes.com"
 
     SourcePatchInput:
       type: object
