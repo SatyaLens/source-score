@@ -3,21 +3,28 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
+	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/proof"
+	"source-score/pkg/helpers"
 
 	"github.com/gin-gonic/gin"
 )
 
 type ProofHandler struct {
 	proofSvc proof.ProofService
+	claimSvc claim.ClaimService
 }
 
-func NewProofHandler(ctx context.Context, proofSvc proof.ProofService) *ProofHandler {
-	return &ProofHandler{proofSvc: proofSvc}
+func NewProofHandler(ctx context.Context, proofSvc proof.ProofService, claimSvc claim.ClaimService) *ProofHandler {
+	return &ProofHandler{
+		proofSvc: proofSvc,
+		claimSvc: claimSvc,
+	}
 }
 
 func (ph *ProofHandler) GetProofs(ctx *gin.Context) {
@@ -36,6 +43,25 @@ func (ph *ProofHandler) PostProof(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(proofInput); err != nil {
 		slog.Error("failed to bind proof input", "error", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// verify claim and source are not from the same source
+	claim, err := ph.claimSvc.GetClaimByUriDigest(ctx, proofInput.ClaimUriDigest)
+	if err != nil {
+		slog.Error(fmt.Sprintf("failed to fetch claim for proof with digest %s", proofInput.ClaimUriDigest), "error", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "claim not found"})
+	}
+
+	sameHost, err := helpers.SameHost(proofInput.Uri, claim.Uri)
+	if err != nil {
+		slog.Error("invalid proof or claim url:", "error", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	if sameHost {
+		slog.Error("claim and source are from the same source", "proof_uri", proofInput.Uri, "claim_uri", claim.Uri)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "claim and source must be from different hosts"})
 		return
 	}
 

@@ -27,7 +27,7 @@ func NewRouter(
 		pingHandler:  handlers.NewPingHandler(),
 		srcHandler:   handlers.NewSourceHandler(ctx, sourceSvc),
 		claimHandler: handlers.NewClaimHandler(ctx, claimSvc),
-		proofHandler: handlers.NewProofHandler(ctx, proofSvc),
+		proofHandler: handlers.NewProofHandler(ctx, proofSvc, claimSvc),
 	}
 }
 

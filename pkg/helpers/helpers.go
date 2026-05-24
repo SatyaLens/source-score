@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -31,4 +32,16 @@ func ValidateHttpsURL(fl validator.FieldLevel) bool {
 	raw := fl.Field().String()
 	u, err := url.ParseRequestURI(raw)
 	return err == nil && u.Scheme == "https" && u.Host != ""
+}
+
+func SameHost(url1, url2 string) (bool, error) {
+	a, err := url.Parse(url1)
+	if err != nil {
+		return false, fmt.Errorf("invalid URL %q: %w", url1, err)
+	}
+	b, err := url.Parse(url2)
+	if err != nil {
+		return false, fmt.Errorf("invalid URL %q: %w", url2, err)
+	}
+	return a.Hostname() == b.Hostname(), nil
 }
