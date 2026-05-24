@@ -3,6 +3,7 @@ package acceptance_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"source-score/pkg/api"
@@ -238,13 +239,13 @@ var _ = Describe("Proof model tests", func() {
 		When("posting a proof with the same host name as its related claim", func() {
 			It("should return 400 Bad Request with error message", func() {
 				supports := true
-				proof := api.ProofInput{
+				proofInput := api.ProofInput{
 					ClaimUriDigest: claim3Digest,
 					ReviewedBy:     "ValidReviewer",
 					SupportsClaim:  &supports,
 					Uri:            "https://sample-claim-3/source-proof",
 				}
-				body, err := json.Marshal(proof)
+				body, err := json.Marshal(proofInput)
 				Expect(err).To(BeNil())
 
 				resp, err := doRequest(http.MethodPost, endpoint, body)
@@ -255,7 +256,9 @@ var _ = Describe("Proof model tests", func() {
 				var errResp map[string]string
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
-				Expect(errResp["error"]).To(Equal("claim and source must be from different sources"))
+				Expect(errResp["error"]).To(
+					Equal(fmt.Sprintf("claim and proofs are from the same source: claim %s and proof %s are from the same source", sampleClaim3.Uri, proofInput.Uri)),
+				)
 			})
 		})
 

@@ -66,12 +66,11 @@ func main() {
 	)
 
 	proofRepo := proof.NewProofRepository(context.Background(), dbClient)
-	proofSvc := proof.NewProofService(context.Background(), proofRepo)
-
 	claimRepo := claim.NewClaimRepository(context.Background(), dbClient)
-	claimSvc := claim.NewClaimService(context.Background(), claimRepo, proofSvc)
-
 	srcRepo := source.NewSourceRepository(context.Background(), dbClient)
+
+	proofSvc := proof.NewProofService(context.Background(), proofRepo, claimRepo)
+	claimSvc := claim.NewClaimService(context.Background(), claimRepo, proofSvc)
 	srcSvc := source.NewSourceService(context.Background(), srcRepo, claimRepo)
 
 	server := gin.Default()

@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
-	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/proof"
 
 	"github.com/gin-gonic/gin"
@@ -15,13 +14,11 @@ import (
 
 type ProofHandler struct {
 	proofSvc proof.ProofService
-	claimSvc claim.ClaimService
 }
 
-func NewProofHandler(ctx context.Context, proofSvc proof.ProofService, claimSvc claim.ClaimService) *ProofHandler {
+func NewProofHandler(ctx context.Context, proofSvc proof.ProofService) *ProofHandler {
 	return &ProofHandler{
 		proofSvc: proofSvc,
-		claimSvc: claimSvc,
 	}
 }
 

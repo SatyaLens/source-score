@@ -43,5 +43,5 @@ func SameHost(url1, url2 string) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("invalid URL %q: %w", url2, err)
 	}
-	return a.Hostname() == b.Hostname(), nil
+	return strings.EqualFold(a.Hostname(), b.Hostname()), nil
 }
