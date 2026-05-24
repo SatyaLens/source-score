@@ -16,11 +16,16 @@ import (
 )
 
 var (
-	fakeProofRepo = prooffakes.FakeProofRepository{}
-	proofSvc      = proof.NewProofService(context.TODO(), &fakeProofRepo)
+	fakeProofRepo   = prooffakes.FakeProofRepository{}
+	fakeClaimReader = prooffakes.FakeClaimReader{}
+	proofSvc        = proof.NewProofService(context.TODO(), &fakeProofRepo, &fakeClaimReader)
 )
 
 var _ = Describe("Proof model service layer unit tests", Ordered, func() {
+	BeforeEach(func() {
+		fakeClaimReader.GetClaimByUriDigestReturns(&sampleClaim, nil)
+	})
+
 	Context("Happy path", func() {
 		When("Posting new proofs", func() {
 			It("Should pass data to the repository and return digest", func() {
@@ -179,6 +184,27 @@ var _ = Describe("Proof model service layer unit tests", Ordered, func() {
 				_, err := proofSvc.PostProof(context.TODO(), &input)
 				Expect(err).ToNot(BeNil())
 				Expect(errors.Is(err, apperrors.ErrDuplicateProof)).To(BeTrue())
+			})
+		})
+
+		When("Posting a proof with the same source as its claim", func() {
+			It("Should return ErrSameClaimProofSource with error message", func() {
+				supports := true
+				input := &api.ProofInput{
+					ClaimUriDigest: sampleClaim.UriDigest,
+					ReviewedBy:     "ValidReviewer",
+					SupportsClaim:  &supports,
+					Uri:            "https://sample-claim/source-proof",
+				}
+
+				postCalls := fakeProofRepo.PostProofCallCount()
+				_, err := proofSvc.PostProof(context.TODO(), input)
+
+				Expect(err).ToNot(BeNil())
+				Expect(errors.Is(err, apperrors.ErrSameClaimProofSource)).To(BeTrue())
+				Expect(err.Error()).To(ContainSubstring(apperrors.ErrSameClaimProofSource.Error()))
+				Expect(err.Error()).To(ContainSubstring("claim https://sample-claim and proof https://sample-claim/source-proof are from the same source"))
+				Expect(fakeProofRepo.PostProofCallCount()).To(Equal(postCalls))
 			})
 		})
 

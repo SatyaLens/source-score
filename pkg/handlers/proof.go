@@ -17,7 +17,9 @@ type ProofHandler struct {
 }
 
 func NewProofHandler(ctx context.Context, proofSvc proof.ProofService) *ProofHandler {
-	return &ProofHandler{proofSvc: proofSvc}
+	return &ProofHandler{
+		proofSvc: proofSvc,
+	}
 }
 
 func (ph *ProofHandler) GetProofs(ctx *gin.Context) {
@@ -42,7 +44,7 @@ func (ph *ProofHandler) PostProof(ctx *gin.Context) {
 	digest, err := ph.proofSvc.PostProof(ctx, proofInput)
 	if err != nil {
 		switch {
-		case errors.Is(err, apperrors.ErrInvalidProof):
+		case errors.Is(err, apperrors.ErrInvalidProof) || errors.Is(err, apperrors.ErrSameClaimProofSource):
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		case errors.Is(err, apperrors.ErrDuplicateProof):
 			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})

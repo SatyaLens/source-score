@@ -24,8 +24,14 @@ type ProofService interface {
 	GetProofsByClaimDigest(ctx context.Context, digest string) ([]api.Proof, error)
 }
 
+//go:generate go tool counterfeiter . ClaimReader
+type ClaimReader interface {
+	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
+}
+
 type proofService struct {
-	proofRepo ProofRepository
+	proofRepo   ProofRepository
+	claimReader ClaimReader
 }
 
 var (
@@ -44,8 +50,11 @@ func init() {
 	}
 }
 
-func NewProofService(ctx context.Context, proofRepo ProofRepository) ProofService {
-	return &proofService{proofRepo: proofRepo}
+func NewProofService(ctx context.Context, proofRepo ProofRepository, claimReader ClaimReader) ProofService {
+	return &proofService{
+		proofRepo:   proofRepo,
+		claimReader: claimReader,
+	}
 }
 
 func (svc *proofService) GetProofs(ctx context.Context) ([]api.Proof, error) {
@@ -104,6 +113,25 @@ func (svc *proofService) PostProof(ctx context.Context, proofInput *api.ProofInp
 		}
 		combinedErrs = strings.TrimSpace(combinedErrs)
 		return "", fmt.Errorf("%w: %s", apperrors.ErrInvalidProof, combinedErrs)
+	}
+
+	// verify claim and source are not from the same source
+	claim, err := svc.claimReader.GetClaimByUriDigest(ctx, proofInput.ClaimUriDigest)
+	if err != nil {
+		switch {
+		case errors.Is(err, gorm.ErrRecordNotFound):
+			return "", fmt.Errorf("%w: %s", apperrors.ErrClaimNotFound, err.Error())
+		default:
+			return "", err
+		}
+	}
+
+	sameHost, err := helpers.SameHost(proofInput.Uri, claim.Uri)
+	if err != nil {
+		return "", err
+	}
+	if sameHost {
+		return "", fmt.Errorf("%w: %s", apperrors.ErrSameClaimProofSource, fmt.Sprintf("claim %s and proof %s are from the same source", claim.Uri, proofInput.Uri))
 	}
 
 	digest, err := svc.proofRepo.PostProof(ctx, proofInput)

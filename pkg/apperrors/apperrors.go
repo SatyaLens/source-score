@@ -14,4 +14,5 @@ var (
 	ErrDuplicateSource          = errors.New("source already exists")
 	ErrDuplicateClaim           = errors.New("claim already exists")
 	ErrDuplicateProof           = errors.New("proof already exists")
+	ErrSameClaimProofSource     = errors.New("claim and proofs are from the same source")
 )
