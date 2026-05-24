@@ -234,6 +234,31 @@ var _ = Describe("Proof model tests", func() {
 				Expect(strings.Contains(strings.ToLower(errResp["error"].(string)), "proof already exists")).To(BeTrue())
 			})
 		})
+
+		When("posting a proof with the same host name as its related claim", func() {
+			It("should return 400 Bad Request with error message", func() {
+				supports := true
+				proof := api.ProofInput{
+					ClaimUriDigest: claim3Digest,
+					ReviewedBy:     "ValidReviewer",
+					SupportsClaim:  &supports,
+					Uri:            "https://sample-claim-3/source-proof",
+				}
+				body, err := json.Marshal(proof)
+				Expect(err).To(BeNil())
+
+				resp, err := doRequest(http.MethodPost, endpoint, body)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(errResp["error"]).To(Equal("claim and source must be from different sources"))
+			})
+		})
+
 		When("POST request with space in ClaimUriDigest is sent", func() {
 			It("should return 400 with validation error mentioning nospace", func() {
 				supports := true
@@ -263,7 +288,7 @@ var _ = Describe("Proof model tests", func() {
 			It("should return 400 with validation error mentioning nospace", func() {
 				supports := true
 				proof := api.ProofInput{
-					ClaimUriDigest: "validclaimdigest",
+					ClaimUriDigest: claim3Digest,
 					ReviewedBy:     "Reviewer Name",
 					SupportsClaim:  &supports,
 					Uri:            "https://example.com",
@@ -337,7 +362,7 @@ var _ = Describe("Proof model tests", func() {
 			It("should return 400 with validation error mentioning httpsurl", func() {
 				supports := true
 				proof := api.ProofInput{
-					ClaimUriDigest: "validclaimdigest",
+					ClaimUriDigest: claim3Digest,
 					ReviewedBy:     "ValidReviewer",
 					SupportsClaim:  &supports,
 					Uri:            "http://not-https.com",
