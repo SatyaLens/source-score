@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"source-score/pkg/api"
+	"source-score/pkg/domain/claim"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -112,6 +113,20 @@ var _ = Describe("Claim repository layer unit tests", func() {
 				Expect(validated).ToNot(BeNil())
 				Expect(validated.Checked).To(BeTrue())
 				Expect(validated.Validity).To(BeTrue())
+			})
+
+			It("Should return checked claims when ClaimFilter Checked is true", func() {
+				checked := true
+				claims, err := claimRepo.GetClaims(context.TODO(), &claim.ClaimFilter{
+					Checked: &checked,
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claims).To(ContainElement(HaveField("UriDigest", claim2Digest)))
+				Expect(claims).ToNot(ContainElement(HaveField("UriDigest", claim1Digest)))
+
+				for _, claim := range claims {
+					Expect(claim.Checked).To(BeTrue())
+				}
 			})
 		})
 
