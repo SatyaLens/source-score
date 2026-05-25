@@ -69,6 +69,25 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				Expect(claims).To(ContainElements(expected))
 				Expect(fakeClaimRepo.GetClaimsCallCount()).To(Equal(1))
 			})
+
+			It("Should return claims from repository when ClaimFilter Checked is true", func() {
+				checked := true
+				checkedClaim := sampleClaim2
+				checkedClaim.Checked = true
+				expected := []api.Claim{checkedClaim}
+				filter := &claim.ClaimFilter{Checked: &checked}
+				callsBefore := fakeClaimRepo.GetClaimsCallCount()
+				fakeClaimRepo.GetClaimsReturns(expected, nil)
+
+				claims, err := claimSvc.GetClaims(context.TODO(), filter)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claims).To(Equal(expected))
+				Expect(fakeClaimRepo.GetClaimsCallCount()).To(Equal(callsBefore + 1))
+				_, claimFilter := fakeClaimRepo.GetClaimsArgsForCall(callsBefore)
+				Expect(claimFilter).ToNot(BeNil())
+				Expect(claimFilter.Checked).ToNot(BeNil())
+				Expect(*claimFilter.Checked).To(BeTrue())
+			})
 		})
 
 		When("Retrieving a single claim by uri digest", func() {
