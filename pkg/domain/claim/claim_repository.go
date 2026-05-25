@@ -39,9 +39,9 @@ func NewClaimRepository(ctx context.Context, client *pgsql.Client) ClaimReposito
 
 // GetClaims returns all claims from the DB
 func (cr *claimRepository) GetClaims(ctx context.Context, claimFilter *ClaimFilter) ([]api.Claim, error) {
-	filterFields := &api.Claim{}
+	filterFields := &ClaimFilter{}
 	if claimFilter != nil {
-		filterFields.Checked = *claimFilter.Checked
+		filterFields.Checked = claimFilter.Checked
 	}
 
 	var claims []api.Claim
