@@ -35,10 +35,11 @@ type FakeClaimService struct {
 		result1 *api.Claim
 		result2 error
 	}
-	GetClaimsStub        func(context.Context) ([]api.Claim, error)
+	GetClaimsStub        func(context.Context, *claim.ClaimFilter) ([]api.Claim, error)
 	getClaimsMutex       sync.RWMutex
 	getClaimsArgsForCall []struct {
 		arg1 context.Context
+		arg2 *claim.ClaimFilter
 	}
 	getClaimsReturns struct {
 		result1 []api.Claim
@@ -244,18 +245,19 @@ func (fake *FakeClaimService) GetClaimByUriDigestReturnsOnCall(i int, result1 *a
 	}{result1, result2}
 }
 
-func (fake *FakeClaimService) GetClaims(arg1 context.Context) ([]api.Claim, error) {
+func (fake *FakeClaimService) GetClaims(arg1 context.Context, arg2 *claim.ClaimFilter) ([]api.Claim, error) {
 	fake.getClaimsMutex.Lock()
 	ret, specificReturn := fake.getClaimsReturnsOnCall[len(fake.getClaimsArgsForCall)]
 	fake.getClaimsArgsForCall = append(fake.getClaimsArgsForCall, struct {
 		arg1 context.Context
-	}{arg1})
+		arg2 *claim.ClaimFilter
+	}{arg1, arg2})
 	stub := fake.GetClaimsStub
 	fakeReturns := fake.getClaimsReturns
-	fake.recordInvocation("GetClaims", []interface{}{arg1})
+	fake.recordInvocation("GetClaims", []interface{}{arg1, arg2})
 	fake.getClaimsMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -269,17 +271,17 @@ func (fake *FakeClaimService) GetClaimsCallCount() int {
 	return len(fake.getClaimsArgsForCall)
 }
 
-func (fake *FakeClaimService) GetClaimsCalls(stub func(context.Context) ([]api.Claim, error)) {
+func (fake *FakeClaimService) GetClaimsCalls(stub func(context.Context, *claim.ClaimFilter) ([]api.Claim, error)) {
 	fake.getClaimsMutex.Lock()
 	defer fake.getClaimsMutex.Unlock()
 	fake.GetClaimsStub = stub
 }
 
-func (fake *FakeClaimService) GetClaimsArgsForCall(i int) context.Context {
+func (fake *FakeClaimService) GetClaimsArgsForCall(i int) (context.Context, *claim.ClaimFilter) {
 	fake.getClaimsMutex.RLock()
 	defer fake.getClaimsMutex.RUnlock()
 	argsForCall := fake.getClaimsArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeClaimService) GetClaimsReturns(result1 []api.Claim, result2 error) {

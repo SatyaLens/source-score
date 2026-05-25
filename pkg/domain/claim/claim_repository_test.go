@@ -44,7 +44,7 @@ var _ = Describe("Claim repository layer unit tests", func() {
 
 		When("Retrieving all claims from the DB", func() {
 			It("Should return all claim records from the DB", func() {
-				claims, err := claimRepo.GetClaims(context.TODO())
+				claims, err := claimRepo.GetClaims(context.TODO(), nil)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(len(claims)).To(Equal(2))
 

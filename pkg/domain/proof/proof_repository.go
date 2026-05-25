@@ -32,7 +32,7 @@ func NewProofRepository(ctx context.Context, client *pgsql.Client) ProofReposito
 // GetProofs returns all proofs from the DB
 func (pr *proofRepository) GetProofs(ctx context.Context) ([]api.Proof, error) {
 	var proofs []api.Proof
-	result := pr.client.FindAll(ctx, &proofs)
+	result := pr.client.FindAll(ctx, &proofs, &api.Proof{})
 
 	if result.Error != nil {
 		return nil, result.Error

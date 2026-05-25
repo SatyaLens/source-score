@@ -63,7 +63,7 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				expected := []api.Claim{sampleClaim1, sampleClaim2}
 				fakeClaimRepo.GetClaimsReturnsOnCall(0, expected, nil)
 
-				claims, err := claimSvc.GetClaims(context.TODO())
+				claims, err := claimSvc.GetClaims(context.TODO(), nil)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(len(claims)).To(Equal(2))
 				Expect(claims).To(ContainElements(expected))

@@ -43,8 +43,8 @@ func (client *Client) FindFirst(ctx context.Context, record any) *gorm.DB {
 	return client.DB.WithContext(ctx).First(record)
 }
 
-func (client *Client) FindAll(ctx context.Context, records any) *gorm.DB {
-	return client.DB.WithContext(ctx).Find(records)
+func (client *Client) FindAll(ctx context.Context, records any, filters any) *gorm.DB {
+	return client.DB.WithContext(ctx).Where(filters).Find(records)
 }
 
 func (client *Client) Update(ctx context.Context, record any) *gorm.DB {
