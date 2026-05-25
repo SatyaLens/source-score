@@ -168,6 +168,12 @@ paths:
       tags:
       - claims
       operationId: getClaims
+      parameters:
+      - name: checked
+        in: query
+        schema:
+          type: boolean
+        required: false
       responses:
         200:
           description: List of claims retrieved successfully

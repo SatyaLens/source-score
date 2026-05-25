@@ -9,6 +9,7 @@ import (
 	"source-score/pkg/api"
 	"source-score/pkg/apperrors"
 	"source-score/pkg/domain/claim"
+	"strconv"
 	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,25 @@ func NewClaimHandler(ctx context.Context, claimSvc claim.ClaimService) *ClaimHan
 }
 
 func (ch *ClaimHandler) GetClaims(ctx *gin.Context) {
-	claims, err := ch.claimSvc.GetClaims(ctx)
+	var claimFilter *claim.ClaimFilter
+
+	paramVal, ok := ctx.GetQuery("checked")
+	if ok {
+		checked, err := strconv.ParseBool(paramVal)
+		if err != nil {
+			ctx.JSON(
+				http.StatusBadRequest,
+				gin.H{"error": err.Error()},
+			)
+			return
+		}
+
+		claimFilter = &claim.ClaimFilter{
+			Checked: &checked,
+		}
+	}
+
+	claims, err := ch.claimSvc.GetClaims(ctx, claimFilter)
 	if err != nil {
 		slog.Error("failed to get claims", "error", err)
 		ctx.JSON(
