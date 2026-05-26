@@ -48,11 +48,11 @@ type FakeClaimRepository struct {
 		result1 *api.Claim
 		result2 error
 	}
-	GetClaimsStub        func(context.Context, *claim.ClaimFilter) ([]api.Claim, error)
+	GetClaimsStub        func(context.Context, *api.GetClaimsParams) ([]api.Claim, error)
 	getClaimsMutex       sync.RWMutex
 	getClaimsArgsForCall []struct {
 		arg1 context.Context
-		arg2 *claim.ClaimFilter
+		arg2 *api.GetClaimsParams
 	}
 	getClaimsReturns struct {
 		result1 []api.Claim
@@ -323,12 +323,12 @@ func (fake *FakeClaimRepository) GetClaimByUriDigestReturnsOnCall(i int, result1
 	}{result1, result2}
 }
 
-func (fake *FakeClaimRepository) GetClaims(arg1 context.Context, arg2 *claim.ClaimFilter) ([]api.Claim, error) {
+func (fake *FakeClaimRepository) GetClaims(arg1 context.Context, arg2 *api.GetClaimsParams) ([]api.Claim, error) {
 	fake.getClaimsMutex.Lock()
 	ret, specificReturn := fake.getClaimsReturnsOnCall[len(fake.getClaimsArgsForCall)]
 	fake.getClaimsArgsForCall = append(fake.getClaimsArgsForCall, struct {
 		arg1 context.Context
-		arg2 *claim.ClaimFilter
+		arg2 *api.GetClaimsParams
 	}{arg1, arg2})
 	stub := fake.GetClaimsStub
 	fakeReturns := fake.getClaimsReturns
@@ -349,13 +349,13 @@ func (fake *FakeClaimRepository) GetClaimsCallCount() int {
 	return len(fake.getClaimsArgsForCall)
 }
 
-func (fake *FakeClaimRepository) GetClaimsCalls(stub func(context.Context, *claim.ClaimFilter) ([]api.Claim, error)) {
+func (fake *FakeClaimRepository) GetClaimsCalls(stub func(context.Context, *api.GetClaimsParams) ([]api.Claim, error)) {
 	fake.getClaimsMutex.Lock()
 	defer fake.getClaimsMutex.Unlock()
 	fake.GetClaimsStub = stub
 }
 
-func (fake *FakeClaimRepository) GetClaimsArgsForCall(i int) (context.Context, *claim.ClaimFilter) {
+func (fake *FakeClaimRepository) GetClaimsArgsForCall(i int) (context.Context, *api.GetClaimsParams) {
 	fake.getClaimsMutex.RLock()
 	defer fake.getClaimsMutex.RUnlock()
 	argsForCall := fake.getClaimsArgsForCall[i]

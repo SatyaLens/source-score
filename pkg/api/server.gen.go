@@ -171,6 +171,11 @@ type SourcePatchInput struct {
 	Tags *string `json:"tags" validate:"omitnil,nospace,nonempty"`
 }
 
+// GetClaimsParams defines parameters for GetClaims.
+type GetClaimsParams struct {
+	Checked *bool `form:"checked,omitempty" json:"checked,omitempty"`
+}
+
 // PostClaimJSONRequestBody defines body for PostClaim for application/json ContentType.
 type PostClaimJSONRequestBody = ClaimInput
 
@@ -214,7 +219,7 @@ type ServerInterface interface {
 	GetProofsByClaimDigest(c *gin.Context, uriDigest string)
 	// Get all claims
 	// (GET /api/v1/claims)
-	GetClaims(c *gin.Context)
+	GetClaims(c *gin.Context, params GetClaimsParams)
 	// Verify all claims
 	// (POST /api/v1/claims/verify)
 	VerifyAllClaims(c *gin.Context)
@@ -413,7 +418,20 @@ func (siw *ServerInterfaceWrapper) GetProofsByClaimDigest(c *gin.Context) {
 // GetClaims operation middleware
 func (siw *ServerInterfaceWrapper) GetClaims(c *gin.Context) {
 
+	var err error
+
 	c.Set(ApiKeyAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetClaimsParams
+
+	// ------------- Optional query parameter "checked" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "checked", c.Request.URL.Query(), &params.Checked)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter checked: %w", err), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -422,7 +440,7 @@ func (siw *ServerInterfaceWrapper) GetClaims(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetClaims(c)
+	siw.Handler.GetClaims(c, params)
 }
 
 // VerifyAllClaims operation middleware

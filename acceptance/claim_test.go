@@ -519,7 +519,7 @@ var _ = Describe("Claim model tests", func() {
 				var errResp map[string]string
 				err = json.NewDecoder(resp.Body).Decode(&errResp)
 				Expect(err).To(BeNil())
-				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("invalid syntax"))
+				Expect(strings.ToLower(errResp["msg"])).To(ContainSubstring("invalid format for parameter checked"))
 			})
 		})
 
