@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"source-score/pkg/api"
 	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/proof"
 	"source-score/pkg/domain/source"
@@ -51,8 +52,8 @@ func (r *router) PatchSource(ctx *gin.Context, uriDigest string) {
 	r.srcHandler.PatchSourceByUriDigest(ctx, uriDigest)
 }
 
-func (r *router) GetClaims(ctx *gin.Context) {
-	r.claimHandler.GetClaims(ctx)
+func (r *router) GetClaims(ctx *gin.Context, params api.GetClaimsParams) {
+	r.claimHandler.GetClaims(ctx, params)
 }
 
 func (r *router) PostClaim(ctx *gin.Context) {
