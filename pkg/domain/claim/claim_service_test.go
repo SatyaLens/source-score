@@ -77,7 +77,7 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				expected := []api.Claim{checkedClaim}
 				filter := &claim.ClaimFilter{Checked: &checked}
 				callsBefore := fakeClaimRepo.GetClaimsCallCount()
-				fakeClaimRepo.GetClaimsReturns(expected, nil)
+				fakeClaimRepo.GetClaimsReturnsOnCall(callsBefore, expected, nil)
 
 				claims, err := claimSvc.GetClaims(context.TODO(), filter)
 				Expect(err).ToNot(HaveOccurred())

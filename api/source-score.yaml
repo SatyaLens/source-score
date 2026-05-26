@@ -183,6 +183,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Claim'
+        400:
+          description: Invalid request parameters
 
   /api/v1/claims/verify:
     post:
