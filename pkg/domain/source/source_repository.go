@@ -44,7 +44,7 @@ func (sr *sourceRepository) DeleteSourceByUriDigest(ctx context.Context, source 
 
 func (sr *sourceRepository) GetSources(ctx context.Context) ([]api.Source, error) {
 	var sources []api.Source
-	result := sr.client.FindAll(ctx, &sources)
+	result := sr.client.FindAll(ctx, &sources, &api.Source{})
 
 	if result.Error != nil {
 		return nil, result.Error

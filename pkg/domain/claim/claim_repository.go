@@ -12,9 +12,13 @@ import (
 	"source-score/pkg/db/pgsql"
 )
 
+type ClaimFilter struct {
+	Checked *bool
+}
+
 //go:generate go tool counterfeiter . ClaimRepository
 type ClaimRepository interface {
-	GetClaims(ctx context.Context) ([]api.Claim, error)
+	GetClaims(ctx context.Context, claimFilter *ClaimFilter) ([]api.Claim, error)
 	PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error)
 	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
 	DeleteClaimByUriDigest(ctx context.Context, claim *api.Claim) error
@@ -34,9 +38,14 @@ func NewClaimRepository(ctx context.Context, client *pgsql.Client) ClaimReposito
 }
 
 // GetClaims returns all claims from the DB
-func (cr *claimRepository) GetClaims(ctx context.Context) ([]api.Claim, error) {
+func (cr *claimRepository) GetClaims(ctx context.Context, claimFilter *ClaimFilter) ([]api.Claim, error) {
+	filterFields := &ClaimFilter{}
+	if claimFilter != nil {
+		filterFields.Checked = claimFilter.Checked
+	}
+
 	var claims []api.Claim
-	result := cr.client.FindAll(ctx, &claims)
+	result := cr.client.FindAll(ctx, &claims, filterFields)
 
 	if result.Error != nil {
 		return nil, result.Error

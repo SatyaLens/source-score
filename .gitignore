@@ -4,6 +4,7 @@ source-score
 coverage.out
 test_database.db
 .amazonq/
+.gocache/
 
 # ide
 .vscode/

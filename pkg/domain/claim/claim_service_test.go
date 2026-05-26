@@ -63,11 +63,30 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				expected := []api.Claim{sampleClaim1, sampleClaim2}
 				fakeClaimRepo.GetClaimsReturnsOnCall(0, expected, nil)
 
-				claims, err := claimSvc.GetClaims(context.TODO())
+				claims, err := claimSvc.GetClaims(context.TODO(), nil)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(len(claims)).To(Equal(2))
 				Expect(claims).To(ContainElements(expected))
 				Expect(fakeClaimRepo.GetClaimsCallCount()).To(Equal(1))
+			})
+
+			It("Should return claims from repository when ClaimFilter Checked is true", func() {
+				checked := true
+				checkedClaim := sampleClaim2
+				checkedClaim.Checked = true
+				expected := []api.Claim{checkedClaim}
+				filter := &claim.ClaimFilter{Checked: &checked}
+				callsBefore := fakeClaimRepo.GetClaimsCallCount()
+				fakeClaimRepo.GetClaimsReturnsOnCall(callsBefore, expected, nil)
+
+				claims, err := claimSvc.GetClaims(context.TODO(), filter)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(claims).To(Equal(expected))
+				Expect(fakeClaimRepo.GetClaimsCallCount()).To(Equal(callsBefore + 1))
+				_, claimFilter := fakeClaimRepo.GetClaimsArgsForCall(callsBefore)
+				Expect(claimFilter).ToNot(BeNil())
+				Expect(claimFilter.Checked).ToNot(BeNil())
+				Expect(*claimFilter.Checked).To(BeTrue())
 			})
 		})
 

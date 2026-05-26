@@ -467,10 +467,62 @@ var _ = Describe("Claim model tests", func() {
 					resp.Body.Close()
 				}, 10*time.Second, 1*time.Second).Should(Succeed())
 			})
+
+			It("should return only checked claims when checked query parameter is true", func() {
+				checkedClaimsUrl := claimsEndpoint + "?checked=true"
+
+				resp, err := doRequest(http.MethodGet, checkedClaimsUrl, nil)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var claims []api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&claims)
+				Expect(err).To(BeNil())
+				Expect(claims).ToNot(BeEmpty())
+
+				for _, claim := range claims {
+					Expect(claim.Checked).To(BeTrue())
+				}
+			})
+
+			It("should return only unchecked claims when checked query parameter is false", func() {
+				uncheckedClaimsUrl := claimsEndpoint + "?checked=false"
+
+				resp, err := doRequest(http.MethodGet, uncheckedClaimsUrl, nil)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+				var claims []api.Claim
+				err = json.NewDecoder(resp.Body).Decode(&claims)
+				Expect(err).To(BeNil())
+				Expect(claims).ToNot(BeEmpty())
+
+				for _, claim := range claims {
+					Expect(claim.Checked).To(BeFalse())
+				}
+			})
 		})
 	})
 
 	Context("Validation tests", func() {
+		When("GET request is sent with an invalid checked query parameter", func() {
+			It("should return 400 with a boolean parsing error", func() {
+				invalidCheckedClaimsUrl := claimsEndpoint + "?checked=invalid"
+
+				resp, err := doRequest(http.MethodGet, invalidCheckedClaimsUrl, nil)
+				Expect(err).To(BeNil())
+				defer resp.Body.Close()
+				Expect(resp.StatusCode).To(Equal(http.StatusBadRequest))
+
+				var errResp map[string]string
+				err = json.NewDecoder(resp.Body).Decode(&errResp)
+				Expect(err).To(BeNil())
+				Expect(strings.ToLower(errResp["error"])).To(ContainSubstring("invalid syntax"))
+			})
+		})
+
 		When("posting a claim that already exists", func() {
 			It("should return 409 Conflict with error message", func() {
 				dupClaim := api.ClaimInput{
