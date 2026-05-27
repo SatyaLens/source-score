@@ -20,8 +20,11 @@ type Claim struct {
 	// Checked Indicates whether the claim has been verified
 	Checked bool `binding:"required" json:"checked"`
 
+	// Source Complete source entity with calculated credibility score
+	Source *Source `json:"source,omitempty"`
+
 	// SourceUriDigest SHA-256 hash of the parent source URI
-	SourceUriDigest string `binding:"required" json:"sourceUriDigest"`
+	SourceUriDigest string `binding:"required" gorm:"not null;size:64;index:idx_claims_source_uri_digest;index:idx_claims_checked_source_uri_digest,priority:2" json:"sourceUriDigest"`
 
 	// Summary Detailed description of the claim
 	Summary string `binding:"required" json:"summary"`
@@ -77,6 +80,9 @@ type CreateSourceResponse struct {
 
 // Proof Complete proof entity
 type Proof struct {
+	// Claim Complete claim entity with verification status
+	Claim *Claim `json:"claim,omitempty"`
+
 	// ClaimUriDigest SHA-256 hash of the claim URI
 	ClaimUriDigest string `binding:"required" json:"claimUriDigest"`
 
@@ -117,25 +123,25 @@ type ProofPatchInput struct {
 // Source Complete source entity with calculated credibility score
 type Source struct {
 	// DomainUrlNewsData Domain url corresponding to newsdata.io `domainurl` parameter
-	DomainUrlNewsData string `binding:"required" json:"domainUrlNewsData"`
+	DomainUrlNewsData string `binding:"required" gorm:"not null" json:"domainUrlNewsData"`
 
 	// Name Display name of the source
-	Name string `binding:"required" json:"name"`
+	Name string `binding:"required" gorm:"not null" json:"name"`
 
 	// Score Credibility score (0.0 to 1.0) calculated as ratio of valid to total verified claims
-	Score float64 `binding:"required" json:"score"`
+	Score float64 `binding:"required" gorm:"not null;default:0;check:chk_sources_score_range,score >= 0 AND score <= 1" json:"score"`
 
 	// Summary Brief description of the source
-	Summary string `binding:"required" json:"summary"`
+	Summary string `binding:"required" gorm:"not null" json:"summary"`
 
 	// Tags Comma-separated categorization tags
-	Tags string `binding:"required" json:"tags"`
+	Tags string `binding:"required" gorm:"not null" json:"tags"`
 
 	// Uri Unique HTTPS URL of the source
-	Uri string `binding:"required" json:"uri"`
+	Uri string `binding:"required" gorm:"not null;uniqueIndex:idx_sources_uri" json:"uri"`
 
 	// UriDigest SHA-256 hash of the URI, used as primary key
-	UriDigest string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
+	UriDigest string `binding:"required" gorm:"primaryKey;size:64" json:"uriDigest"`
 }
 
 // SourceInput Input schema for creating a new source

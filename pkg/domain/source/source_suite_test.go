@@ -44,7 +44,7 @@ var (
 func TestSource(t *testing.T) {
 	var _ = BeforeSuite(func() {
 		testDB, err = gorm.Open(
-			sqlite.Open(testDBFile),
+			sqlite.Open(testDBFile+"?_foreign_keys=on"),
 			conf.GormConfig,
 		)
 		Expect(err).ToNot(HaveOccurred())

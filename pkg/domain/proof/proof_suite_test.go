@@ -27,8 +27,17 @@ var (
 	proofRepo proof.ProofRepository
 	testDB    *gorm.DB
 
+	sampleSource = api.Source{
+		Name:              "example-source",
+		Uri:               "https://example-source",
+		DomainUrlNewsData: "https://example-source",
+		UriDigest:         "59d8244b13aa5c56a5d29a9f1fb97b079d3de27411e4657a83d73909a894cef5",
+		Summary:           "Example Source",
+		Tags:              "test",
+	}
+
 	sampleClaim = api.Claim{
-		SourceUriDigest: "8649a4126fb4fc9a750f432b729c8477398cf28ca241403b2cd36a6dc841f441",
+		SourceUriDigest: sampleSource.UriDigest,
 		Summary:         "Sample claim for proof tests",
 		Title:           "Sample Claim",
 		Uri:             "https://sample-claim",
@@ -57,7 +66,7 @@ var (
 func TestProof(t *testing.T) {
 	var _ = BeforeSuite(func() {
 		testDB, err = gorm.Open(
-			sqlite.Open(testDBFile),
+			sqlite.Open(testDBFile+"?_foreign_keys=on"),
 			conf.GormConfig,
 		)
 		Expect(err).ToNot(HaveOccurred())
@@ -65,8 +74,11 @@ func TestProof(t *testing.T) {
 		err = testDB.AutoMigrate(&api.Source{}, &api.Claim{}, &api.Proof{})
 		Expect(err).ToNot(HaveOccurred())
 
+		result := testDB.Create(&sampleSource)
+		Expect(result.Error).ToNot(HaveOccurred())
+
 		// insert claim to reference from proofs
-		result := testDB.Create(&sampleClaim)
+		result = testDB.Create(&sampleClaim)
 		Expect(result.Error).ToNot(HaveOccurred())
 
 		// configure repository

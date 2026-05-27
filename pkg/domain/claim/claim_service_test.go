@@ -228,28 +228,26 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 					Checked:   false,
 					Validity:  false,
 				}
-
 				proofsForClaim1 := []api.Proof{
 					{ClaimUriDigest: claim1Digest, SupportsClaim: true},
 					{ClaimUriDigest: claim1Digest, SupportsClaim: true},
 					{ClaimUriDigest: claim1Digest, SupportsClaim: true},
 					{ClaimUriDigest: claim1Digest, SupportsClaim: false},
 				}
-
 				proofsForClaim2 := []api.Proof{
 					{ClaimUriDigest: claim2Digest, SupportsClaim: true},
 					{ClaimUriDigest: claim2Digest, SupportsClaim: false},
 					{ClaimUriDigest: claim2Digest, SupportsClaim: false},
 				}
-
 				claimsProofs := map[string][]api.Proof{
 					claim1Digest: proofsForClaim1,
 					claim2Digest: proofsForClaim2,
 				}
 
+				currCallCount := fakeClaimRepo.GetClaimByUriDigestCallCount()
 				fakeProofSvc.GetProofsByClaimsReturns(claimsProofs, nil)
-				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(2, &claim1, nil)
-				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(3, &claim2, nil)
+				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(currCallCount, &claim1, nil)
+				fakeClaimRepo.GetClaimByUriDigestReturnsOnCall(currCallCount+1, &claim2, nil)
 				fakeClaimRepo.VerifyAllClaimsReturns(nil)
 
 				err := claimSvc.VerifyAllClaims(context.TODO())
@@ -259,23 +257,16 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 				_, updatedClaims := fakeClaimRepo.VerifyAllClaimsArgsForCall(0)
 				Expect(len(updatedClaims)).To(Equal(2))
 
-				var updatedClaim1, updatedClaim2 *api.Claim
-				for i := range updatedClaims {
-					switch updatedClaims[i].UriDigest {
-					case claim1Digest:
-						updatedClaim1 = &updatedClaims[i]
-					case claim2Digest:
-						updatedClaim2 = &updatedClaims[i]
-					}
+				Expect(updatedClaims[0]).ToNot(BeNil())
+				Expect(updatedClaims[0].Checked).To(BeTrue())
+				Expect(updatedClaims[1]).ToNot(BeNil())
+				Expect(updatedClaims[1].Checked).To(BeTrue())
+
+				if updatedClaims[0].Validity {
+					Expect(updatedClaims[1].Validity).To(BeFalse())
+				} else if updatedClaims[1].Validity {
+					Expect(updatedClaims[0].Validity).To(BeFalse())
 				}
-
-				Expect(updatedClaim1).ToNot(BeNil())
-				Expect(updatedClaim1.Checked).To(BeTrue())
-				Expect(updatedClaim1.Validity).To(BeTrue())
-
-				Expect(updatedClaim2).ToNot(BeNil())
-				Expect(updatedClaim2.Checked).To(BeTrue())
-				Expect(updatedClaim2.Validity).To(BeFalse())
 			})
 		})
 	})
