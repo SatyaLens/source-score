@@ -18,28 +18,28 @@ const (
 // Claim Complete claim entity with verification status
 type Claim struct {
 	// Checked Indicates whether the claim has been verified
-	Checked bool `binding:"required" json:"checked"`
+	Checked bool `binding:"required" gorm:"not null;default:false;index:idx_claims_source_uri_digest" json:"checked"`
 
 	// Source Complete source entity with calculated credibility score
 	Source *Source `json:"source,omitempty"`
 
 	// SourceUriDigest SHA-256 hash of the parent source URI
-	SourceUriDigest string `binding:"required" gorm:"not null;size:64;index:idx_claims_source_uri_digest;index:idx_claims_checked_source_uri_digest,priority:2" json:"sourceUriDigest"`
+	SourceUriDigest string `binding:"required" gorm:"not null;size:64;index:idx_claims_source_uri_digest" json:"sourceUriDigest"`
 
 	// Summary Detailed description of the claim
-	Summary string `binding:"required" json:"summary"`
+	Summary string `binding:"required" gorm:"not null;type:text" json:"summary"`
 
 	// Title Short title of the claim
-	Title string `binding:"required" json:"title"`
+	Title string `binding:"required" gorm:"not null" json:"title"`
 
 	// Uri Unique HTTPS URL of the claim
-	Uri string `binding:"required" json:"uri"`
+	Uri string `binding:"required" gorm:"not null;uniqueIndex:idx_claims_uri" json:"uri"`
 
 	// UriDigest SHA-256 hash of the URI, used as primary key
-	UriDigest string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
+	UriDigest string `binding:"required" gorm:"primaryKey;size:64" json:"uriDigest"`
 
 	// Validity Indicates whether the claim is valid (true) or invalid (false) based on proof analysis
-	Validity bool `binding:"required" json:"validity"`
+	Validity bool `binding:"required" gorm:"not null;default:false" json:"validity"`
 }
 
 // ClaimInput Input schema for creating a new claim
@@ -87,16 +87,16 @@ type Proof struct {
 	ClaimUriDigest string `binding:"required" json:"claimUriDigest"`
 
 	// ReviewedBy Identifier of the reviewer
-	ReviewedBy string `binding:"required" json:"reviewedBy"`
+	ReviewedBy string `binding:"required" gorm:"not null" json:"reviewedBy"`
 
 	// SupportsClaim Whether this proof supports (true) or refutes (false) the claim
-	SupportsClaim bool `binding:"required" json:"supportsClaim"`
+	SupportsClaim bool `binding:"required" gorm:"not null;default:false" json:"supportsClaim"`
 
 	// Uri Unique HTTPS URL of the proof source
-	Uri string `binding:"required" json:"uri"`
+	Uri string `binding:"required" gorm:"not null;uniqueIndex:idx_proofs_uri" json:"uri"`
 
 	// UriDigest SHA-256 hash of the URI, used as primary key
-	UriDigest string `binding:"required" gorm:"primaryKey" json:"uriDigest"`
+	UriDigest string `binding:"required" gorm:"primaryKey;size:64" json:"uriDigest"`
 }
 
 // ProofInput Input schema for creating a new proof
@@ -123,7 +123,7 @@ type ProofPatchInput struct {
 // Source Complete source entity with calculated credibility score
 type Source struct {
 	// DomainUrlNewsData Domain url corresponding to newsdata.io `domainurl` parameter
-	DomainUrlNewsData string `binding:"required" gorm:"not null" json:"domainUrlNewsData"`
+	DomainUrlNewsData string `binding:"required" gorm:"type:text" json:"domainUrlNewsData"`
 
 	// Name Display name of the source
 	Name string `binding:"required" gorm:"not null" json:"name"`
@@ -132,10 +132,10 @@ type Source struct {
 	Score float64 `binding:"required" gorm:"not null;default:0;check:chk_sources_score_range,score >= 0 AND score <= 1" json:"score"`
 
 	// Summary Brief description of the source
-	Summary string `binding:"required" gorm:"not null" json:"summary"`
+	Summary string `binding:"required" gorm:"not null;type:text" json:"summary"`
 
 	// Tags Comma-separated categorization tags
-	Tags string `binding:"required" gorm:"not null" json:"tags"`
+	Tags string `binding:"required" gorm:"not null;type:text" json:"tags"`
 
 	// Uri Unique HTTPS URL of the source
 	Uri string `binding:"required" gorm:"not null;uniqueIndex:idx_sources_uri" json:"uri"`

@@ -264,8 +264,8 @@ var _ = Describe("Claim model service layer unit tests", Ordered, func() {
 
 				if updatedClaims[0].Validity {
 					Expect(updatedClaims[1].Validity).To(BeFalse())
-				} else if updatedClaims[1].Validity {
-					Expect(updatedClaims[0].Validity).To(BeFalse())
+				} else {
+					Expect(updatedClaims[1].Validity).To(BeTrue())
 				}
 			})
 		})
