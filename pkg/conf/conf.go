@@ -18,6 +18,7 @@ type conf struct {
 	PgHost            string `env:"PG_HOST" yaml:"PG_HOST" env-required:"true"`
 	Port              string `env:"PORT" yaml:"PORT" env-default:"8080"`
 	SuperUserPassword string `env:"SUPER_USER_PASSWORD" yaml:"SUPER_USER_PASSWORD" env-required:"true"`
+	JwtSecret         string `env:"JWT_SECRET" yaml:"JWT_SECRET" env-default:"default-secret-string"`
 }
 
 var (

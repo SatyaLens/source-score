@@ -9,11 +9,12 @@ import (
 )
 
 const (
-	SamplePort  = "8099"
-	SamplePwd   = "sample-pwd"
-	SampleHost  = "sample-host"
-	SampleSUPwd = "super-pwd"
+	SamplePort   = "8099"
+	SamplePwd    = "sample-pwd"
+	SampleHost   = "sample-host"
+	SampleSUPwd  = "super-pwd"
 	SampleDbName = "test-db"
+	SampleSecret = "env-secret"
 )
 
 var _ = Describe("Conf Tests", func() {
@@ -22,6 +23,7 @@ var _ = Describe("Conf Tests", func() {
 		os.Setenv("PG_HOST", SampleHost)
 		os.Setenv("PORT", SamplePort)
 		os.Setenv("SUPER_USER_PASSWORD", SampleSUPwd)
+		os.Setenv("JWT_SECRET", SampleSecret)
 
 		It("should load the environment variables into the config", func() {
 			os.Unsetenv("DOTENV_PATH")
@@ -31,6 +33,7 @@ var _ = Describe("Conf Tests", func() {
 			Expect(conf.Cfg.PgHost).To(BeEquivalentTo(SampleHost))
 			Expect(conf.Cfg.Port).To(BeEquivalentTo(SamplePort))
 			Expect(conf.Cfg.SuperUserPassword).To(BeEquivalentTo(SampleSUPwd))
+			Expect(conf.Cfg.JwtSecret).To(Equal(SampleSecret))
 		})
 	})
 
@@ -43,6 +46,7 @@ var _ = Describe("Conf Tests", func() {
 			Expect(conf.Cfg.PgHost).To(BeEquivalentTo("env-host"))
 			Expect(conf.Cfg.Port).To(BeEquivalentTo("8999"))
 			Expect(conf.Cfg.SuperUserPassword).To(BeEquivalentTo("user-pwd"))
+			Expect(conf.Cfg.JwtSecret).To(Equal("test-secret"))
 		})
 	})
 

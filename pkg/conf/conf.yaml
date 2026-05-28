@@ -2,3 +2,4 @@ APP_USER_PASSWORD: env-pwd
 PG_HOST: env-host
 PORT: 8999
 SUPER_USER_PASSWORD: user-pwd
+JWT_SECRET: test-secret
