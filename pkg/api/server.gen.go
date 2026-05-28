@@ -182,6 +182,12 @@ type GetClaimsParams struct {
 	Checked *bool `form:"checked,omitempty" json:"checked,omitempty"`
 }
 
+// GetAuthTokenJSONBody defines parameters for GetAuthToken.
+type GetAuthTokenJSONBody struct {
+	// ClientId Client identifier
+	ClientId string `json:"clientId"`
+}
+
 // PostClaimJSONRequestBody defines body for PostClaim for application/json ContentType.
 type PostClaimJSONRequestBody = ClaimInput
 
@@ -202,6 +208,9 @@ type PostSourceJSONRequestBody = SourceInput
 
 // PatchSourceJSONRequestBody defines body for PatchSource for application/json ContentType.
 type PatchSourceJSONRequestBody = SourcePatchInput
+
+// GetAuthTokenJSONRequestBody defines body for GetAuthToken for application/json ContentType.
+type GetAuthTokenJSONRequestBody GetAuthTokenJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -265,6 +274,9 @@ type ServerInterface interface {
 	// Update all source scores
 	// (POST /api/v1/sources/scores)
 	UpdateAllScores(c *gin.Context)
+	// Obtain API token
+	// (POST /auth/token)
+	GetAuthToken(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -721,6 +733,21 @@ func (siw *ServerInterfaceWrapper) UpdateAllScores(c *gin.Context) {
 	siw.Handler.UpdateAllScores(c)
 }
 
+// GetAuthToken operation middleware
+func (siw *ServerInterfaceWrapper) GetAuthToken(c *gin.Context) {
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetAuthToken(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -768,4 +795,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v1/source/:uriDigest/claims", wrapper.GetClaimsBySourceDigest)
 	router.GET(options.BaseURL+"/api/v1/sources", wrapper.GetSources)
 	router.POST(options.BaseURL+"/api/v1/sources/scores", wrapper.UpdateAllScores)
+	router.POST(options.BaseURL+"/auth/token", wrapper.GetAuthToken)
 }

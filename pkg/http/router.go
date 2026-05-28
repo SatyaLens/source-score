@@ -112,3 +112,7 @@ func (r *router) GetClaimsBySourceDigest(ctx *gin.Context, sourceDigest string) 
 func (r *router) GetProofsByClaimDigest(ctx *gin.Context, claimDigest string) {
 	r.proofHandler.GetProofsByClaimDigest(ctx, claimDigest)
 }
+
+func (r *router) GetAuthToken(c *gin.Context) {
+	
+}

@@ -12,6 +12,48 @@ security:
   - ApiKeyAuth: []
 
 paths:
+  /auth/token:
+    post:
+      summary: Obtain API token
+      description: Authenticates a user and returns an API token for subsequent requests
+      tags:
+      - authentication
+      operationId: getAuthToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - clientId
+              properties:
+                clientId:
+                  type: string
+                  description: Client identifier
+                  example: "web-app"
+      responses:
+        200:
+          description: Authentication successful, token returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: API token to be used in the X-API-Key header for authenticated requests
+        401:
+          description: Authentication failed, invalid client ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+
   /api/v1/sources:
     get:
       summary: Get all sources
