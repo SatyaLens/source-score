@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"source-score/pkg/api"
+	"source-score/pkg/conf"
 	"source-score/pkg/domain/claim"
 	"source-score/pkg/domain/proof"
 	"source-score/pkg/domain/source"
@@ -16,6 +17,7 @@ type router struct {
 	srcHandler   *handlers.SourceHandler
 	claimHandler *handlers.ClaimHandler
 	proofHandler *handlers.ProofHandler
+	authHandler  *handlers.AuthHandler
 }
 
 func NewRouter(
@@ -29,6 +31,7 @@ func NewRouter(
 		srcHandler:   handlers.NewSourceHandler(ctx, sourceSvc),
 		claimHandler: handlers.NewClaimHandler(ctx, claimSvc),
 		proofHandler: handlers.NewProofHandler(ctx, proofSvc),
+		authHandler:  handlers.NewAuthHandler(conf.Cfg.JwtSecret),
 	}
 }
 
@@ -114,5 +117,5 @@ func (r *router) GetProofsByClaimDigest(ctx *gin.Context, claimDigest string) {
 }
 
 func (r *router) GetAuthToken(c *gin.Context) {
-	
+	r.authHandler.GetAuthToken(c)
 }

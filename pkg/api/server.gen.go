@@ -184,8 +184,8 @@ type GetClaimsParams struct {
 
 // GetAuthTokenJSONBody defines parameters for GetAuthToken.
 type GetAuthTokenJSONBody struct {
-	// ClientId Client identifier
-	ClientId string `json:"clientId"`
+	// ClientID Client identifier
+	ClientID string `json:"clientID"`
 }
 
 // PostClaimJSONRequestBody defines body for PostClaim for application/json ContentType.

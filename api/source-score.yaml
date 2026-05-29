@@ -26,9 +26,9 @@ paths:
             schema:
               type: object
               required:
-              - clientId
+              - clientID
               properties:
-                clientId:
+                clientID:
                   type: string
                   description: Client identifier
                   example: "web-app"
