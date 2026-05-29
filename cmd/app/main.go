@@ -99,12 +99,17 @@ func main() {
 		serverOpts.Middlewares = append(serverOpts.Middlewares, api.MiddlewareFunc(middleware.RateLimiterMiddleware(10, 20)))
 	}
 
-	// Secure with API key if the env var is set
-	if key, ok := os.LookupEnv("API_KEY"); ok {
-		slog.Info("API Key found, securing the API")
-		// server.Use(middleware.APIKeyMiddleware(key))
-		serverOpts.Middlewares = append(serverOpts.Middlewares, api.MiddlewareFunc(middleware.APIKeyMiddleware(key)))
-	}
+	authTokenMiddleware := middleware.AuthTokenMiddleware(conf.Cfg.JwtSecret)
+	serverOpts.Middlewares = append(
+		serverOpts.Middlewares,
+		func(c *gin.Context) {
+			if c.FullPath() == "/auth/token" {
+				c.Next()
+			} else {
+				authTokenMiddleware(c)
+			}
+		},
+	)
 
 	api.RegisterHandlersWithOptions(
 		server,
