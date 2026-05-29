@@ -522,6 +522,7 @@ components:
       required: true
       schema:
         type: string
+        default: swagger-ui
       description: Client identifier for authentication
 
   schemas:
