@@ -19,19 +19,8 @@ paths:
       tags:
       - authentication
       operationId: getAuthToken
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - clientID
-              properties:
-                clientID:
-                  type: string
-                  description: Client identifier
-                  example: "web-app"
+      parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       responses:
         200:
           description: Authentication successful, token returned
@@ -61,6 +50,8 @@ paths:
       tags:
       - sources
       operationId: getSources
+      parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       responses:
         200:
           description: List of sources retrieved successfully
@@ -78,6 +69,8 @@ paths:
       tags:
       - sources
       operationId: updateAllScores
+      parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       responses:
         202:
           description: Score update process initiated successfully
@@ -91,6 +84,8 @@ paths:
       tags:
       - source
       operationId: postSource
+      parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       requestBody:
         required: true
         content:
@@ -117,6 +112,7 @@ paths:
       - source
       operationId: getSource
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -137,9 +133,10 @@ paths:
       summary: Update source fields
       description: Partially updates a source. Only provided fields will be updated. Empty values are not allowed.
       tags:
-        - source
+      - source
       operationId: patchSource
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -167,6 +164,7 @@ paths:
       - source
       operationId: deleteSource
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -187,6 +185,7 @@ paths:
       - claims
       operationId: getClaimsBySourceDigest
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -211,6 +210,7 @@ paths:
       - claims
       operationId: getClaims
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - name: checked
         in: query
         schema:
@@ -235,6 +235,8 @@ paths:
       tags:
       - claims
       operationId: verifyAllClaims
+      parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       responses:
         202:
           description: Claim verification process initiated successfully
@@ -248,6 +250,8 @@ paths:
       tags:
       - claim
       operationId: postClaim
+      parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       requestBody:
         required: true
         content:
@@ -270,6 +274,7 @@ paths:
       - claim
       operationId: getClaim
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -293,6 +298,7 @@ paths:
       - claim
       operationId: deleteClaim
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -312,6 +318,7 @@ paths:
         - claim
       operationId: patchClaim
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -339,6 +346,7 @@ paths:
       - claim
       operationId: verifyClaim
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -367,6 +375,7 @@ paths:
       - proofs
       operationId: getProofsByClaimDigest
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -390,6 +399,8 @@ paths:
       tags:
       - proofs
       operationId: getProofs
+      parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       responses:
         200:
           description: List of proofs retrieved successfully
@@ -407,6 +418,8 @@ paths:
       tags:
       - proof
       operationId: postProof
+      parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       requestBody:
         required: true
         content:
@@ -429,6 +442,7 @@ paths:
       - proof
       operationId: getProof
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -452,6 +466,7 @@ paths:
       - proof
       operationId: deleteProof
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -468,9 +483,10 @@ paths:
       summary: Update proof reviewer
       description: Updates the reviewer identifier for a proof. Empty values and spaces are not allowed.
       tags:
-        - proof
+      - proof
       operationId: patchProof
       parameters:
+      - $ref: '#/components/parameters/ClientIDHeader'
       - in: path
         name: uriDigest
         required: true
@@ -492,6 +508,15 @@ paths:
           description: Proof not found
 
 components:
+  parameters:
+    ClientIDHeader:
+      name: Client-ID
+      in: header
+      required: true
+      schema:
+        type: string
+      description: Client identifier for authentication
+
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

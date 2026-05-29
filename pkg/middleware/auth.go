@@ -26,7 +26,7 @@ func AuthTokenMiddleware(jwtSecret string) gin.HandlerFunc {
 			jwt.RegisteredClaims{},
 			func(*jwt.Token) (any, error) { return []byte(jwtSecret), nil },
 		)
-		if err != nil {
+		if err != nil || !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}

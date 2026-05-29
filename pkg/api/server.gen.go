@@ -177,15 +177,135 @@ type SourcePatchInput struct {
 	Tags *string `json:"tags" validate:"omitnil,nospace,nonempty"`
 }
 
+// ClientIDHeader defines model for ClientIDHeader.
+type ClientIDHeader = string
+
+// PostClaimParams defines parameters for PostClaim.
+type PostClaimParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// DeleteClaimParams defines parameters for DeleteClaim.
+type DeleteClaimParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// GetClaimParams defines parameters for GetClaim.
+type GetClaimParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// PatchClaimParams defines parameters for PatchClaim.
+type PatchClaimParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// VerifyClaimParams defines parameters for VerifyClaim.
+type VerifyClaimParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// GetProofsByClaimDigestParams defines parameters for GetProofsByClaimDigest.
+type GetProofsByClaimDigestParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
 // GetClaimsParams defines parameters for GetClaims.
 type GetClaimsParams struct {
 	Checked *bool `form:"checked,omitempty" json:"checked,omitempty"`
+
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
 }
 
-// GetAuthTokenJSONBody defines parameters for GetAuthToken.
-type GetAuthTokenJSONBody struct {
-	// ClientID Client identifier
-	ClientID string `json:"clientID"`
+// VerifyAllClaimsParams defines parameters for VerifyAllClaims.
+type VerifyAllClaimsParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// PostProofParams defines parameters for PostProof.
+type PostProofParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// DeleteProofParams defines parameters for DeleteProof.
+type DeleteProofParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// GetProofParams defines parameters for GetProof.
+type GetProofParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// PatchProofParams defines parameters for PatchProof.
+type PatchProofParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// GetProofsParams defines parameters for GetProofs.
+type GetProofsParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// PostSourceParams defines parameters for PostSource.
+type PostSourceParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// DeleteSourceParams defines parameters for DeleteSource.
+type DeleteSourceParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// GetSourceParams defines parameters for GetSource.
+type GetSourceParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// PatchSourceParams defines parameters for PatchSource.
+type PatchSourceParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// GetClaimsBySourceDigestParams defines parameters for GetClaimsBySourceDigest.
+type GetClaimsBySourceDigestParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// GetSourcesParams defines parameters for GetSources.
+type GetSourcesParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// UpdateAllScoresParams defines parameters for UpdateAllScores.
+type UpdateAllScoresParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
+}
+
+// GetAuthTokenParams defines parameters for GetAuthToken.
+type GetAuthTokenParams struct {
+	// ClientID Client identifier for authentication
+	ClientID ClientIDHeader `json:"Client-ID"`
 }
 
 // PostClaimJSONRequestBody defines body for PostClaim for application/json ContentType.
@@ -209,74 +329,71 @@ type PostSourceJSONRequestBody = SourceInput
 // PatchSourceJSONRequestBody defines body for PatchSource for application/json ContentType.
 type PatchSourceJSONRequestBody = SourcePatchInput
 
-// GetAuthTokenJSONRequestBody defines body for GetAuthToken for application/json ContentType.
-type GetAuthTokenJSONRequestBody GetAuthTokenJSONBody
-
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Create a new claim
 	// (POST /api/v1/claim)
-	PostClaim(c *gin.Context)
+	PostClaim(c *gin.Context, params PostClaimParams)
 	// Delete a claim
 	// (DELETE /api/v1/claim/{uriDigest})
-	DeleteClaim(c *gin.Context, uriDigest string)
+	DeleteClaim(c *gin.Context, uriDigest string, params DeleteClaimParams)
 	// Get claim by URI digest
 	// (GET /api/v1/claim/{uriDigest})
-	GetClaim(c *gin.Context, uriDigest string)
+	GetClaim(c *gin.Context, uriDigest string, params GetClaimParams)
 	// Update claim fields
 	// (PATCH /api/v1/claim/{uriDigest})
-	PatchClaim(c *gin.Context, uriDigest string)
+	PatchClaim(c *gin.Context, uriDigest string, params PatchClaimParams)
 	// Verify a single claim
 	// (POST /api/v1/claim/{uriDigest})
-	VerifyClaim(c *gin.Context, uriDigest string)
+	VerifyClaim(c *gin.Context, uriDigest string, params VerifyClaimParams)
 	// Get all the proofs provided for a claim
 	// (GET /api/v1/claim/{uriDigest}/proofs)
-	GetProofsByClaimDigest(c *gin.Context, uriDigest string)
+	GetProofsByClaimDigest(c *gin.Context, uriDigest string, params GetProofsByClaimDigestParams)
 	// Get all claims
 	// (GET /api/v1/claims)
 	GetClaims(c *gin.Context, params GetClaimsParams)
 	// Verify all claims
 	// (POST /api/v1/claims/verify)
-	VerifyAllClaims(c *gin.Context)
+	VerifyAllClaims(c *gin.Context, params VerifyAllClaimsParams)
 	// Create a new proof
 	// (POST /api/v1/proof)
-	PostProof(c *gin.Context)
+	PostProof(c *gin.Context, params PostProofParams)
 	// Delete a proof
 	// (DELETE /api/v1/proof/{uriDigest})
-	DeleteProof(c *gin.Context, uriDigest string)
+	DeleteProof(c *gin.Context, uriDigest string, params DeleteProofParams)
 	// Get proof by URI digest
 	// (GET /api/v1/proof/{uriDigest})
-	GetProof(c *gin.Context, uriDigest string)
+	GetProof(c *gin.Context, uriDigest string, params GetProofParams)
 	// Update proof reviewer
 	// (PATCH /api/v1/proof/{uriDigest})
-	PatchProof(c *gin.Context, uriDigest string)
+	PatchProof(c *gin.Context, uriDigest string, params PatchProofParams)
 	// Get all proofs
 	// (GET /api/v1/proofs)
-	GetProofs(c *gin.Context)
+	GetProofs(c *gin.Context, params GetProofsParams)
 	// Create a new source
 	// (POST /api/v1/source)
-	PostSource(c *gin.Context)
+	PostSource(c *gin.Context, params PostSourceParams)
 	// Delete a source
 	// (DELETE /api/v1/source/{uriDigest})
-	DeleteSource(c *gin.Context, uriDigest string)
+	DeleteSource(c *gin.Context, uriDigest string, params DeleteSourceParams)
 	// Get source by URI digest
 	// (GET /api/v1/source/{uriDigest})
-	GetSource(c *gin.Context, uriDigest string)
+	GetSource(c *gin.Context, uriDigest string, params GetSourceParams)
 	// Update source fields
 	// (PATCH /api/v1/source/{uriDigest})
-	PatchSource(c *gin.Context, uriDigest string)
+	PatchSource(c *gin.Context, uriDigest string, params PatchSourceParams)
 	// Get all the claims made by a source
 	// (GET /api/v1/source/{uriDigest}/claims)
-	GetClaimsBySourceDigest(c *gin.Context, uriDigest string)
+	GetClaimsBySourceDigest(c *gin.Context, uriDigest string, params GetClaimsBySourceDigestParams)
 	// Get all sources
 	// (GET /api/v1/sources)
-	GetSources(c *gin.Context)
+	GetSources(c *gin.Context, params GetSourcesParams)
 	// Update all source scores
 	// (POST /api/v1/sources/scores)
-	UpdateAllScores(c *gin.Context)
+	UpdateAllScores(c *gin.Context, params UpdateAllScoresParams)
 	// Obtain API token
 	// (POST /auth/token)
-	GetAuthToken(c *gin.Context)
+	GetAuthToken(c *gin.Context, params GetAuthTokenParams)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -291,7 +408,36 @@ type MiddlewareFunc func(c *gin.Context)
 // PostClaim operation middleware
 func (siw *ServerInterfaceWrapper) PostClaim(c *gin.Context) {
 
+	var err error
+
 	c.Set(ApiKeyAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PostClaimParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -300,7 +446,7 @@ func (siw *ServerInterfaceWrapper) PostClaim(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostClaim(c)
+	siw.Handler.PostClaim(c, params)
 }
 
 // DeleteClaim operation middleware
@@ -319,6 +465,33 @@ func (siw *ServerInterfaceWrapper) DeleteClaim(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteClaimParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -326,7 +499,7 @@ func (siw *ServerInterfaceWrapper) DeleteClaim(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteClaim(c, uriDigest)
+	siw.Handler.DeleteClaim(c, uriDigest, params)
 }
 
 // GetClaim operation middleware
@@ -345,6 +518,33 @@ func (siw *ServerInterfaceWrapper) GetClaim(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetClaimParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -352,7 +552,7 @@ func (siw *ServerInterfaceWrapper) GetClaim(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetClaim(c, uriDigest)
+	siw.Handler.GetClaim(c, uriDigest, params)
 }
 
 // PatchClaim operation middleware
@@ -371,6 +571,33 @@ func (siw *ServerInterfaceWrapper) PatchClaim(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PatchClaimParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -378,7 +605,7 @@ func (siw *ServerInterfaceWrapper) PatchClaim(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PatchClaim(c, uriDigest)
+	siw.Handler.PatchClaim(c, uriDigest, params)
 }
 
 // VerifyClaim operation middleware
@@ -397,6 +624,33 @@ func (siw *ServerInterfaceWrapper) VerifyClaim(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params VerifyClaimParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -404,7 +658,7 @@ func (siw *ServerInterfaceWrapper) VerifyClaim(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.VerifyClaim(c, uriDigest)
+	siw.Handler.VerifyClaim(c, uriDigest, params)
 }
 
 // GetProofsByClaimDigest operation middleware
@@ -423,6 +677,33 @@ func (siw *ServerInterfaceWrapper) GetProofsByClaimDigest(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetProofsByClaimDigestParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -430,7 +711,7 @@ func (siw *ServerInterfaceWrapper) GetProofsByClaimDigest(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetProofsByClaimDigest(c, uriDigest)
+	siw.Handler.GetProofsByClaimDigest(c, uriDigest, params)
 }
 
 // GetClaims operation middleware
@@ -451,6 +732,30 @@ func (siw *ServerInterfaceWrapper) GetClaims(c *gin.Context) {
 		return
 	}
 
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -464,7 +769,36 @@ func (siw *ServerInterfaceWrapper) GetClaims(c *gin.Context) {
 // VerifyAllClaims operation middleware
 func (siw *ServerInterfaceWrapper) VerifyAllClaims(c *gin.Context) {
 
+	var err error
+
 	c.Set(ApiKeyAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params VerifyAllClaimsParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -473,13 +807,42 @@ func (siw *ServerInterfaceWrapper) VerifyAllClaims(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.VerifyAllClaims(c)
+	siw.Handler.VerifyAllClaims(c, params)
 }
 
 // PostProof operation middleware
 func (siw *ServerInterfaceWrapper) PostProof(c *gin.Context) {
 
+	var err error
+
 	c.Set(ApiKeyAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PostProofParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -488,7 +851,7 @@ func (siw *ServerInterfaceWrapper) PostProof(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostProof(c)
+	siw.Handler.PostProof(c, params)
 }
 
 // DeleteProof operation middleware
@@ -507,6 +870,33 @@ func (siw *ServerInterfaceWrapper) DeleteProof(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteProofParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -514,7 +904,7 @@ func (siw *ServerInterfaceWrapper) DeleteProof(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteProof(c, uriDigest)
+	siw.Handler.DeleteProof(c, uriDigest, params)
 }
 
 // GetProof operation middleware
@@ -533,6 +923,33 @@ func (siw *ServerInterfaceWrapper) GetProof(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetProofParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -540,7 +957,7 @@ func (siw *ServerInterfaceWrapper) GetProof(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetProof(c, uriDigest)
+	siw.Handler.GetProof(c, uriDigest, params)
 }
 
 // PatchProof operation middleware
@@ -559,6 +976,33 @@ func (siw *ServerInterfaceWrapper) PatchProof(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PatchProofParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -566,13 +1010,42 @@ func (siw *ServerInterfaceWrapper) PatchProof(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PatchProof(c, uriDigest)
+	siw.Handler.PatchProof(c, uriDigest, params)
 }
 
 // GetProofs operation middleware
 func (siw *ServerInterfaceWrapper) GetProofs(c *gin.Context) {
 
+	var err error
+
 	c.Set(ApiKeyAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetProofsParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -581,13 +1054,42 @@ func (siw *ServerInterfaceWrapper) GetProofs(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetProofs(c)
+	siw.Handler.GetProofs(c, params)
 }
 
 // PostSource operation middleware
 func (siw *ServerInterfaceWrapper) PostSource(c *gin.Context) {
 
+	var err error
+
 	c.Set(ApiKeyAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PostSourceParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -596,7 +1098,7 @@ func (siw *ServerInterfaceWrapper) PostSource(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostSource(c)
+	siw.Handler.PostSource(c, params)
 }
 
 // DeleteSource operation middleware
@@ -615,6 +1117,33 @@ func (siw *ServerInterfaceWrapper) DeleteSource(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteSourceParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -622,7 +1151,7 @@ func (siw *ServerInterfaceWrapper) DeleteSource(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteSource(c, uriDigest)
+	siw.Handler.DeleteSource(c, uriDigest, params)
 }
 
 // GetSource operation middleware
@@ -641,6 +1170,33 @@ func (siw *ServerInterfaceWrapper) GetSource(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetSourceParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -648,7 +1204,7 @@ func (siw *ServerInterfaceWrapper) GetSource(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetSource(c, uriDigest)
+	siw.Handler.GetSource(c, uriDigest, params)
 }
 
 // PatchSource operation middleware
@@ -667,6 +1223,33 @@ func (siw *ServerInterfaceWrapper) PatchSource(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PatchSourceParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -674,7 +1257,7 @@ func (siw *ServerInterfaceWrapper) PatchSource(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PatchSource(c, uriDigest)
+	siw.Handler.PatchSource(c, uriDigest, params)
 }
 
 // GetClaimsBySourceDigest operation middleware
@@ -693,6 +1276,33 @@ func (siw *ServerInterfaceWrapper) GetClaimsBySourceDigest(c *gin.Context) {
 
 	c.Set(ApiKeyAuthScopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetClaimsBySourceDigestParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -700,13 +1310,42 @@ func (siw *ServerInterfaceWrapper) GetClaimsBySourceDigest(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetClaimsBySourceDigest(c, uriDigest)
+	siw.Handler.GetClaimsBySourceDigest(c, uriDigest, params)
 }
 
 // GetSources operation middleware
 func (siw *ServerInterfaceWrapper) GetSources(c *gin.Context) {
 
+	var err error
+
 	c.Set(ApiKeyAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetSourcesParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -715,13 +1354,42 @@ func (siw *ServerInterfaceWrapper) GetSources(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetSources(c)
+	siw.Handler.GetSources(c, params)
 }
 
 // UpdateAllScores operation middleware
 func (siw *ServerInterfaceWrapper) UpdateAllScores(c *gin.Context) {
 
+	var err error
+
 	c.Set(ApiKeyAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateAllScoresParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -730,13 +1398,42 @@ func (siw *ServerInterfaceWrapper) UpdateAllScores(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.UpdateAllScores(c)
+	siw.Handler.UpdateAllScores(c, params)
 }
 
 // GetAuthToken operation middleware
 func (siw *ServerInterfaceWrapper) GetAuthToken(c *gin.Context) {
 
+	var err error
+
 	c.Set(ApiKeyAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetAuthTokenParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "Client-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Client-ID")]; found {
+		var ClientID ClientIDHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Client-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Client-ID", valueList[0], &ClientID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Client-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.ClientID = ClientID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter Client-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -745,7 +1442,7 @@ func (siw *ServerInterfaceWrapper) GetAuthToken(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetAuthToken(c)
+	siw.Handler.GetAuthToken(c, params)
 }
 
 // GinServerOptions provides options for the Gin server.
