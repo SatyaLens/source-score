@@ -392,7 +392,7 @@ type ServerInterface interface {
 	// (POST /api/v1/sources/scores)
 	UpdateAllScores(c *gin.Context, params UpdateAllScoresParams)
 	// Obtain API token
-	// (GET /auth/token)
+	// (POST /auth/token)
 	GetAuthToken(c *gin.Context, params GetAuthTokenParams)
 }
 
@@ -1490,5 +1490,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v1/source/:uriDigest/claims", wrapper.GetClaimsBySourceDigest)
 	router.GET(options.BaseURL+"/api/v1/sources", wrapper.GetSources)
 	router.POST(options.BaseURL+"/api/v1/sources/scores", wrapper.UpdateAllScores)
-	router.GET(options.BaseURL+"/auth/token", wrapper.GetAuthToken)
+	router.POST(options.BaseURL+"/auth/token", wrapper.GetAuthToken)
 }

@@ -25,6 +25,7 @@ services:
     - PG_HOST=database
     - SUPER_USER_PASSWORD=sourcescore
     - RATE_LIMIT_DISABLED=true
+    - JWT_SECRET=default-secret-string
     ports:
     - "8080:8080"
   adminer:

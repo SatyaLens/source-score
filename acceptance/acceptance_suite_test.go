@@ -140,7 +140,7 @@ func TestSourceScore(t *testing.T) {
 		endpoint, err := url.JoinPath(baseUrl, "/auth/token")
 		Expect(err).To(BeNil())
 
-		resp, err := doRequest(http.MethodGet, endpoint, nil)
+		resp, err := doRequest(http.MethodPost, endpoint, nil)
 		Expect(err).To(BeNil())
 		Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
