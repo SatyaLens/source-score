@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Source Score API Documentation</title>
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui.css"
+        integrity="sha384-rcbEi6xgdPk0iWkAQzT2F3FeBJXdG+ydrawGlfHAFIZG7wU6aKbQaRewysYpmrlW"
+        crossorigin="anonymous"
+    >
+    <style>
+        html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+        *, *:before, *:after { box-sizing: inherit; }
+        body { margin:0; padding:0; }
+    </style>
+</head>
+<body>
+    <button id="swagger-login" style="margin:12px; padding:8px 14px;">
+        Authorize Swagger
+    </button>
+    <div id="swagger-ui"></div>
+    <script
+        src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-bundle.js"
+        integrity="sha384-NXtFPpN61oWCuN4D42K6Zd5Rt2+uxeIT36R7kpXBuY9tLnZorzrJ4ykpqwJfgjpZ"
+        crossorigin="anonymous"
+    ></script>
+    <script
+        src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-standalone-preset.js"
+        integrity="sha384-qr68CD0cvHa88PmVu7e1a58Ego4qvKtcvcLdS2a8Mo5zILI01gyIV9jVwJk7X2NU"
+        crossorigin="anonymous"
+    ></script>
+    <script>
+        window.onload = function() {
+            const DisableAuthorizePlugin = function() {
+                return {
+                    wrapComponents: {
+                        authorizeBtn: () => () => null
+                    }
+                };
+            };
+
+            window.ui = SwaggerUIBundle({
+                url: "/swagger/spec",
+                dom_id: '#swagger-ui',
+                requestInterceptor: (req) => {
+                    if (req.url.includes("/auth/token")) {
+                    req.headers["Client-ID"] = "swagger-ui";
+                    }
+                    return req;
+                },
+                onComplete: () => {
+                    document.getElementById("swagger-login").onclick = async () => {
+                        try {
+                            const res = await fetch("/auth/token", {
+                                method: "POST",
+                                headers: {
+                                    "Client-ID": "swagger-ui"
+                                }
+                            });
+
+                            if (!res.ok) {
+                                throw new Error("token request failed: " + res.status);
+                            }
+
+                            const data = await res.json();
+                            const token = data.token;
+
+                            if (!token) {
+                                throw new Error("no token found in response");
+                            }
+
+                            window.ui.preauthorizeApiKey("BearerAuth", token);
+                            alert("Swagger authorized successfully");
+                        } catch (err) {
+                            console.error(err);
+                            alert("Authorization failed: " + err.message);
+                        }
+                    };
+                },
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl,
+                    DisableAuthorizePlugin
+                ],
+                layout: "StandaloneLayout"
+            });
+        };
+    </script>
+</body>
+</html>
