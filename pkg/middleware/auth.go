@@ -47,7 +47,7 @@ func AuthTokenMiddleware(jwtSecret string) gin.HandlerFunc {
 			if err != nil {
 				slog.Error("failed to parse jwt token", "error", err)
 			}
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid or expired token"})
 			return
 		}
 
