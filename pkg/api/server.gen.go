@@ -11,10 +11,6 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-const (
-	ApiKeyAuthScopes = "ApiKeyAuth.Scopes"
-)
-
 // Claim Complete claim entity with verification status
 type Claim struct {
 	// Checked Indicates whether the claim has been verified
@@ -410,8 +406,6 @@ func (siw *ServerInterfaceWrapper) PostClaim(c *gin.Context) {
 
 	var err error
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params PostClaimParams
 
@@ -462,8 +456,6 @@ func (siw *ServerInterfaceWrapper) DeleteClaim(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
-
-	c.Set(ApiKeyAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params DeleteClaimParams
@@ -516,8 +508,6 @@ func (siw *ServerInterfaceWrapper) GetClaim(c *gin.Context) {
 		return
 	}
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetClaimParams
 
@@ -568,8 +558,6 @@ func (siw *ServerInterfaceWrapper) PatchClaim(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
-
-	c.Set(ApiKeyAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params PatchClaimParams
@@ -622,8 +610,6 @@ func (siw *ServerInterfaceWrapper) VerifyClaim(c *gin.Context) {
 		return
 	}
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params VerifyClaimParams
 
@@ -675,8 +661,6 @@ func (siw *ServerInterfaceWrapper) GetProofsByClaimDigest(c *gin.Context) {
 		return
 	}
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetProofsByClaimDigestParams
 
@@ -718,8 +702,6 @@ func (siw *ServerInterfaceWrapper) GetProofsByClaimDigest(c *gin.Context) {
 func (siw *ServerInterfaceWrapper) GetClaims(c *gin.Context) {
 
 	var err error
-
-	c.Set(ApiKeyAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetClaimsParams
@@ -771,8 +753,6 @@ func (siw *ServerInterfaceWrapper) VerifyAllClaims(c *gin.Context) {
 
 	var err error
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params VerifyAllClaimsParams
 
@@ -814,8 +794,6 @@ func (siw *ServerInterfaceWrapper) VerifyAllClaims(c *gin.Context) {
 func (siw *ServerInterfaceWrapper) PostProof(c *gin.Context) {
 
 	var err error
-
-	c.Set(ApiKeyAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params PostProofParams
@@ -868,8 +846,6 @@ func (siw *ServerInterfaceWrapper) DeleteProof(c *gin.Context) {
 		return
 	}
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params DeleteProofParams
 
@@ -920,8 +896,6 @@ func (siw *ServerInterfaceWrapper) GetProof(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
-
-	c.Set(ApiKeyAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetProofParams
@@ -974,8 +948,6 @@ func (siw *ServerInterfaceWrapper) PatchProof(c *gin.Context) {
 		return
 	}
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params PatchProofParams
 
@@ -1018,8 +990,6 @@ func (siw *ServerInterfaceWrapper) GetProofs(c *gin.Context) {
 
 	var err error
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetProofsParams
 
@@ -1061,8 +1031,6 @@ func (siw *ServerInterfaceWrapper) GetProofs(c *gin.Context) {
 func (siw *ServerInterfaceWrapper) PostSource(c *gin.Context) {
 
 	var err error
-
-	c.Set(ApiKeyAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params PostSourceParams
@@ -1115,8 +1083,6 @@ func (siw *ServerInterfaceWrapper) DeleteSource(c *gin.Context) {
 		return
 	}
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params DeleteSourceParams
 
@@ -1167,8 +1133,6 @@ func (siw *ServerInterfaceWrapper) GetSource(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter uriDigest: %w", err), http.StatusBadRequest)
 		return
 	}
-
-	c.Set(ApiKeyAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetSourceParams
@@ -1221,8 +1185,6 @@ func (siw *ServerInterfaceWrapper) PatchSource(c *gin.Context) {
 		return
 	}
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params PatchSourceParams
 
@@ -1274,8 +1236,6 @@ func (siw *ServerInterfaceWrapper) GetClaimsBySourceDigest(c *gin.Context) {
 		return
 	}
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetClaimsBySourceDigestParams
 
@@ -1317,8 +1277,6 @@ func (siw *ServerInterfaceWrapper) GetClaimsBySourceDigest(c *gin.Context) {
 func (siw *ServerInterfaceWrapper) GetSources(c *gin.Context) {
 
 	var err error
-
-	c.Set(ApiKeyAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetSourcesParams
@@ -1362,8 +1320,6 @@ func (siw *ServerInterfaceWrapper) UpdateAllScores(c *gin.Context) {
 
 	var err error
 
-	c.Set(ApiKeyAuthScopes, []string{})
-
 	// Parameter object where we will unmarshal all parameters from the context
 	var params UpdateAllScoresParams
 
@@ -1405,8 +1361,6 @@ func (siw *ServerInterfaceWrapper) UpdateAllScores(c *gin.Context) {
 func (siw *ServerInterfaceWrapper) GetAuthToken(c *gin.Context) {
 
 	var err error
-
-	c.Set(ApiKeyAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetAuthTokenParams

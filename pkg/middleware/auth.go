@@ -33,7 +33,7 @@ func AuthTokenMiddleware(jwtSecret string) gin.HandlerFunc {
 
 		token, err := jwt.ParseWithClaims(
 			strings.TrimPrefix(authHeader, "Bearer "),
-			jwt.RegisteredClaims{},
+			&jwt.RegisteredClaims{},
 			func(*jwt.Token) (any, error) { return []byte(jwtSecret), nil },
 			jwt.WithAudience(clientID),
 			jwt.WithIssuer(TokenIssuer),

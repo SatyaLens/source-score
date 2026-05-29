@@ -79,7 +79,7 @@ func main() {
 	server.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"https://satyalens.github.io"},
 		AllowMethods:     []string{"GET", "OPTIONS"},
-		AllowHeaders:     []string{"Content-Type", "X-API-Key"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
 	}))
 

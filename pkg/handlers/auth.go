@@ -37,7 +37,7 @@ func (ah *AuthHandler) GetAuthToken(c *gin.Context) {
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    middleware.TokenIssuer,
 		},
-	).SignedString(ah.jwtSecret)
+	).SignedString([]byte(ah.jwtSecret))
 	if err != nil {
 		slog.Error("failed to generate auth token", "error", err)
 		c.JSON(
