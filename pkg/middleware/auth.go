@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -21,13 +22,24 @@ func AuthTokenMiddleware(jwtSecret string) gin.HandlerFunc {
 			return
 		}
 
+		clientID := c.GetHeader(ClientIDHeader)
+		if clientID == "" {
+			c.JSON(
+				http.StatusBadRequest,
+				gin.H{"error": fmt.Sprintf("%s header missing", ClientIDHeader)},
+			)
+			return
+		}
+
 		token, err := jwt.ParseWithClaims(
 			strings.TrimPrefix(authHeader, "Bearer "),
 			jwt.RegisteredClaims{},
 			func(*jwt.Token) (any, error) { return []byte(jwtSecret), nil },
+			jwt.WithAudience(clientID),
+			jwt.WithIssuer(TokenIssuer),
 		)
 		if err != nil || !token.Valid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
 
