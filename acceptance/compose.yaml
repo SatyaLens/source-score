@@ -24,8 +24,8 @@ services:
     - APP_USER_PASSWORD=sourcescore
     - PG_HOST=database
     - SUPER_USER_PASSWORD=sourcescore
-    - API_KEY=demo-api-key
     - RATE_LIMIT_DISABLED=true
+    - JWT_SECRET=default-secret-string
     ports:
     - "8080:8080"
   adminer:

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"source-score/pkg/api"
+	"source-score/pkg/domain/claim"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -116,7 +117,7 @@ var _ = Describe("Claim repository layer unit tests", func() {
 
 			It("Should return checked claims when ClaimFilter Checked is true", func() {
 				checked := true
-				claims, err := claimRepo.GetClaims(context.TODO(), &api.GetClaimsParams{
+				claims, err := claimRepo.GetClaims(context.TODO(), &claim.ClaimFilter{
 					Checked: &checked,
 				})
 				Expect(err).ToNot(HaveOccurred())

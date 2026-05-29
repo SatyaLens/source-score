@@ -14,7 +14,7 @@ import (
 
 //go:generate go tool counterfeiter . ClaimRepository
 type ClaimRepository interface {
-	GetClaims(ctx context.Context, claimFilter *api.GetClaimsParams) ([]api.Claim, error)
+	GetClaims(ctx context.Context, claimFilter *ClaimFilter) ([]api.Claim, error)
 	PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error)
 	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
 	DeleteClaimByUriDigest(ctx context.Context, claim *api.Claim) error
@@ -34,10 +34,9 @@ func NewClaimRepository(ctx context.Context, client *pgsql.Client) ClaimReposito
 }
 
 // GetClaims returns all claims from the DB
-func (cr *claimRepository) GetClaims(ctx context.Context, claimFilter *api.GetClaimsParams) ([]api.Claim, error) {
+func (cr *claimRepository) GetClaims(ctx context.Context, claimFilter *ClaimFilter) ([]api.Claim, error) {
 	var claims []api.Claim
 	result := cr.client.FindAll(ctx, &claims, claimFilter)
-
 	if result.Error != nil {
 		return nil, result.Error
 	}

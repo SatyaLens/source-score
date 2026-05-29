@@ -2,9 +2,11 @@ package acceptance_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"source-score/pkg/api"
 	"source-score/pkg/helpers"
@@ -32,10 +34,14 @@ const (
 )
 
 var (
-	baseUrl        string
-	commonHeaders  = map[string]string{"X-API-Key": "demo-api-key"}
-	client         = &http.Client{Timeout: 10 * time.Second}
-	serverPort     = os.Getenv("PORT")
+	baseUrl string
+	token   string
+
+	commonHeaders = map[string]string{
+		"Client-ID": "ac-tests",
+	}
+	client       = &http.Client{Timeout: 10 * time.Second}
+	serverPort   = os.Getenv("PORT")
 	sourceInput1 = api.SourceInput{
 		Name:    "Sample Source 1",
 		Summary: "Sample summary",
@@ -129,6 +135,25 @@ func TestSourceScore(t *testing.T) {
 	}
 
 	baseUrl = "http://" + helpers.Localhost + ":" + serverPort
+
+	var _ = BeforeSuite(func() {
+		endpoint, err := url.JoinPath(baseUrl, "/auth/token")
+		Expect(err).To(BeNil())
+
+		resp, err := doRequest(http.MethodPost, endpoint, nil)
+		Expect(err).To(BeNil())
+		Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+		defer resp.Body.Close()
+		var tokenResp map[string]string
+		err = json.NewDecoder(resp.Body).Decode(&tokenResp)
+		Expect(err).To(BeNil())
+
+		token = tokenResp["token"]
+		Expect(token).ToNot(Equal(""))
+
+		commonHeaders["Authorization"] = "Bearer " + token
+	})
 
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "SourceScore Acceptance Test Suite")
