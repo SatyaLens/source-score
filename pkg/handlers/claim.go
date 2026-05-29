@@ -27,7 +27,11 @@ func NewClaimHandler(ctx context.Context, claimSvc claim.ClaimService) *ClaimHan
 }
 
 func (ch *ClaimHandler) GetClaims(ctx *gin.Context, params api.GetClaimsParams) {
-	claims, err := ch.claimSvc.GetClaims(ctx, &params)
+	claimFilter := &claim.ClaimFilter{
+		Checked: params.Checked,
+	}
+
+	claims, err := ch.claimSvc.GetClaims(ctx, claimFilter)
 	if err != nil {
 		slog.Error("failed to get claims", "error", err)
 		ctx.JSON(

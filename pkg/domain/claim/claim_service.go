@@ -18,7 +18,7 @@ import (
 
 //go:generate go tool counterfeiter . ClaimService
 type ClaimService interface {
-	GetClaims(ctx context.Context, claimFilter *api.GetClaimsParams) ([]api.Claim, error)
+	GetClaims(ctx context.Context, claimFilter *ClaimFilter) ([]api.Claim, error)
 	PostClaim(ctx context.Context, claimInput *api.ClaimInput) (string, error)
 	GetClaimByUriDigest(ctx context.Context, uriDigest string) (*api.Claim, error)
 	DeleteClaimByUriDigest(ctx context.Context, uriDigest string) error
@@ -26,6 +26,10 @@ type ClaimService interface {
 	VerifyClaimByUriDigest(ctx context.Context, claimVerification *api.ClaimVerification, uriDigest string) error
 	VerifyAllClaims(ctx context.Context) error
 	GetClaimsBySourceDigest(ctx context.Context, sourceDigest string) ([]api.Claim, error)
+}
+
+type ClaimFilter struct {
+	Checked *bool
 }
 
 type claimService struct {
@@ -53,7 +57,7 @@ func NewClaimService(ctx context.Context, claimRepo ClaimRepository, proofSvc pr
 	}
 }
 
-func (svc *claimService) GetClaims(ctx context.Context, claimFilter *api.GetClaimsParams) ([]api.Claim, error) {
+func (svc *claimService) GetClaims(ctx context.Context, claimFilter *ClaimFilter) ([]api.Claim, error) {
 	return svc.claimRepo.GetClaims(ctx, claimFilter)
 }
 
