@@ -5,8 +5,11 @@ info:
   version: 0.1.0
 
 servers:
-  - url: /
-    description: Current host
+- url: /
+  description: Current host
+
+security:
+- BearerAuth: []
 
 paths:
   /auth/token:
@@ -15,6 +18,7 @@ paths:
       description: Authenticates a user and returns an API token for subsequent requests
       tags:
       - authentication
+      security: []
       operationId: getAuthToken
       parameters:
       - $ref: '#/components/parameters/ClientIDHeader'
@@ -505,6 +509,12 @@ paths:
           description: Proof not found
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
   parameters:
     ClientIDHeader:
       name: Client-ID

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -39,7 +40,10 @@ func AuthTokenMiddleware(jwtSecret string) gin.HandlerFunc {
 			jwt.WithIssuer(TokenIssuer),
 		)
 		if err != nil || !token.Valid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			if err != nil {
+				slog.Error("failed to parse jwt token", "error", err)
+			}
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
 
