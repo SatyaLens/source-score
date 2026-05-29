@@ -13,7 +13,7 @@ security:
 
 paths:
   /auth/token:
-    post:
+    get:
       summary: Obtain API token
       description: Authenticates a user and returns an API token for subsequent requests
       tags:
