@@ -1,96 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Source Score API Documentation</title>
-    <link
-        rel="stylesheet"
-        type="text/css"
-        href="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui.css"
-        integrity="sha384-rcbEi6xgdPk0iWkAQzT2F3FeBJXdG+ydrawGlfHAFIZG7wU6aKbQaRewysYpmrlW"
-        crossorigin="anonymous"
-    >
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui.css"
+        integrity="sha384-rcbEi6xgdPk0iWkAQzT2F3FeBJXdG+ydrawGlfHAFIZG7wU6aKbQaRewysYpmrlW" crossorigin="anonymous" />
     <style>
-        html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
-        *, *:before, *:after { box-sizing: inherit; }
-        body { margin:0; padding:0; }
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
+
 <body>
-    <button id="swagger-login" style="margin:12px; padding:8px 14px;">
-        Authorize Swagger
-    </button>
     <div id="swagger-ui"></div>
-    <script
-        src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-bundle.js"
+
+    <script src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-bundle.js"
         integrity="sha384-NXtFPpN61oWCuN4D42K6Zd5Rt2+uxeIT36R7kpXBuY9tLnZorzrJ4ykpqwJfgjpZ"
-        crossorigin="anonymous"
-    ></script>
-    <script
-        src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-standalone-preset.js"
+        crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-standalone-preset.js"
         integrity="sha384-qr68CD0cvHa88PmVu7e1a58Ego4qvKtcvcLdS2a8Mo5zILI01gyIV9jVwJk7X2NU"
-        crossorigin="anonymous"
-    ></script>
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"
+        integrity="sha384-+pxiN6T7yvpryuJmE1gM9PX7yQit15auDb+ZwwvJOd/4be2Cie5/IuVXgQb/S9du"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        window.onload = function() {
-            const DisableAuthorizePlugin = function() {
+        window.onload = async function () {
+            const AutoAuthorizePlugin = function (system) {
                 return {
                     wrapComponents: {
-                        authorizeBtn: () => () => null
+                        authorizeBtn: () => function AuthorizeBtnOverride(props) {
+                            const React = system.React;
+
+                            const handleClick = async () => {
+                                try {
+                                    const res = await fetch("/auth/token", {
+                                        method: "POST",
+                                        headers: {
+                                            "Client-ID": "swagger-ui"
+                                        }
+                                    });
+
+                                    if (!res.ok) {
+                                        throw new Error("token request failed: " + res.status);
+                                    }
+
+                                    const data = await res.json();
+                                    const token = data.token;
+
+                                    if (!token) {
+                                        throw new Error("no token found in response");
+                                    }
+
+                                    window.ui.preauthorizeApiKey("BearerAuth", token);
+
+                                    const btn = document.querySelector(".auth-wrapper .authorize");
+                                    if (btn) {
+                                        btn.classList.remove("unlocked");
+                                        btn.classList.add("locked");
+                                        btn.setAttribute("aria-label", "Authorized");
+                                        btn.title = "Authorized";
+                                    }
+                                } catch (err) {
+                                    console.error(err);
+                                    alert("Authorization failed: " + err.message);
+                                }
+                            };
+
+                            const isAuthorized =
+                                document.querySelector(".auth-wrapper .authorize.locked") !== null;
+
+                            return React.createElement(
+                                "button",
+                                {
+                                    type: "button",
+                                    className: isAuthorized
+                                        ? "btn authorize locked"
+                                        : "btn authorize unlocked",
+                                    onClick: handleClick,
+                                    title: isAuthorized ? "Authorized" : "Authorize",
+                                    "aria-label": isAuthorized ? "Authorized" : "Authorize"
+                                },
+                                "Authorize"
+                            );
+                        }
                     }
                 };
             };
 
-            window.ui = SwaggerUIBundle({
-                url: "/swagger/spec",
-                dom_id: '#swagger-ui',
-                requestInterceptor: (req) => {
-                    if (req.url.includes("/auth/token")) {
-                    req.headers["Client-ID"] = "swagger-ui";
-                    }
-                    return req;
-                },
-                onComplete: () => {
-                    document.getElementById("swagger-login").onclick = async () => {
-                        try {
-                            const res = await fetch("/auth/token", {
-                                method: "POST",
-                                headers: {
-                                    "Client-ID": "swagger-ui"
-                                }
-                            });
+            try {
+                const res = await fetch("/swagger/spec");
+                if (!res.ok) {
+                    throw new Error("failed to load swagger spec: " + res.status);
+                }
 
-                            if (!res.ok) {
-                                throw new Error("token request failed: " + res.status);
-                            }
+                const yamlText = await res.text();
+                const spec = jsyaml.load(yamlText);
 
-                            const data = await res.json();
-                            const token = data.token;
+                if (spec.paths && spec.paths["/auth/token"]) {
+                    delete spec.paths["/auth/token"];
+                }
 
-                            if (!token) {
-                                throw new Error("no token found in response");
-                            }
-
-                            window.ui.preauthorizeApiKey("BearerAuth", token);
-                            alert("Swagger authorized successfully");
-                        } catch (err) {
-                            console.error(err);
-                            alert("Authorization failed: " + err.message);
+                window.ui = SwaggerUIBundle({
+                    spec: spec,
+                    dom_id: "#swagger-ui",
+                    requestInterceptor: (req) => {
+                        if (req.url.includes("/auth/token")) {
+                            req.headers["Client-ID"] = "swagger-ui";
                         }
-                    };
-                },
-                deepLinking: true,
-                presets: [
-                    SwaggerUIBundle.presets.apis,
-                    SwaggerUIStandalonePreset
-                ],
-                plugins: [
-                    SwaggerUIBundle.plugins.DownloadUrl,
-                    DisableAuthorizePlugin
-                ],
-                layout: "StandaloneLayout"
-            });
+                        return req;
+                    },
+                    deepLinking: true,
+                    presets: [
+                        SwaggerUIBundle.presets.apis,
+                        SwaggerUIStandalonePreset
+                    ],
+                    plugins: [
+                        SwaggerUIBundle.plugins.DownloadUrl,
+                        AutoAuthorizePlugin
+                    ],
+                    layout: "StandaloneLayout"
+                });
+            } catch (err) {
+                console.error(err);
+                document.getElementById("swagger-ui").innerHTML =
+                    "<div style='padding:20px;font-family:sans-serif;color:#b00020;'>Failed to load Swagger UI</div>";
+            }
         };
     </script>
 </body>
+
 </html>
