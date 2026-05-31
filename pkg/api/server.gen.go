@@ -177,6 +177,15 @@ type SourcePatchInput struct {
 	Tags *string `json:"tags" validate:"omitnil,nospace,nonempty"`
 }
 
+// SourcesPage defines model for SourcesPage.
+type SourcesPage struct {
+	Data    []Source `json:"data"`
+	HasNext bool     `json:"has_next"`
+	Page    int      `json:"page"`
+	Size    int      `json:"size"`
+	Total   int      `json:"total"`
+}
+
 // ClientIDHeader defines model for ClientIDHeader.
 type ClientIDHeader = string
 
@@ -292,6 +301,9 @@ type GetClaimsBySourceDigestParams struct {
 
 // GetSourcesParams defines parameters for GetSources.
 type GetSourcesParams struct {
+	Page *int `form:"page,omitempty" json:"page,omitempty"`
+	Size *int `form:"size,omitempty" json:"size,omitempty"`
+
 	// ClientID Client identifier for authentication
 	ClientID ClientIDHeader `json:"Client-ID"`
 }
@@ -1322,6 +1334,22 @@ func (siw *ServerInterfaceWrapper) GetSources(c *gin.Context) {
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetSourcesParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", c.Request.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "size" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "size", c.Request.URL.Query(), &params.Size)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter size: %w", err), http.StatusBadRequest)
+		return
+	}
 
 	headers := c.Request.Header
 
