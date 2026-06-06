@@ -53,6 +53,21 @@ paths:
       operationId: getSources
       parameters:
       - $ref: '#/components/parameters/ClientIDHeader'
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
       responses:
         200:
           description: List of sources retrieved successfully
@@ -61,7 +76,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Source'
+                  $ref: '#/components/schemas/SourcesPage'
 
   /api/v1/sources/scores:
     post:
@@ -670,6 +685,23 @@ components:
             binding: required
             gorm: "type:text"
 
+    SourcesPage:
+      type: object
+      required: [data, total, page, size, has_next]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Source"
+        total:
+          type: integer
+        page:
+          type: integer
+        size:
+          type: integer
+        has_next:
+          type: boolean
+    
     CreateSourceResponse:
       type: object
       description: Response after successfully creating a source
